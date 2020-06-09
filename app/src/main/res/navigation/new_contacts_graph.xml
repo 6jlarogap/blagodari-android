@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/new_contacts_graph"
+    app:startDestination="@id/newContactsFragment">
+
+    <fragment
+        android:id="@+id/newContactsFragment"
+        android:name="com.vsdrozd.blagodarie.ui.newcontacts.NewContactsFragment"
+        android:label="NewContactsFragment" />
+</navigation>

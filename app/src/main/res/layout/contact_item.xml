@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/tvSumLikesCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:text="@{String.valueOf(Contact.sumLikeCount)}"/>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical">
+
+                <include layout="@layout/photo"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center"
+                    app:Contact="@{Contact}"/>
+
+                <Button
+                    android:id="@+id/btnLike"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/heart"
+                    android:layout_gravity="end|bottom"
+                    android:text="@{String.valueOf(Contact.likeCount)}"
+                    android:onClick="@{() -> OnLikeCreateListener.onCreateLike(Contact.id)}" />
+
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tvFame"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:text="@{String.valueOf(Contact.fame)}"/>
+
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:minLines="3"
+                android:maxLines="3"
+                android:textSize="12sp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:text="@{Contact.title}"/>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="Contact"
+            type="com.vsdrozd.blagodarie.db.scheme.Contact"/>
+
+        <variable
+            name="OnLikeCreateListener"
+            type="com.vsdrozd.blagodarie.ui.OnLikeCreateListener" />
+
+    </data>
+
+</layout>

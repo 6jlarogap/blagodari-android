@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:civ_border_width="2dp"
+            app:civ_border_color="#00000000"
+            android:layout_gravity="center"
+            app:url="@{Contact.photoUri}"
+            android:visibility="@{Contact.photoUri != null ? View.VISIBLE : View.GONE}" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:visibility="@{Contact.photoUri == null ? View.VISIBLE : View.GONE}" >
+
+            <ImageView
+                android:id="@+id/civCircle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/circle"
+                android:tint="@android:color/darker_gray"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@{String.valueOf(Contact.title.charAt(0))}"
+                android:textSize="56sp"
+                android:textColor="@android:color/white"/>
+
+        </FrameLayout>
+
+    </FrameLayout>
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="Contact"
+            type="com.vsdrozd.blagodarie.db.scheme.Contact" />
+
+    </data>
+
+</layout>

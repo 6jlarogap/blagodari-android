@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvWarnings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="vertical" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Нет предупреждений"
+        android:visibility="@{ViewModel.mHaveWarnings ? View.GONE : View.VISIBLE}"/>
+
+</LinearLayout>
+
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="ViewModel"
+            type="com.vsdrozd.blagodarie.ui.warning.WarningViewModel" />
+    </data>
+</layout>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="on_get_data">Синхронизация контактов (получение контактов %d из %d)</string>
+    <string name="on_processing_contacts">Синхронизация контактов (обработка %d-%d из %d)</string>
+    <string name="on_database_write">Синхронизация контактов (запись в БД %d-%d из %d)</string>
+    <string name="on_contact_repository_write">Синхронизация контактов (запись идентификаторов %d-%d из %d)</string>
+</resources>

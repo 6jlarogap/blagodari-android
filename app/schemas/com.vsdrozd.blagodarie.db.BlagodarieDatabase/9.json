@@ -1,0 +1,571 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 9,
+    "identityHash": "917b5b60962a19c6dca0fb1de16f67a6",
+    "entities": [
+      {
+        "tableName": "tbl_keyztype",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`Id` INTEGER PRIMARY KEY AUTOINCREMENT, `title` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "Id",
+            "columnName": "Id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "Title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "Id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_tbl_keyztype_title",
+            "unique": true,
+            "columnNames": [
+              "title"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_tbl_keyztype_title` ON `${TABLE_NAME}` (`title`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "tbl_user",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`Id` INTEGER PRIMARY KEY AUTOINCREMENT, `server_id` INTEGER, `sync_timestamp` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "Id",
+            "columnName": "Id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ServerId",
+            "columnName": "server_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "SyncTimestamp",
+            "columnName": "sync_timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "Id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_tbl_user_server_id",
+            "unique": true,
+            "columnNames": [
+              "server_id"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_tbl_user_server_id` ON `${TABLE_NAME}` (`server_id`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "tbl_keyz",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`Id` INTEGER PRIMARY KEY AUTOINCREMENT, `server_id` INTEGER, `owner_id` INTEGER, `value` TEXT NOT NULL, `type_id` INTEGER NOT NULL, FOREIGN KEY(`owner_id`) REFERENCES `tbl_user`(`Id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`type_id`) REFERENCES `tbl_keyztype`(`Id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "Id",
+            "columnName": "Id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ServerId",
+            "columnName": "server_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "OwnerId",
+            "columnName": "owner_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "Value",
+            "columnName": "value",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "TypeId",
+            "columnName": "type_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "Id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_tbl_keyz_value_type_id",
+            "unique": true,
+            "columnNames": [
+              "value",
+              "type_id"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_tbl_keyz_value_type_id` ON `${TABLE_NAME}` (`value`, `type_id`)"
+          },
+          {
+            "name": "index_tbl_keyz_owner_id",
+            "unique": false,
+            "columnNames": [
+              "owner_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tbl_keyz_owner_id` ON `${TABLE_NAME}` (`owner_id`)"
+          },
+          {
+            "name": "index_tbl_keyz_type_id",
+            "unique": false,
+            "columnNames": [
+              "type_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tbl_keyz_type_id` ON `${TABLE_NAME}` (`type_id`)"
+          },
+          {
+            "name": "index_tbl_keyz_value",
+            "unique": false,
+            "columnNames": [
+              "value"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tbl_keyz_value` ON `${TABLE_NAME}` (`value`)"
+          },
+          {
+            "name": "index_tbl_keyz_server_id",
+            "unique": true,
+            "columnNames": [
+              "server_id"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_tbl_keyz_server_id` ON `${TABLE_NAME}` (`server_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "tbl_user",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "owner_id"
+            ],
+            "referencedColumns": [
+              "Id"
+            ]
+          },
+          {
+            "table": "tbl_keyztype",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "type_id"
+            ],
+            "referencedColumns": [
+              "Id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "tbl_contact",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`Id` INTEGER PRIMARY KEY AUTOINCREMENT, `server_id` INTEGER, `owner_id` INTEGER NOT NULL, `lookup_key` TEXT NOT NULL, `name` TEXT NOT NULL, `photo_uri` TEXT, `likes_count` INTEGER NOT NULL, `fame` INTEGER NOT NULL, `sum_likes_count` INTEGER NOT NULL, `is_actual` INTEGER NOT NULL, `is_need_sync` INTEGER NOT NULL, `update_timestamp` INTEGER NOT NULL, FOREIGN KEY(`owner_id`) REFERENCES `tbl_user`(`Id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "Id",
+            "columnName": "Id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ServerId",
+            "columnName": "server_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "OwnerId",
+            "columnName": "owner_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "LookupKey",
+            "columnName": "lookup_key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "Name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "PhotoURI",
+            "columnName": "photo_uri",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "LikesCount",
+            "columnName": "likes_count",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "Fame",
+            "columnName": "fame",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "SumLikesCount",
+            "columnName": "sum_likes_count",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "IsActual",
+            "columnName": "is_actual",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "IsNeedSync",
+            "columnName": "is_need_sync",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "UpdateTimestamp",
+            "columnName": "update_timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "Id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_tbl_contact_lookup_key",
+            "unique": true,
+            "columnNames": [
+              "lookup_key"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_tbl_contact_lookup_key` ON `${TABLE_NAME}` (`lookup_key`)"
+          },
+          {
+            "name": "index_tbl_contact_owner_id",
+            "unique": false,
+            "columnNames": [
+              "owner_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tbl_contact_owner_id` ON `${TABLE_NAME}` (`owner_id`)"
+          },
+          {
+            "name": "index_tbl_contact_name",
+            "unique": false,
+            "columnNames": [
+              "name"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tbl_contact_name` ON `${TABLE_NAME}` (`name`)"
+          },
+          {
+            "name": "index_tbl_contact_likes_count",
+            "unique": false,
+            "columnNames": [
+              "likes_count"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tbl_contact_likes_count` ON `${TABLE_NAME}` (`likes_count`)"
+          },
+          {
+            "name": "index_tbl_contact_fame",
+            "unique": false,
+            "columnNames": [
+              "fame"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tbl_contact_fame` ON `${TABLE_NAME}` (`fame`)"
+          },
+          {
+            "name": "index_tbl_contact_sum_likes_count",
+            "unique": false,
+            "columnNames": [
+              "sum_likes_count"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tbl_contact_sum_likes_count` ON `${TABLE_NAME}` (`sum_likes_count`)"
+          },
+          {
+            "name": "index_tbl_contact_update_timestamp",
+            "unique": false,
+            "columnNames": [
+              "update_timestamp"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tbl_contact_update_timestamp` ON `${TABLE_NAME}` (`update_timestamp`)"
+          },
+          {
+            "name": "index_tbl_contact_server_id",
+            "unique": true,
+            "columnNames": [
+              "server_id"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_tbl_contact_server_id` ON `${TABLE_NAME}` (`server_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "tbl_user",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "owner_id"
+            ],
+            "referencedColumns": [
+              "Id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "tbl_contact_keyz",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`Id` INTEGER PRIMARY KEY AUTOINCREMENT, `server_id` INTEGER, `contact_id` INTEGER NOT NULL, `keyz_id` INTEGER NOT NULL, `is_actual` INTEGER NOT NULL, `is_need_sync` INTEGER NOT NULL, FOREIGN KEY(`contact_id`) REFERENCES `tbl_contact`(`Id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`keyz_id`) REFERENCES `tbl_keyz`(`Id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "Id",
+            "columnName": "Id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ServerId",
+            "columnName": "server_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ContactId",
+            "columnName": "contact_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "KeyzId",
+            "columnName": "keyz_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "IsActual",
+            "columnName": "is_actual",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "IsNeedSync",
+            "columnName": "is_need_sync",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "Id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_tbl_contact_keyz_contact_id_keyz_id",
+            "unique": true,
+            "columnNames": [
+              "contact_id",
+              "keyz_id"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_tbl_contact_keyz_contact_id_keyz_id` ON `${TABLE_NAME}` (`contact_id`, `keyz_id`)"
+          },
+          {
+            "name": "index_tbl_contact_keyz_contact_id",
+            "unique": false,
+            "columnNames": [
+              "contact_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tbl_contact_keyz_contact_id` ON `${TABLE_NAME}` (`contact_id`)"
+          },
+          {
+            "name": "index_tbl_contact_keyz_keyz_id",
+            "unique": false,
+            "columnNames": [
+              "keyz_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tbl_contact_keyz_keyz_id` ON `${TABLE_NAME}` (`keyz_id`)"
+          },
+          {
+            "name": "index_tbl_contact_keyz_server_id",
+            "unique": true,
+            "columnNames": [
+              "server_id"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_tbl_contact_keyz_server_id` ON `${TABLE_NAME}` (`server_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "tbl_contact",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "contact_id"
+            ],
+            "referencedColumns": [
+              "Id"
+            ]
+          },
+          {
+            "table": "tbl_keyz",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "keyz_id"
+            ],
+            "referencedColumns": [
+              "Id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "tbl_like",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`Id` INTEGER PRIMARY KEY AUTOINCREMENT, `server_id` INTEGER, `owner_id` INTEGER NOT NULL, `contact_id` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, FOREIGN KEY(`owner_id`) REFERENCES `tbl_user`(`Id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`contact_id`) REFERENCES `tbl_contact`(`Id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "Id",
+            "columnName": "Id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ServerId",
+            "columnName": "server_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "OwnerId",
+            "columnName": "owner_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ContactId",
+            "columnName": "contact_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "Timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "Id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_tbl_like_owner_id_contact_id_timestamp",
+            "unique": true,
+            "columnNames": [
+              "owner_id",
+              "contact_id",
+              "timestamp"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_tbl_like_owner_id_contact_id_timestamp` ON `${TABLE_NAME}` (`owner_id`, `contact_id`, `timestamp`)"
+          },
+          {
+            "name": "index_tbl_like_owner_id",
+            "unique": false,
+            "columnNames": [
+              "owner_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tbl_like_owner_id` ON `${TABLE_NAME}` (`owner_id`)"
+          },
+          {
+            "name": "index_tbl_like_contact_id",
+            "unique": false,
+            "columnNames": [
+              "contact_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tbl_like_contact_id` ON `${TABLE_NAME}` (`contact_id`)"
+          },
+          {
+            "name": "index_tbl_like_server_id",
+            "unique": true,
+            "columnNames": [
+              "server_id"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_tbl_like_server_id` ON `${TABLE_NAME}` (`server_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "tbl_user",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "owner_id"
+            ],
+            "referencedColumns": [
+              "Id"
+            ]
+          },
+          {
+            "table": "tbl_contact",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "contact_id"
+            ],
+            "referencedColumns": [
+              "Id"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '917b5b60962a19c6dca0fb1de16f67a6')"
+    ]
+  }
+}

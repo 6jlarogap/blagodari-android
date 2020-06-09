@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContactsAccountType
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+    <!--
+    inviteContactActivity="activity_name"
+    inviteContactActionLabel="invite_command_text"
+    viewContactNotifyService="view_notify_service"
+    viewGroupActivity="group_view_activity"
+    viewGroupActionLabel="group_action_text"
+    viewStreamItemActivity="viewstream_activity_name"
+    viewStreamItemPhotoActivity="viewphotostream_activity_name"
+    -->
+
+
+    <ContactsDataKind
+        android:detailColumn="data2"
+        android:icon="@drawable/ic_launcher"
+        android:mimeType="vnd.android.cursor.item/vnd.org.blagodarie.contact_id"
+        android:summaryColumn="data1" />
+
+</ContactsAccountType>

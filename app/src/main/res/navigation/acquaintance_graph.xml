@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/acquaintance_graph"
+    app:startDestination="@id/greetingFragment">
+
+    <fragment
+        android:id="@+id/greetingFragment"
+        android:name="com.vsdrozd.blagodarie.ui.acquaintance.GreetingFragment"
+        android:label="GreetingFragment" >
+        <action
+            android:id="@+id/action_greetingFragment_to_agreementFragment"
+            app:destination="@id/agreementFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/agreementFragment"
+        android:name="com.vsdrozd.blagodarie.ui.acquaintance.AgreementFragment"
+        android:label="AgreementFragment" >
+        <action
+            android:id="@+id/action_agreementFragment_to_enterFragment"
+            app:destination="@id/enterFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_agreementFragment_to_greetingFragment2"
+            app:destination="@id/greetingFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_right"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_left" />
+    </fragment>
+    <fragment
+        android:id="@+id/enterFragment"
+        android:name="com.vsdrozd.blagodarie.ui.acquaintance.EnterFragment"
+        android:label="EnterFragment" >
+        <action
+            android:id="@+id/action_enterFragment_to_contactsActivity"
+            app:destination="@id/contactsActivity"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" >
+            <argument android:defaultValue="-1"
+                android:name="mUserId" />
+        </action>
+        <action
+            android:id="@+id/action_enterFragment_to_agreementFragment2"
+            app:destination="@id/agreementFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_right"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_left" />
+        <action
+            android:id="@+id/action_enterFragment_to_newContactsActivity"
+            app:destination="@id/newContactsActivity"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <activity
+        android:id="@+id/contactsActivity"
+        android:name="com.vsdrozd.blagodarie.ui.contacts.ContactsActivity"
+        android:label="contacts_activity"
+        tools:layout="@layout/contacts_activity" >
+        <argument
+            android:name="userId"
+            app:argType="long"
+            android:defaultValue="-1L" />
+    </activity>
+    <activity
+        android:id="@+id/newContactsActivity"
+        android:name="com.vsdrozd.blagodarie.ui.newcontacts.NewContactsActivity"
+        android:label="NewContactsActivity" >
+        <argument
+            android:name="userId"
+            app:argType="long"
+            android:defaultValue="-1L" />
+    </activity>
+</navigation>
