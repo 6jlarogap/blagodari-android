@@ -24,6 +24,6 @@
         <import type="android.view.View"/>
         <variable
             name="ViewModel"
-            type="com.vsdrozd.blagodarie.ui.warning.WarningViewModel" />
+            type="org.blagodari.ui.warning.WarningViewModel" />
     </data>
 </layout>

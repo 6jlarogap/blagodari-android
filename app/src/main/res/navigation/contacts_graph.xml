@@ -5,7 +5,7 @@
 
     <fragment
         android:id="@+id/contactsFragment"
-        android:name="com.vsdrozd.blagodarie.ui.contacts.ContactsFragment"
+        android:name="org.blagodari.ui.contacts.ContactsFragment"
         android:label="ContactsFragment" >
         <action
             android:id="@+id/action_contactsFragment_to_profileActivity"
@@ -21,7 +21,7 @@
     </fragment>
     <activity
         android:id="@+id/contactDetailActivity"
-        android:name="com.vsdrozd.blagodarie.ui.contactdetail.ContactDetailActivity"
+        android:name="org.blagodari.ui.contactdetail.ContactDetailActivity"
         android:label="ContactDetailActivity">
         <argument
             android:name="contactId"
@@ -34,6 +34,6 @@
     </activity>
     <activity
         android:id="@+id/warningActivity"
-        android:name="com.vsdrozd.blagodarie.ui.warning.WarningActivity"
+        android:name="org.blagodari.ui.warning.WarningActivity"
         android:label="WarningActivity" />
 </navigation>

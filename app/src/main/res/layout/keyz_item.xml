@@ -11,7 +11,7 @@
 
         <variable
             name="Keyz"
-            type="com.vsdrozd.blagodarie.db.scheme.Keyz" />
+            type="org.blagodari.db.scheme.Keyz" />
 
     </data>
 

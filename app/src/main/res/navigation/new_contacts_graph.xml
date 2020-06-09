@@ -5,6 +5,6 @@
 
     <fragment
         android:id="@+id/newContactsFragment"
-        android:name="com.vsdrozd.blagodarie.ui.newcontacts.NewContactsFragment"
+        android:name="org.blagodari.ui.newcontacts.NewContactsFragment"
         android:label="NewContactsFragment" />
 </navigation>

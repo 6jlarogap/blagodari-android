@@ -14,7 +14,7 @@
 
         <variable
             name="Contact"
-            type="com.vsdrozd.blagodarie.db.scheme.Contact" />
+            type="org.blagodari.db.scheme.Contact" />
 
     </data>
 

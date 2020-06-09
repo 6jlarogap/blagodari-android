@@ -16,7 +16,7 @@
 
     <data>
 
-        <import type="com.vsdrozd.blagodarie.BuildConfig" />
+        <import type="org.blagodari.BuildConfig" />
 
     </data>
 

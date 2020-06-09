@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/greetingFragment"
-        android:name="com.vsdrozd.blagodarie.ui.acquaintance.GreetingFragment"
+        android:name="org.blagodari.ui.acquaintance.GreetingFragment"
         android:label="GreetingFragment" >
         <action
             android:id="@+id/action_greetingFragment_to_agreementFragment"
@@ -19,7 +19,7 @@
     </fragment>
     <fragment
         android:id="@+id/agreementFragment"
-        android:name="com.vsdrozd.blagodarie.ui.acquaintance.AgreementFragment"
+        android:name="org.blagodari.ui.acquaintance.AgreementFragment"
         android:label="AgreementFragment" >
         <action
             android:id="@+id/action_agreementFragment_to_enterFragment"
@@ -38,7 +38,7 @@
     </fragment>
     <fragment
         android:id="@+id/enterFragment"
-        android:name="com.vsdrozd.blagodarie.ui.acquaintance.EnterFragment"
+        android:name="org.blagodari.ui.acquaintance.EnterFragment"
         android:label="EnterFragment" >
         <action
             android:id="@+id/action_enterFragment_to_contactsActivity"
@@ -67,7 +67,7 @@
     </fragment>
     <activity
         android:id="@+id/contactsActivity"
-        android:name="com.vsdrozd.blagodarie.ui.contacts.ContactsActivity"
+        android:name="org.blagodari.ui.contacts.ContactsActivity"
         android:label="contacts_activity"
         tools:layout="@layout/contacts_activity" >
         <argument
@@ -77,7 +77,7 @@
     </activity>
     <activity
         android:id="@+id/newContactsActivity"
-        android:name="com.vsdrozd.blagodarie.ui.newcontacts.NewContactsActivity"
+        android:name="org.blagodari.ui.newcontacts.NewContactsActivity"
         android:label="NewContactsActivity" >
         <argument
             android:name="userId"

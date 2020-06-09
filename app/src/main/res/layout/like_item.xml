@@ -38,11 +38,11 @@
 
         <variable
             name="Like"
-            type="com.vsdrozd.blagodarie.db.scheme.Like" />
+            type="org.blagodari.db.scheme.Like" />
 
         <variable
             name="OnLikeCancelListener"
-            type="com.vsdrozd.blagodarie.ui.OnLikeCancelListener" />
+            type="org.blagodari.ui.OnLikeCancelListener" />
 
         <variable
             name="UserId"

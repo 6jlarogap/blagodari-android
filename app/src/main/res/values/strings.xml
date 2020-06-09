@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Благодарие</string>
+    <string name="app_name">Благодари</string>
     <integer name="com_vk_sdk_AppId">7015858</integer>
     <string name="facebook_app_id">add late</string>
     <string name="facebook_login_protocol_scheme">add late</string>
