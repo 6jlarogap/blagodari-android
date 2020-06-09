@@ -64,6 +64,11 @@ public final class NewContactsViewModel
     };
     @NonNull
     private final MutableLiveData<Collection<ContactWithKeyz>> mContacts = new MutableLiveData<>(new TreeSet<>(contactWithKeyzComparator));
+    @NonNull
+    private final MutableLiveData<Collection<ContactWithKeyz>> mFilteredContacts = new MutableLiveData<>(new TreeSet<>(contactWithKeyzComparator));
+
+    @NonNull
+    private final MutableLiveData<String> mFilter = new MutableLiveData<>("");
 
     private NewContactsViewModel () {
         this.mContacts.observeForever(input -> this.mHaveContacts.set(!input.isEmpty()));
@@ -82,6 +87,16 @@ public final class NewContactsViewModel
     @NonNull
     public final MutableLiveData<Collection<ContactWithKeyz>> getContacts () {
         return this.mContacts;
+    }
+
+    @NonNull
+    public final MutableLiveData<Collection<ContactWithKeyz>> getFilteredContacts () {
+        return this.mFilteredContacts;
+    }
+
+    @NonNull
+    public MutableLiveData<String> getFilter () {
+        return mFilter;
     }
 
     static final class Factory
