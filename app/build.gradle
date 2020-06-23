@@ -6,8 +6,8 @@ android {
         applicationId 'org.blagodari'
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 74
-        versionName "0.2.2"
+        versionCode 72
+        versionName "0.2.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         project.ext.set("archivesBaseName", "blagodari-" + defaultConfig.versionName);
         javaCompileOptions {
