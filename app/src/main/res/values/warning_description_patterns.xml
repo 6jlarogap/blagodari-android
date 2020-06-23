@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="vague_keyz_warning">Ключ \"%s\" принадлежит нескольким контактам: %s</string>
-    <string name="vague_like_warning">Благодарность %s принадлежит ключам, которые принадлежат разным контактам: %s</string>
-    <string name="missing_keyz_warning">Благодарность %s принадлежит отсутствующему ключу или ключам: %s</string>
-</resources>
