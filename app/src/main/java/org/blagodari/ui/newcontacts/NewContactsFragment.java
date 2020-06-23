@@ -22,12 +22,10 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.ex.diagnosticlib.Diagnostic;
-
 import org.blagodari.R;
 import org.blagodari.databinding.NewContactsFragmentBinding;
 import org.blagodari.db.addent.ContactWithKeyz;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 import io.reactivex.Observable;
@@ -35,8 +33,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 public class NewContactsFragment
-        extends Fragment
-        implements SearchView.OnQueryTextListener {
+        extends Fragment {
     private NewContactsViewModel mContactsViewModel;
     private int mScrollYPosition = 0;
     private NewContactsFragmentBinding mContactsFragmentBinding;
@@ -122,10 +119,10 @@ public class NewContactsFragment
         }
     }
 
-    private void refreshContacts () {
+    private void refreshContacts(){
         if (mNeedSyncContacts) {
             Collection<ContactWithKeyz> contactWithKeyzList = mContactsViewModel.getContacts().getValue();
-            if (contactWithKeyzList != null) {
+            if(contactWithKeyzList !=null) {
                 contactWithKeyzList.clear();
             }
             mContactsViewModel.getContacts().setValue(contactWithKeyzList);
@@ -186,7 +183,7 @@ public class NewContactsFragment
 
         MenuItem myActionMenuItem = menu.findItem(R.id.miFilter);
         SearchView searchView = (SearchView) myActionMenuItem.getActionView();
-        searchView.setOnQueryTextListener(this);
+        //searchView.setOnQueryTextListener(this);
         //searchView.setQuery(mContactsViewModel.getFilter(), false);
     }
 
@@ -207,31 +204,6 @@ public class NewContactsFragment
                 mScrollYPosition = recyclerView.computeVerticalScrollOffset();
             }
         });
-        this.mContactsViewModel.getContacts().observe(getViewLifecycleOwner(), contacts -> filter());
-        this.mContactsViewModel.getFilteredContacts().observe(getViewLifecycleOwner(), contactsAdapter::setData);
-        mContactsViewModel.getFilter().observe(getViewLifecycleOwner(), filter -> filter());
-    }
-
-    private void filter () {
-        final Collection<ContactWithKeyz> filteredContacts = new ArrayList<>();
-        if (mContactsViewModel.getContacts().getValue() != null && mContactsViewModel.getFilter().getValue() != null) {
-            for (ContactWithKeyz contactWithKeyz : mContactsViewModel.getContacts().getValue()) {
-                if (mContactsViewModel.getFilter().getValue().equals("") || contactWithKeyz.getContact().getTitle().toLowerCase().contains(mContactsViewModel.getFilter().getValue().toLowerCase())) {
-                    filteredContacts.add(contactWithKeyz);
-                }
-            }
-        }
-        mContactsViewModel.getFilteredContacts().setValue(filteredContacts);
-    }
-
-    @Override
-    public boolean onQueryTextSubmit (String query) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange (String newText) {
-        mContactsViewModel.getFilter().setValue(newText);
-        return false;
+        this.mContactsViewModel.getContacts().observe(getViewLifecycleOwner(), contactsAdapter::setData);
     }
 }
