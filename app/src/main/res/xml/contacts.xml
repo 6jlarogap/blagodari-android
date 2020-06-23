@@ -16,7 +16,7 @@
     <ContactsDataKind
         android:detailColumn="data2"
         android:icon="@drawable/ic_launcher"
-        android:mimeType="vnd.android.cursor.item/vnd.org.blagodari.contact_id"
+        android:mimeType="vnd.android.cursor.item/vnd.org.blagodarie.contact_id"
         android:summaryColumn="data1" />
 
 </ContactsAccountType>

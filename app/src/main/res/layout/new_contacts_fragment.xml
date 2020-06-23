@@ -5,7 +5,7 @@
     <RelativeLayout xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="org.blagodari.ui.contacts.ContactsActivity">
+        tools:context=".ui.contacts.ContactsActivity">
 
         <TextView
             android:id="@+id/noContacts"
@@ -43,7 +43,7 @@
 
         <variable
             name="ViewModel"
-            type="org.blagodari.ui.newcontacts.NewContactsViewModel" />
+            type="com.vsdrozd.blagodarie.ui.newcontacts.NewContactsViewModel" />
 
     </data>
 </layout>

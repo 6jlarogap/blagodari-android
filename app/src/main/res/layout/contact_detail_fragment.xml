@@ -62,7 +62,7 @@
 
         <variable
             name="ViewModel"
-            type="org.blagodari.ui.contactdetail.ContactDetailViewModel" />
+            type="com.vsdrozd.blagodarie.ui.contactdetail.ContactDetailViewModel" />
 
     </data>
 </layout>

@@ -87,15 +87,15 @@
 
         <variable
             name="ViewModel"
-            type="org.blagodari.ui.contactdetail.ContactDetailViewModel" />
+            type="com.vsdrozd.blagodarie.ui.contactdetail.ContactDetailViewModel" />
 
         <variable
             name="Contact"
-            type="org.blagodari.db.scheme.Contact" />
+            type="com.vsdrozd.blagodarie.db.scheme.Contact" />
 
         <variable
             name="OnLikeCreateListener"
-            type="org.blagodari.ui.OnLikeCreateListener" />
+            type="com.vsdrozd.blagodarie.ui.OnLikeCreateListener" />
 
     </data>
 </layout>

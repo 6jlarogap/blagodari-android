@@ -31,7 +31,7 @@
 
         <variable
             name="AcquaintanceNavigator"
-            type="org.blagodari.ui.acquaintance.AcquaintanceNavigator" />
+            type="com.vsdrozd.blagodarie.ui.acquaintance.AcquaintanceNavigator" />
 
     </data>
 

@@ -18,7 +18,7 @@
 
         <variable
             name="Warning"
-            type="org.blagodari.ui.warning.Warning" />
+            type="com.vsdrozd.blagodarie.ui.warning.Warning" />
 
         <variable
             name="Description"

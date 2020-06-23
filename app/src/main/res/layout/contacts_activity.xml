@@ -7,7 +7,7 @@
         android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="org.blagodari.ui.contacts.ContactsActivity">
+        tools:context=".ui.contacts.ContactsActivity">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -92,7 +92,7 @@
 
         <variable
             name="ViewModel"
-            type="org.blagodari.ui.contacts.ContactsViewModel" />
+            type="com.vsdrozd.blagodarie.ui.contacts.ContactsViewModel" />
 
     </data>
 

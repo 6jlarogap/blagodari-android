@@ -73,11 +73,11 @@
 
         <variable
             name="Contact"
-            type="org.blagodari.db.scheme.Contact"/>
+            type="com.vsdrozd.blagodarie.db.scheme.Contact"/>
 
         <variable
             name="OnLikeCreateListener"
-            type="org.blagodari.ui.OnLikeCreateListener" />
+            type="com.vsdrozd.blagodarie.ui.OnLikeCreateListener" />
 
     </data>
 
