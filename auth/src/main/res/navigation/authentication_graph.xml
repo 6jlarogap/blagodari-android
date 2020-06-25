@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/authentication_graph"
+    app:startDestination="@id/startFragment">
+
+    <fragment
+        android:id="@+id/startFragment"
+        android:name="blagodarie.rating.auth.StartFragment"
+        android:label="StartFragment" >
+        <action
+            android:id="@+id/action_startFragment_to_signInFragment"
+            app:destination="@id/signInFragment" />
+        <action
+            android:id="@+id/action_startFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/signInFragment"
+        android:name="blagodarie.rating.auth.SignInFragment"
+        android:label="SignInFragment" >
+        <argument
+            android:name="user_id"
+            app:argType="long" />
+    </fragment>
+    <fragment
+        android:id="@+id/signUpFragment"
+        android:name="blagodarie.rating.auth.SignUpFragment"
+        android:label="SignUpFragment" />
+</navigation>

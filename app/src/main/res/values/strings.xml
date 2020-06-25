@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Благодарие</string>
+
+    <string name="rqst_choose_account">Выберите аккаунт</string>
+</resources>
