@@ -2,4 +2,7 @@
     <string name="app_name">Благодарие</string>
 
     <string name="rqst_choose_account">Выберите аккаунт</string>
+
+    <string name="err_msg_account_not_created">Аккаунт не был создан</string>
+    <string name="err_msg_authentication_error">Ошибка аутентификации</string>
 </resources>

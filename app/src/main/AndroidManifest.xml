@@ -20,6 +20,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".ui.main.MainActivity" />
+
         <service
             android:name=".auth.AuthenticatorService"
             android:exported="false">

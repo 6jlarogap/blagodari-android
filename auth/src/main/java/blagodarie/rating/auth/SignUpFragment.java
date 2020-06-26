@@ -61,7 +61,13 @@ public final class SignUpFragment
 
     private void initViews (final View view) {
         Log.d(TAG, "initViews");
-        view.findViewById(R.id.btnSignIn).setOnClickListener(v -> AuthenticationActivity.googleSignIn(requireActivity(), this, getString(R.string.oauth2_client_id)));
+        view.findViewById(R.id.btnSignIn).setOnClickListener(
+                v -> AuthenticationActivity.googleSignIn(
+                        requireActivity(),
+                        this,
+                        getString(R.string.oauth2_client_id)
+                )
+        );
     }
 
     @Override
@@ -121,13 +127,13 @@ public final class SignUpFragment
                 try {
                     final JSONObject userJSON = new JSONObject(responseBody);
                     final long userId = userJSON.getLong("user_id");
-                    final String first_name = userJSON.getString("first_name");
-                    final String middleName = userJSON.getString("middle_name");
-                    final String lastName = userJSON.getString("last_name");
+                    // TODO: 26.06.2020 Заглушка
+                    final String first_name = "Иван";//userJSON.getString("first_name");
+                    final String middleName = "Иванович";//userJSON.getString("middle_name");
+                    final String lastName = "Иванов";//userJSON.getString("last_name");
                     final String authToken = userJSON.getString("token");
                     createAccount(userId, first_name, middleName, lastName, authToken);
                 } catch (JSONException e) {
-                    Log.e(TAG, e.toString());
                     Log.e(TAG, Log.getStackTraceString(e));
                     Toast.makeText(requireActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
                 }
@@ -143,7 +149,7 @@ public final class SignUpFragment
             @NonNull final String authToken
     ) {
         Log.d(TAG, "createAccount");
-        final String accountName = lastName + middleName + firstName;
+        final String accountName = lastName + " " + firstName + " " + middleName;
         final AccountManager accountManager = AccountManager.get(getContext());
         final Account account = new Account(accountName, getString(R.string.account_type));
         final Bundle userData = new Bundle();
@@ -155,6 +161,7 @@ public final class SignUpFragment
         bundle.putString(AccountManager.KEY_ACCOUNT_NAME, accountName);
         bundle.putString(AccountManager.KEY_ACCOUNT_TYPE, getString(R.string.account_type));
         bundle.putString(AccountManager.KEY_AUTHTOKEN, authToken);
+
         final Intent res = new Intent();
         res.putExtras(bundle);
 

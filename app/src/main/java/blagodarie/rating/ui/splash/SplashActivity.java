@@ -2,19 +2,25 @@ package blagodarie.rating.ui.splash;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import blagodarie.rating.R;
 import blagodarie.rating.auth.AccountGeneral;
+import blagodarie.rating.ui.main.MainActivity;
 
 public final class SplashActivity
         extends AppCompatActivity {
@@ -45,10 +51,10 @@ public final class SplashActivity
         final String accountType = getString(R.string.account_type);
         final Account[] accounts = mAccountManager.getAccountsByType(accountType);
         if (accounts.length == 1) {
-                final String userId = mAccountManager.getUserData(accounts[0], AccountGeneral.USER_DATA_USER_ID);
-                if (userId == null) {
-                    mAccountManager.setUserData(accounts[0], AccountGeneral.USER_DATA_USER_ID, accounts[0].name);
-                }
+            final String userId = mAccountManager.getUserData(accounts[0], AccountGeneral.USER_DATA_USER_ID);
+            if (userId == null) {
+                mAccountManager.setUserData(accounts[0], AccountGeneral.USER_DATA_USER_ID, accounts[0].name);
+            }
             toMainActivity(accounts[0]);
         } else if (accounts.length > 1) {
             showAccountPicker(accounts);
@@ -67,9 +73,31 @@ public final class SplashActivity
                 null,
                 null,
                 this,
-                future -> chooseAccount(),
+                this::onAddAccountFinish,
                 null
         );
+    }
+
+    public void onAddAccountFinish (final AccountManagerFuture<Bundle> result) {
+        try {
+            final Bundle bundle = result.getResult();
+            final Account account = new Account(
+                    bundle.getString(AccountManager.KEY_ACCOUNT_NAME),
+                    bundle.getString(AccountManager.KEY_ACCOUNT_TYPE)
+            );
+            toMainActivity(account);
+        } catch (OperationCanceledException e) {
+            Log.e(TAG, Log.getStackTraceString(e));
+            Toast.makeText(this, getString(R.string.err_msg_account_not_created), Toast.LENGTH_LONG).show();
+            finish();
+        } catch (AuthenticatorException e) {
+            Log.e(TAG, Log.getStackTraceString(e));
+            Toast.makeText(this, getString(R.string.err_msg_authentication_error), Toast.LENGTH_LONG).show();
+            finish();
+        } catch (IOException e) {
+            Log.e(TAG, Log.getStackTraceString(e));
+            finish();
+        }
     }
 
     private void showAccountPicker (
@@ -99,7 +127,7 @@ public final class SplashActivity
             @NonNull final Account account
     ) {
         Log.d(TAG, "toMainActivity account=" + account);
-        //startActivity(MessagesActivity.createSelfIntent(this, account));
-        //finish();
+        startActivity(MainActivity.createSelfIntent(this, account));
+        finish();
     }
 }

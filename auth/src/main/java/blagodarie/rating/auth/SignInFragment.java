@@ -18,97 +18,28 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
-import io.reactivex.disposables.CompositeDisposable;
-
-import static android.app.Activity.RESULT_OK;
-
-/*
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.Locale;
 
-import blagodarie.health.authentication.SignInFragmentArgs;
-import blagodarie.health.server.ServerApiExecutor;
-import blagodarie.health.server.ServerApiResponse;
-import blagodarie.health.server.ServerConnector;
+import blagodarie.rating.server.ServerApiResponse;
+import blagodarie.rating.server.ServerConnector;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
+import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
-*/
+
 public final class SignInFragment
         extends Fragment {
 
     private static final String TAG = SignInFragment.class.getSimpleName();
 
     static final Long DEFAULT_USER_ID = Long.MIN_VALUE;
-    /*
-        private static final class SignInExecutor {
 
-            private static final String TAG = SignInExecutor.class.getSileName();
-
-            private static final class ApiResult
-                    extends ServerApiExecutor.ApiResult {
-
-                @NonNull
-                private final String mToken;
-
-                ApiResult (
-                        @NonNull final String token
-                ) {
-                    mToken = token;
-                }
-
-                @NonNull
-                String getToken () {
-                    return mToken;
-                }
-            }
-
-            private static final String JSON_PATTERN = "{\"oauth\":{\"provider\":\"google\",\"token\":\"%s\"},\"user_id\":%d}";
-
-            @NonNull
-            private final String mGoogleTokenId;
-
-            @NonNull
-            private final Long mUserId;
-
-            private SignInExecutor (
-                    @NonNull final String googleTokenId,
-                    @NonNull final Long userId
-            ) {
-                mGoogleTokenId = googleTokenId;
-                mUserId = userId;
-            }
-
-            public SignInExecutor.ApiResult execute (
-                    @NonNull final ServerConnector serverConnector
-            ) throws JSONException, IOException {
-                Log.d(TAG, "execute");
-                String authToken = null;
-
-                final String content = String.format(Locale.ENGLISH, JSON_PATTERN, mGoogleTokenId, mUserId);
-                Log.d(TAG, "content=" + content);
-
-                final ServerApiResponse serverApiResponse = serverConnector.sendRequestAndGetResponse("auth/signin", content);
-                Log.d(TAG, "serverApiResponse=" + serverApiResponse);
-
-                if (serverApiResponse.getCode() == 200) {
-                    if (serverApiResponse.getBody() != null) {
-                        final String responseBody = serverApiResponse.getBody();
-                        final JSONObject userJSON = new JSONObject(responseBody);
-                        authToken = userJSON.getString("token");
-                    }
-                }
-                return new SignInExecutor.ApiResult(authToken);
-
-            }
-        }
-    */
     private Long mUserId;
 
     private CompositeDisposable mDisposables = new CompositeDisposable();
@@ -134,13 +65,20 @@ public final class SignInFragment
         super.onViewCreated(view, savedInstanceState);
         if (getArguments() != null) {
             mUserId = SignInFragmentArgs.fromBundle(getArguments()).getUserId();
+            if (mUserId.equals(DEFAULT_USER_ID)) {
+                Toast.makeText(requireActivity(), getString(R.string.err_msg_no_user_id), Toast.LENGTH_LONG).show();
+                requireActivity().setResult(RESULT_CANCELED);
+                requireActivity().finish();
+            }
         } else {
-            throw new IllegalArgumentException("No required parameters");
+            Toast.makeText(requireActivity(), getString(R.string.err_msg_no_user_id), Toast.LENGTH_LONG).show();
+            requireActivity().setResult(RESULT_CANCELED);
+            requireActivity().finish();
         }
     }
 
     @Override
-    public void onActivityCreated (@Nullable Bundle savedInstanceState) {
+    public void onActivityCreated (@Nullable final Bundle savedInstanceState) {
         Log.d(TAG, "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
     }
@@ -153,7 +91,7 @@ public final class SignInFragment
     }
 
 
-    private void initViews (View view) {
+    private void initViews (@NonNull final View view) {
         Log.d(TAG, "initViews");
         view.findViewById(R.id.btnSignIn).setOnClickListener(
                 v -> AuthenticationActivity.googleSignIn(
@@ -165,7 +103,7 @@ public final class SignInFragment
     }
 
     @Override
-    public void onActivityResult (
+    public final void onActivityResult (
             final int requestCode,
             final int resultCode,
             @Nullable final Intent data
@@ -178,34 +116,52 @@ public final class SignInFragment
                 final GoogleSignInAccount account = task.getResult(ApiException.class);
                 if (account != null &&
                         account.getIdToken() != null) {
-                    //startSignIn(account.getIdToken());
+                    startSignIn(account.getIdToken());
                 }
             } catch (ApiException e) {
+                Log.e(TAG, Log.getStackTraceString(e));
                 Toast.makeText(requireActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
     }
-/*
+
     private void startSignIn (
             @NonNull final String googleTokenId
     ) {
         Log.d(TAG, "startSignIn");
-        final ServerConnector serverConnector = new ServerConnector(requireContext());
-        final SignInExecutor signInExecutor = new SignInExecutor(googleTokenId, mUserId);
+        final String content = String.format(Locale.ENGLISH, "{\"oauth\":{\"provider\":\"google\",\"token\":\"%s\"},\"user_id\":%d}", googleTokenId, mUserId);
+        Log.d(TAG, "content=" + content);
+
         mDisposables.add(
                 Observable.
-                        fromCallable(
-                                () -> signInExecutor.execute(serverConnector)
-                        ).
+                        fromCallable(() -> ServerConnector.sendRequestAndGetResponse("auth/signin", content)).
                         subscribeOn(Schedulers.io()).
                         observeOn(AndroidSchedulers.mainThread()).
                         subscribe(
-                                apiResult -> finishSignIn(apiResult.getToken()),
+                                this::extractDataFromServerApiResponse,
                                 throwable -> Toast.makeText(requireActivity(), throwable.getMessage(), Toast.LENGTH_LONG).show()
                         )
         );
     }
-*/
+
+    private void extractDataFromServerApiResponse (
+            @NonNull final ServerApiResponse serverApiResponse
+    ) {
+        if (serverApiResponse.getCode() == 200) {
+            if (serverApiResponse.getBody() != null) {
+                final String responseBody = serverApiResponse.getBody();
+                try {
+                    final JSONObject userJSON = new JSONObject(responseBody);
+                    final String authToken = userJSON.getString("token");
+                    finishSignIn(authToken);
+                } catch (JSONException e) {
+                    Log.e(TAG, Log.getStackTraceString(e));
+                    Toast.makeText(requireActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    }
+
     private void finishSignIn (
             @NonNull final String authToken
     ) {
@@ -214,6 +170,7 @@ public final class SignInFragment
         bundle.putString(AccountManager.KEY_ACCOUNT_NAME, mUserId.toString());
         bundle.putString(AccountManager.KEY_ACCOUNT_TYPE, getString(R.string.account_type));
         bundle.putString(AccountManager.KEY_AUTHTOKEN, authToken);
+
         final Intent res = new Intent();
         res.putExtras(bundle);
 

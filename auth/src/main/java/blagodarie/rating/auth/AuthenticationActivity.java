@@ -74,6 +74,7 @@ public final class AuthenticationActivity
     @Override
     public void onBackPressed () {
         Log.d(TAG, "onBackPressed");
+        setResult(RESULT_CANCELED);
         finish();
     }
 
@@ -86,7 +87,7 @@ public final class AuthenticationActivity
         final GoogleSignInOptions gso = new GoogleSignInOptions.
                 Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).
                 requestEmail().
-                requestIdToken("404507462751-0kcpe1le377jq73jm0o0vdjoa37t6j68.apps.googleusercontent.com").
+                requestIdToken(oauth2ClientId).
                 build();
         final GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(activity, gso);
         final Intent signInIntent = mGoogleSignInClient.getSignInIntent();
@@ -130,8 +131,7 @@ public final class AuthenticationActivity
             if (mResultBundle != null) {
                 mAccountAuthenticatorResponse.onResult(mResultBundle);
             } else {
-                mAccountAuthenticatorResponse.onError(AccountManager.ERROR_CODE_CANCELED,
-                        "canceled");
+                mAccountAuthenticatorResponse.onError(AccountManager.ERROR_CODE_CANCELED, "canceled");
             }
             mAccountAuthenticatorResponse = null;
         }
