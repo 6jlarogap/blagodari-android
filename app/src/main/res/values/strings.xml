@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Благодарие</string>
 
+    <string name="url_profile">https://blagodarie.org/profile?id=%s</string>
+
     <string name="rqst_choose_account">Выберите аккаунт</string>
 
     <string name="err_msg_account_not_created">Аккаунт не был создан</string>

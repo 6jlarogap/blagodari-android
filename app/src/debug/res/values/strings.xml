@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Благодарие-dbg</string>
+
+    <string name="url_profile">https://dev.blagodarie.org/profile?id=%s</string>
 </resources>

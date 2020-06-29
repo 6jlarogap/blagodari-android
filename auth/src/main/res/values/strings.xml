@@ -7,6 +7,7 @@
     <string name="info_msg_one_account_only">Нельзя добавить больше аккаунтов</string>
 
     <string name="err_msg_no_user_id">Отсутствует идентификатор пользователя</string>
+    <string name="err_msg_incorrect_user_id">Некорректный идентификатор пользователя</string>
 
     <string name="txt_hello">Здравствуйте!</string>
 </resources>
