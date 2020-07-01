@@ -19,15 +19,18 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            manifestPlaceholders = [hostName:"blagodarie.org"]
         }
         debug {
             debuggable true
+            applicationIdSuffix ".dbg"
 
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
-            applicationIdSuffix ".dbg"
+            manifestPlaceholders = [hostName:"dev.blagodarie.org"]
         }
     }
 
@@ -54,6 +57,8 @@ dependencies {
 
     implementation "io.reactivex.rxjava2:rxjava:2.2.9"
     implementation "io.reactivex.rxjava2:rxandroid:2.1.0"
+
+    implementation "com.squareup.picasso:picasso:2.71828"
 
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'

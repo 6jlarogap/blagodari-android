@@ -6,6 +6,8 @@ import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.app.AlertDialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
@@ -51,11 +53,7 @@ public final class SplashActivity
         final String accountType = getString(R.string.account_type);
         final Account[] accounts = mAccountManager.getAccountsByType(accountType);
         if (accounts.length == 1) {
-            final String userId = mAccountManager.getUserData(accounts[0], AccountGeneral.USER_DATA_USER_ID);
-            if (userId == null) {
-                mAccountManager.setUserData(accounts[0], AccountGeneral.USER_DATA_USER_ID, accounts[0].name);
-            }
-            toMainActivity(accounts[0]);
+            toProfile(accounts[0]);
         } else if (accounts.length > 1) {
             showAccountPicker(accounts);
         } else {
@@ -85,7 +83,7 @@ public final class SplashActivity
                     bundle.getString(AccountManager.KEY_ACCOUNT_NAME),
                     bundle.getString(AccountManager.KEY_ACCOUNT_TYPE)
             );
-            toMainActivity(account);
+            toProfile(account);
         } catch (OperationCanceledException e) {
             Log.e(TAG, Log.getStackTraceString(e));
             Toast.makeText(this, getString(R.string.err_msg_account_not_created), Toast.LENGTH_LONG).show();
@@ -117,17 +115,19 @@ public final class SplashActivity
                         new ArrayAdapter<>(
                                 getBaseContext(),
                                 android.R.layout.simple_list_item_1, names),
-                        (dialog, which) -> toMainActivity(accounts[which])
+                        (dialog, which) -> toProfile(accounts[which])
                 ).
                 create().
                 show();
     }
 
-    private void toMainActivity (
+    private void toProfile (
             @NonNull final Account account
     ) {
-        Log.d(TAG, "toMainActivity account=" + account);
-        startActivity(MainActivity.createSelfIntent(this, account));
-        finish();
+        Log.d(TAG, "toProfile account=" + account);
+        final String userId = mAccountManager.getUserData(account, AccountGeneral.USER_DATA_USER_ID);
+        final Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(getString(R.string.url_profile, userId)));
+        startActivity(i);
     }
 }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Благодарие</string>
+    <string name="app_name">БлагоДари!</string>
 
     <string name="url_profile">https://blagodarie.org/profile?id=%s</string>
 
@@ -7,4 +7,14 @@
 
     <string name="err_msg_account_not_created">Аккаунт не был создан</string>
     <string name="err_msg_authentication_error">Ошибка аутентификации</string>
+    <string name="err_msg_missing_profile_user_id">Не указан идентификатор пользователя</string>
+
+    <string name="txt_fame">Известность: %d</string>
+    <string name="txt_sum_thanks_count">Всего благодарностей: %d</string>
+    <string name="txt_trustless_count">Утраты доверия: %d</string>
+    <string name="txt_thanks_count">Мои благодарности: %d</string>
+    <string name="txt_is_trust">Доверие: %s</string>
+    <string name="txt_yes">Да</string>
+    <string name="txt_no">Нет</string>
+    <string name="txt_card_number">Номер карты</string>
 </resources>

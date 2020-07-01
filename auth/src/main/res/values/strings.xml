@@ -5,9 +5,12 @@
     <string name="oauth2_client_id" tools:ignore="TypographyDashes">404507462751-5a4j37k4o6nnvlnuof95tl68j30c151p.apps.googleusercontent.com</string>
 
     <string name="info_msg_one_account_only">Нельзя добавить больше аккаунтов</string>
+    <string name="info_msg_update_data_complete">Данные обновлены</string>
 
     <string name="err_msg_no_user_id">Отсутствует идентификатор пользователя</string>
     <string name="err_msg_incorrect_user_id">Некорректный идентификатор пользователя</string>
+    <string name="err_msg_incorrect_card_number">Неверный номер карты</string>
+    <string name="err_msg_update_data_failed">Не удалось обновить данные</string>
 
     <string name="txt_hello">Здравствуйте!</string>
 </resources>

@@ -1,7 +1,6 @@
 package blagodarie.rating.server;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 
 import androidx.annotation.NonNull;
 
@@ -88,11 +87,34 @@ public final class ServerConnector {
                 build();
     }
 
+    private static Request createAuthRequest (
+            @NonNull final String relativeUrl,
+            @NonNull final String authToken,
+            @NonNull final String content
+    ) {
+        final RequestBody body = RequestBody.create(JSON_TYPE, content);
+        return new Request.Builder().
+                url(API_BASE_URL + relativeUrl).
+                header("Authorization", String.format("Token %s", authToken)).
+                post(body).
+                build();
+    }
+
     private static Request createRequest (
             @NonNull final String relativeUrl
     ) {
         return new Request.Builder().
                 url(API_BASE_URL + relativeUrl).
+                build();
+    }
+
+    private static Request createAuthRequest (
+            @NonNull final String relativeUrl,
+            @NonNull final String authToken
+    ) {
+        return new Request.Builder().
+                url(API_BASE_URL + relativeUrl).
+                header("Authorization", String.format("Token %s", authToken)).
                 build();
     }
 
@@ -111,10 +133,29 @@ public final class ServerConnector {
         return new ServerApiResponse(response.code(), response.body() != null ? response.body().string() : null);
     }
 
+    public static ServerApiResponse sendAuthRequestAndGetResponse (
+            @NonNull final String relativeUrl,
+            @NonNull final String authToken,
+            @NonNull final String content
+    ) throws IOException {
+        final Request request = createAuthRequest(relativeUrl, authToken, content);
+        final Response response = sendRequestAndGetRespone(request);
+        return new ServerApiResponse(response.code(), response.body() != null ? response.body().string() : null);
+    }
+
     public static ServerApiResponse sendRequestAndGetResponse (
             @NonNull final String relativeUrl
     ) throws IOException {
         final Request request = createRequest(relativeUrl);
+        final Response response = sendRequestAndGetRespone(request);
+        return new ServerApiResponse(response.code(), response.body() != null ? response.body().string() : null);
+    }
+
+    public static ServerApiResponse sendAuthRequestAndGetResponse (
+            @NonNull final String relativeUrl,
+            @NonNull final String authToken
+    ) throws IOException {
+        final Request request = createAuthRequest(relativeUrl, authToken);
         final Response response = sendRequestAndGetRespone(request);
         return new ServerApiResponse(response.code(), response.body() != null ? response.body().string() : null);
     }
