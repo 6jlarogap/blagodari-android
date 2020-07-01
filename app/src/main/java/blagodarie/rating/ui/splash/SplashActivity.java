@@ -5,12 +5,10 @@ import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,14 +16,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import blagodarie.rating.R;
 import blagodarie.rating.auth.AccountGeneral;
-import blagodarie.rating.ui.main.MainActivity;
+import blagodarie.rating.ui.AccountProvider;
 
 public final class SplashActivity
-        extends AppCompatActivity {
+        extends AppCompatActivity
+        implements AccountProvider.OnAccountSelectListener {
 
     private static final String TAG = SplashActivity.class.getSimpleName();
 
@@ -45,20 +43,20 @@ public final class SplashActivity
     protected void onResume () {
         super.onResume();
         Log.d(TAG, "onResume");
-        chooseAccount();
+        AccountProvider.getAccount(
+                this,
+                this
+        );
     }
 
-    private void chooseAccount () {
-        Log.d(TAG, "chooseAccount");
-        final String accountType = getString(R.string.account_type);
-        final Account[] accounts = mAccountManager.getAccountsByType(accountType);
-        if (accounts.length == 1) {
-            toProfile(accounts[0]);
-        } else if (accounts.length > 1) {
-            showAccountPicker(accounts);
-        } else {
-            addNewAccount(accountType);
-        }
+    @Override
+    public void onNoAccount () {
+        addNewAccount(getString(R.string.account_type));
+    }
+
+    @Override
+    public void onAccountSelected (@NonNull final Account account) {
+        toProfile(account);
     }
 
     private void addNewAccount (
@@ -71,12 +69,13 @@ public final class SplashActivity
                 null,
                 null,
                 this,
-                this::onAddAccountFinish,
+                this::onAddAccountFinished,
                 null
         );
     }
 
-    public void onAddAccountFinish (final AccountManagerFuture<Bundle> result) {
+    public void onAddAccountFinished (final AccountManagerFuture<Bundle> result) {
+        Log.d(TAG, "onAddAccountFinish");
         try {
             final Bundle bundle = result.getResult();
             final Account account = new Account(
@@ -96,29 +95,6 @@ public final class SplashActivity
             Log.e(TAG, Log.getStackTraceString(e));
             finish();
         }
-    }
-
-    private void showAccountPicker (
-            @NonNull final Account[] accounts
-    ) {
-        Log.d(TAG, "showAccountPicker accounts=" + Arrays.toString(accounts));
-        final String[] names = new String[accounts.length];
-        for (int i = 0; i < accounts.length; i++) {
-            names[i] = accounts[i].name;
-        }
-
-        new AlertDialog.
-                Builder(this).
-                setTitle(R.string.rqst_choose_account).
-                setCancelable(false).
-                setAdapter(
-                        new ArrayAdapter<>(
-                                getBaseContext(),
-                                android.R.layout.simple_list_item_1, names),
-                        (dialog, which) -> toProfile(accounts[which])
-                ).
-                create().
-                show();
     }
 
     private void toProfile (

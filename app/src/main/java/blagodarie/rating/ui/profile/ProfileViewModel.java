@@ -17,12 +17,6 @@ public final class ProfileViewModel
     private final ObservableField<Mode> mCurrentMode = new ObservableField<>(Mode.VIEW);
 
     @NonNull
-    private final ObservableField<String> mProfileUserId = new ObservableField<>("");
-
-    @NonNull
-    private final ObservableField<String> mPhoto = new ObservableField<>("");
-
-    @NonNull
     private final ObservableField<String> mLastName = new ObservableField<>("");
 
     @NonNull
@@ -53,7 +47,7 @@ public final class ProfileViewModel
     private final ObservableBoolean mDownloadInProgress = new ObservableBoolean(false);
 
     @NonNull
-    private final ObservableBoolean mEnableEdit = new ObservableBoolean(false);
+    private final ObservableBoolean mSelfProfile = new ObservableBoolean(false);
 
     public ProfileViewModel () {
     }
@@ -65,16 +59,6 @@ public final class ProfileViewModel
 
     public final void setCurrentMode (@NonNull final Mode mode) {
         mCurrentMode.set(mode);
-    }
-
-    @NonNull
-    public final ObservableField<String> getProfileUserId () {
-        return mProfileUserId;
-    }
-
-    @NonNull
-    public final ObservableField<String> getPhoto () {
-        return mPhoto;
     }
 
     @NonNull
@@ -127,8 +111,8 @@ public final class ProfileViewModel
         return mDownloadInProgress;
     }
 
-    public final ObservableBoolean getIsEnableEdit () {
-        return mEnableEdit;
+    public final ObservableBoolean getIsSelfProfile () {
+        return mSelfProfile;
     }
 
 }

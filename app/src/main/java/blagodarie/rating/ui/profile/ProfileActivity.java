@@ -5,7 +5,6 @@ import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
-import android.app.AlertDialog;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -13,7 +12,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -35,14 +33,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Locale;
 
+import blagodarie.rating.OnThanksListener;
 import blagodarie.rating.R;
-import blagodarie.rating.RatingApp;
 import blagodarie.rating.auth.AccountGeneral;
 import blagodarie.rating.databinding.ProfileActivityBinding;
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
+import blagodarie.rating.ui.AccountProvider;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -50,7 +49,8 @@ import io.reactivex.schedulers.Schedulers;
 
 public final class ProfileActivity
         extends AppCompatActivity
-        implements ProfileEditor {
+        implements ProfileEditor,
+        OnThanksListener {
 
     private static final String TAG = ProfileActivity.class.getSimpleName();
 
@@ -73,6 +73,8 @@ public final class ProfileActivity
         Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
 
+        mAccountManager = AccountManager.get(this);
+
         final Uri data = getIntent().getData();
 
         if (data != null) {
@@ -82,7 +84,22 @@ public final class ProfileActivity
                 initBinding();
                 setupToolbar();
                 setupNavigationDrawer();
-                chooseAccount();
+                AccountProvider.getAccount(
+                        this,
+                        new AccountProvider.OnAccountSelectListener() {
+                            @Override
+                            public void onNoAccount () {
+                                downloadProfileData(null);
+                            }
+
+                            @Override
+                            public void onAccountSelected (@NonNull final Account account) {
+                                mAccount = account;
+                                mViewModel.getIsSelfProfile().set(mProfileUserId.equals(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID)));
+                                getAuthTokenAndDownloadProfileData();
+                            }
+                        }
+                );
             } else {
                 Toast.makeText(this, R.string.err_msg_missing_profile_user_id, Toast.LENGTH_LONG).show();
                 finish();
@@ -97,7 +114,6 @@ public final class ProfileActivity
     ) {
         Log.d(TAG, "initViewModel");
         mViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
-        mViewModel.getProfileUserId().set(mProfileUserId);
     }
 
     private void initBinding (
@@ -106,6 +122,7 @@ public final class ProfileActivity
         mActivityBinding = DataBindingUtil.setContentView(this, R.layout.profile_activity);
         mActivityBinding.setViewModel(mViewModel);
         mActivityBinding.setProfileEditor(this);
+        mActivityBinding.setOnThanksListener(this);
 
         final QRCodeWriter writer = new QRCodeWriter();
         try {
@@ -224,6 +241,31 @@ public final class ProfileActivity
         );
     }
 
+    private void addThanks (
+            @NonNull final String authToken
+    ) {
+        Log.d(TAG, "updateProfileData");
+
+        final String content = String.format(Locale.ENGLISH, "{\"user_id_to\":\"%s\",\"operation_type_id\":1,\"timestamp\":%d}", mProfileUserId, System.currentTimeMillis());
+
+        mCompositeDisposable.add(
+                Observable.
+                        fromCallable(() -> ServerConnector.sendAuthRequestAndGetResponse("addoperation", authToken, content)).
+                        subscribeOn(Schedulers.io()).
+                        observeOn(AndroidSchedulers.mainThread()).
+                        subscribe(
+                                serverApiResponse -> {
+                                    Log.d(TAG, serverApiResponse.toString());
+                                    onAddThanksComplete(serverApiResponse);
+                                },
+                                throwable -> {
+                                    Log.e(TAG, Log.getStackTraceString(throwable));
+                                    Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_LONG).show();
+                                }
+                        )
+        );
+    }
+
     private void onUpdateDataComplete (@NonNull final ServerApiResponse serverApiResponse) {
         Log.d(TAG, "onUpdateDataComplete serverApiResponse=" + serverApiResponse);
         if (serverApiResponse.getCode() == 200) {
@@ -235,54 +277,21 @@ public final class ProfileActivity
         }
     }
 
-    private void chooseAccount () {
-        Log.d(TAG, "chooseAccount");
-
-        mAccountManager = AccountManager.get(this);
-
-        final String accountType = getString(R.string.account_type);
-        final Account[] accounts = mAccountManager.getAccountsByType(accountType);
-        if (accounts.length == 0) {
-            downloadProfileData(null);
-        } else if (accounts.length == 1) {
-            mAccount = accounts[0];
-            mViewModel.getIsEnableEdit().set(mProfileUserId.equals(mAccountManager.getUserData(accounts[0], AccountGeneral.USER_DATA_USER_ID)));
-            getAuthTokenAndDownloadProfileData();
+    private void onAddThanksComplete (@NonNull final ServerApiResponse serverApiResponse) {
+        Log.d(TAG, "onUpdateDataComplete serverApiResponse=" + serverApiResponse);
+        if (serverApiResponse.getCode() == 200) {
+            final Integer thanksCount = mViewModel.getThanksCount().get();
+            mViewModel.getThanksCount().set(thanksCount != null ? thanksCount + 1 : 0);
+            mViewModel.getSumThanksCount().set(mViewModel.getSumThanksCount().get() + 1);
+            Toast.makeText(this, R.string.info_msg_add_thanks_complete, Toast.LENGTH_LONG).show();
         } else {
-            showAccountPicker(accounts);
+            Toast.makeText(this, R.string.err_msg_add_thanks_failed, Toast.LENGTH_LONG).show();
         }
-    }
-
-    private void showAccountPicker (
-            @NonNull final Account[] accounts
-    ) {
-        Log.d(TAG, "showAccountPicker accounts=" + Arrays.toString(accounts));
-        final String[] names = new String[accounts.length];
-        for (int i = 0; i < accounts.length; i++) {
-            names[i] = accounts[i].name;
-        }
-
-        new AlertDialog.
-                Builder(this).
-                setTitle(R.string.rqst_choose_account).
-                setCancelable(false).
-                setAdapter(
-                        new ArrayAdapter<>(
-                                getBaseContext(),
-                                android.R.layout.simple_list_item_1, names),
-                        (dialog, which) -> {
-                            mAccount = accounts[which];
-                            mViewModel.getIsEnableEdit().set(mProfileUserId.equals(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID)));
-                            getAuthTokenAndDownloadProfileData();
-                        }
-                ).
-                create().
-                show();
     }
 
     private void getAuthTokenAndDownloadProfileData () {
         Log.d(TAG, "getAuthTokenAndDownloadProfileData");
-        RatingApp.getAuthToken(
+        AccountProvider.getAuthToken(
                 this,
                 mAccount,
                 this::onGetAuthTokenForDownloadProfileDataComplete);
@@ -290,10 +299,19 @@ public final class ProfileActivity
 
     private void getAuthTokenAndUpdateProfileData (@NonNull final String cardNumber) {
         Log.d(TAG, "getAuthTokenAndUpdateProfileData");
-        RatingApp.getAuthToken(
+        AccountProvider.getAuthToken(
                 this,
                 mAccount,
                 future -> onGetAuthTokenForUpdateProfileDataComplete(future, cardNumber)
+        );
+    }
+
+    private void getAuthTokenAndAddThanks () {
+        Log.d(TAG, "getAuthTokenAndUpdateProfileData");
+        AccountProvider.getAuthToken(
+                this,
+                mAccount,
+                this::onGetAuthTokenForAddThanksComplete
         );
     }
 
@@ -321,6 +339,23 @@ public final class ProfileActivity
                 final String authToken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
                 if (authToken != null) {
                     updateProfileData(authToken, cardNumber);
+                }
+            }
+        } catch (AuthenticatorException | IOException | OperationCanceledException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void onGetAuthTokenForAddThanksComplete (
+            @NonNull final AccountManagerFuture<Bundle> future
+    ) {
+        Log.d(TAG, "onGetAuthTokenForUpdateProfileDataComplete");
+        try {
+            final Bundle bundle = future.getResult();
+            if (bundle != null) {
+                final String authToken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
+                if (authToken != null) {
+                    addThanks(authToken);
                 }
             }
         } catch (AuthenticatorException | IOException | OperationCanceledException e) {
@@ -408,6 +443,7 @@ public final class ProfileActivity
         if (cardNumber.length() == 16) {
             getAuthTokenAndUpdateProfileData(cardNumber);
         } else {
+            mViewModel.getCardNumber().notifyChange();
             Toast.makeText(this, getString(blagodarie.rating.auth.R.string.err_msg_incorrect_card_number), Toast.LENGTH_LONG).show();
         }
     }
@@ -419,4 +455,43 @@ public final class ProfileActivity
         mViewModel.setCurrentMode(ProfileViewModel.Mode.VIEW);
     }
 
+    @Override
+    public void onThanks () {
+        if (mAccount != null) {
+            getAuthTokenAndAddThanks();
+        } else {
+            mAccountManager.addAccount(
+                    getString(R.string.account_type),
+                    getString(R.string.token_type),
+                    null,
+                    null,
+                    this,
+                    this::onAddAccountFinished,
+                    null
+            );
+        }
+    }
+
+    public void onAddAccountFinished (final AccountManagerFuture<Bundle> result) {
+        Log.d(TAG, "onAddAccountFinish");
+        try {
+            final Bundle bundle = result.getResult();
+            mAccount = new Account(
+                    bundle.getString(AccountManager.KEY_ACCOUNT_NAME),
+                    bundle.getString(AccountManager.KEY_ACCOUNT_TYPE)
+            );
+            getAuthTokenAndAddThanks();
+        } catch (OperationCanceledException e) {
+            Log.e(TAG, Log.getStackTraceString(e));
+            Toast.makeText(this, getString(R.string.err_msg_account_not_created), Toast.LENGTH_LONG).show();
+            finish();
+        } catch (AuthenticatorException e) {
+            Log.e(TAG, Log.getStackTraceString(e));
+            Toast.makeText(this, getString(R.string.err_msg_authentication_error), Toast.LENGTH_LONG).show();
+            finish();
+        } catch (IOException e) {
+            Log.e(TAG, Log.getStackTraceString(e));
+            finish();
+        }
+    }
 }

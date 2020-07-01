@@ -55,13 +55,6 @@
                         android:text='@{ViewModel.lastName + " " + ViewModel.firstName + (ViewModel.middleName.equals("") ? "" : " " + ViewModel.middleName)}' />
 
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:text='@{ViewModel.profileUserId}'
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
-                    <TextView
                         style="@style/TextAppearance.AppCompat.Body1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -110,12 +103,12 @@
                                 style="@style/TextAppearance.AppCompat.Body1"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:enabled="@{ViewModel.currentMode == Mode.EDIT ? true : false}"
                                 android:hint="@string/txt_card_number"
                                 android:importantForAutofill="no"
                                 android:inputType="number"
                                 android:maxLength="16"
-                                android:text="@{ViewModel.cardNumber}"
-                                android:enabled="@{ViewModel.currentMode == Mode.EDIT ? true : false}" />
+                                android:text="@{ViewModel.cardNumber}" />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -133,7 +126,7 @@
                                 android:layout_gravity="center_vertical"
                                 android:onClick="@{() -> ProfileEditor.onEdit()}"
                                 android:src="@drawable/pencil"
-                                android:visibility="@{ViewModel.isEnableEdit &amp;&amp; ViewModel.currentMode == Mode.VIEW ? View.VISIBLE : View.GONE}" />
+                                android:visibility="@{ViewModel.isSelfProfile &amp;&amp; ViewModel.currentMode == Mode.VIEW ? View.VISIBLE : View.GONE}" />
 
                             <androidx.appcompat.widget.AppCompatImageButton
                                 android:layout_width="wrap_content"
@@ -160,6 +153,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal" />
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:onClick="@{() -> OnThanksListener.onThanks()}"
+                        android:text="@string/btn_thanks"
+                        android:visibility="@{!ViewModel.isSelfProfile ? View.VISIBLE : View.GONE}" />
 
                 </LinearLayout>
 
@@ -189,6 +190,10 @@
         <variable
             name="ProfileEditor"
             type="blagodarie.rating.ui.profile.ProfileEditor" />
+
+        <variable
+            name="OnThanksListener"
+            type="blagodarie.rating.OnThanksListener" />
 
     </data>
 
