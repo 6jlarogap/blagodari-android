@@ -44,7 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import blagodarie.rating.OnThanksListener;
+import blagodarie.rating.OnOperationListener;
 import blagodarie.rating.R;
 import blagodarie.rating.auth.AccountGeneral;
 import blagodarie.rating.databinding.NavHeaderLayoutBinding;
@@ -61,7 +61,7 @@ import io.reactivex.schedulers.Schedulers;
 public final class ProfileActivity
         extends AppCompatActivity
         implements ProfileEditor,
-        OnThanksListener {
+        OnOperationListener {
 
     private static final String TAG = ProfileActivity.class.getSimpleName();
 
@@ -136,7 +136,7 @@ public final class ProfileActivity
         mActivityBinding = DataBindingUtil.setContentView(this, R.layout.profile_activity);
         mActivityBinding.setViewModel(mViewModel);
         mActivityBinding.setProfileEditor(this);
-        mActivityBinding.setOnThanksListener(this);
+        mActivityBinding.setOnOperationListener(this);
 
         final QRCodeWriter writer = new QRCodeWriter();
         try {
@@ -212,6 +212,7 @@ public final class ProfileActivity
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
             case R.id.miQRCodeScan:
+                Toast.makeText(this, getString(blagodarie.rating.auth.R.string.info_msg_in_developing), Toast.LENGTH_LONG).show();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -279,12 +280,13 @@ public final class ProfileActivity
         );
     }
 
-    private void addThanks (
-            @NonNull final String authToken
+    private void addOperation (
+            @NonNull final String authToken,
+            final int operationTypeId
     ) {
-        Log.d(TAG, "updateProfileData");
+        Log.d(TAG, "addOperation");
 
-        final String content = String.format(Locale.ENGLISH, "{\"user_id_to\":\"%s\",\"operation_type_id\":1,\"timestamp\":%d}", mProfileUserId, System.currentTimeMillis());
+        final String content = String.format(Locale.ENGLISH, "{\"user_id_to\":\"%s\",\"operation_type_id\":%d,\"timestamp\":%d}", mProfileUserId, operationTypeId, System.currentTimeMillis());
 
         mCompositeDisposable.add(
                 Observable.
@@ -294,7 +296,7 @@ public final class ProfileActivity
                         subscribe(
                                 serverApiResponse -> {
                                     Log.d(TAG, serverApiResponse.toString());
-                                    onAddThanksComplete(serverApiResponse);
+                                    onAddOperationComplete(serverApiResponse, operationTypeId);
                                 },
                                 throwable -> {
                                     Log.e(TAG, Log.getStackTraceString(throwable));
@@ -317,20 +319,42 @@ public final class ProfileActivity
         }
     }
 
-    private void onAddThanksComplete (
-            @NonNull final ServerApiResponse serverApiResponse
+    private void onAddOperationComplete (
+            @NonNull final ServerApiResponse serverApiResponse,
+            final int operationTypeId
     ) {
         Log.d(TAG, "onUpdateDataComplete serverApiResponse=" + serverApiResponse);
         if (serverApiResponse.getCode() == 200) {
-            final Integer thanksCount = mViewModel.getThanksCount().get();
-            if (thanksCount == null) {
-                mViewModel.getFame().set(mViewModel.getFame().get() + 1);
-                mViewModel.getThanksCount().set(1);
-            } else {
-                mViewModel.getThanksCount().set(thanksCount + 1);
+            switch (operationTypeId) {
+                case 1: {
+                    final Integer thanksCount = mViewModel.getThanksCount().get();
+                    if (thanksCount == null) {
+                        mViewModel.getFame().set(mViewModel.getFame().get() + 1);
+                        mViewModel.getThanksCount().set(1);
+                        mViewModel.getIsTrust().set(true);
+                    } else {
+                        mViewModel.getThanksCount().set(thanksCount + 1);
+                    }
+                    mViewModel.getSumThanksCount().set(mViewModel.getSumThanksCount().get() + 1);
+                    Toast.makeText(this, R.string.info_msg_add_thanks_complete, Toast.LENGTH_LONG).show();
+                    break;
+                }
+                case 2: {
+                    mViewModel.getTrustlessCount().set(mViewModel.getTrustlessCount().get() + 1);
+                    mViewModel.getIsTrust().set(false);
+                    if (mViewModel.getThanksCount().get() == null) {
+                        mViewModel.getThanksCount().set(0);
+                    }
+                    Toast.makeText(this, R.string.info_msg_trust_is_lost, Toast.LENGTH_LONG).show();
+                    break;
+                }
+                case 3: {
+                    mViewModel.getTrustlessCount().set(mViewModel.getTrustlessCount().get() - 1);
+                    mViewModel.getIsTrust().set(true);
+                    Toast.makeText(this, R.string.info_msg_trust_restored, Toast.LENGTH_LONG).show();
+                    break;
+                }
             }
-            mViewModel.getSumThanksCount().set(mViewModel.getSumThanksCount().get() + 1);
-            Toast.makeText(this, R.string.info_msg_add_thanks_complete, Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(this, R.string.err_msg_add_thanks_failed, Toast.LENGTH_LONG).show();
         }
@@ -353,12 +377,12 @@ public final class ProfileActivity
         );
     }
 
-    private void getAuthTokenAndAddThanks () {
-        Log.d(TAG, "getAuthTokenAndUpdateProfileData");
+    private void getAuthTokenAndAddOperation (final int operationTypeId) {
+        Log.d(TAG, "getAuthTokenAndAddOperation");
         AccountProvider.getAuthToken(
                 this,
                 mAccount,
-                this::onGetAuthTokenForAddThanksComplete
+                accountManagerFuture -> onGetAuthTokenForAddOperationComplete(accountManagerFuture, operationTypeId)
         );
     }
 
@@ -393,8 +417,9 @@ public final class ProfileActivity
         }
     }
 
-    private void onGetAuthTokenForAddThanksComplete (
-            @NonNull final AccountManagerFuture<Bundle> future
+    private void onGetAuthTokenForAddOperationComplete (
+            @NonNull final AccountManagerFuture<Bundle> future,
+            final int operationTypeId
     ) {
         Log.d(TAG, "onGetAuthTokenForUpdateProfileDataComplete");
         try {
@@ -402,7 +427,7 @@ public final class ProfileActivity
             if (bundle != null) {
                 final String authToken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
                 if (authToken != null) {
-                    addThanks(authToken);
+                    addOperation(authToken, operationTypeId);
                 }
             }
         } catch (AuthenticatorException | IOException | OperationCanceledException e) {
@@ -516,7 +541,7 @@ public final class ProfileActivity
     @Override
     public void onThanks () {
         if (mAccount != null) {
-            getAuthTokenAndAddThanks();
+            getAuthTokenAndAddOperation(1);
         } else {
             mAccountManager.addAccount(
                     getString(R.string.account_type),
@@ -524,13 +549,47 @@ public final class ProfileActivity
                     null,
                     null,
                     this,
-                    this::onAddAccountFinished,
+                    accountManagerFuture -> onAddAccountFinished(accountManagerFuture, 1),
                     null
             );
         }
     }
 
-    public void onAddAccountFinished (final AccountManagerFuture<Bundle> result) {
+    @Override
+    public void onTrustless () {
+        if (mAccount != null) {
+            getAuthTokenAndAddOperation(2);
+        } else {
+            mAccountManager.addAccount(
+                    getString(R.string.account_type),
+                    getString(R.string.token_type),
+                    null,
+                    null,
+                    this,
+                    accountManagerFuture -> onAddAccountFinished(accountManagerFuture, 2),
+                    null
+            );
+        }
+    }
+
+    @Override
+    public void onTrustlessCancel () {
+        if (mAccount != null) {
+            getAuthTokenAndAddOperation(3);
+        } else {
+            mAccountManager.addAccount(
+                    getString(R.string.account_type),
+                    getString(R.string.token_type),
+                    null,
+                    null,
+                    this,
+                    accountManagerFuture -> onAddAccountFinished(accountManagerFuture, 3),
+                    null
+            );
+        }
+    }
+
+    public void onAddAccountFinished (final AccountManagerFuture<Bundle> result, final int operationTypeId) {
         Log.d(TAG, "onAddAccountFinish");
         try {
             final Bundle bundle = result.getResult();
@@ -538,7 +597,7 @@ public final class ProfileActivity
                     bundle.getString(AccountManager.KEY_ACCOUNT_NAME),
                     bundle.getString(AccountManager.KEY_ACCOUNT_TYPE)
             );
-            getAuthTokenAndAddThanks();
+            getAuthTokenAndAddOperation(operationTypeId);
         } catch (OperationCanceledException e) {
             Log.e(TAG, Log.getStackTraceString(e));
             Toast.makeText(this, getString(R.string.err_msg_account_not_created), Toast.LENGTH_LONG).show();
