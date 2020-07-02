@@ -211,11 +211,22 @@ public final class ProfileActivity
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
+            case R.id.miShare:
+                share();
+                return true;
             case R.id.miQRCodeScan:
                 Toast.makeText(this, getString(blagodarie.rating.auth.R.string.info_msg_in_developing), Toast.LENGTH_LONG).show();
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void share () {
+        final Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.url_profile, mProfileUserId));
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, "Поделиться"));
     }
 
     @Override
