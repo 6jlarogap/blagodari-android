@@ -1,17 +1,21 @@
 package blagodarie.rating.ui.profile;
 
+import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
+import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -31,7 +35,10 @@ import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
+import com.google.zxing.client.android.Intents;
 import com.google.zxing.common.BitMatrix;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.squareup.picasso.Picasso;
 
@@ -215,13 +222,66 @@ public final class ProfileActivity
                 share();
                 return true;
             case R.id.miQRCodeScan:
-                Toast.makeText(this, getString(blagodarie.rating.auth.R.string.info_msg_in_developing), Toast.LENGTH_LONG).show();
+                tryScanQRCode();
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public void share () {
+    private void tryScanQRCode () {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                scanQRCode();
+            } else {
+                requestPermissions(new String[]{Manifest.permission.CAMERA}, 1);
+            }
+        }
+    }
+
+    private void scanQRCode () {
+        new IntentIntegrator(this).
+                setPrompt(getString(R.string.rqst_scan_qr_code)).
+                setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES).
+                setOrientationLocked(true).
+                initiateScan();
+    }
+
+    @Override
+    protected void onActivityResult (int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case IntentIntegrator.REQUEST_CODE: {
+                IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+                if (result.getContents() != null) {
+                    final String url = result.getContents();
+                    final Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(url));
+                    if (i.resolveActivity(getPackageManager()) != null){
+                        startActivity(i);
+                    } else {
+                        Toast.makeText(this, R.string.err_msg_incorrect_link, Toast.LENGTH_LONG).show();
+                    }
+                }
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult (int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 1:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    scanQRCode();
+                }
+                break;
+        }
+    }
+
+    private void share () {
         final Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.url_profile, mProfileUserId));

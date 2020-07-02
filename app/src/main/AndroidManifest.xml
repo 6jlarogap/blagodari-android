@@ -35,6 +35,11 @@
         <activity android:name=".ui.main.MainActivity" />
 
         <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="portrait"
+            tools:replace="screenOrientation" />
+
+        <activity
             android:name=".ui.profile.ProfileActivity"
             android:screenOrientation="portrait">
             <intent-filter
