@@ -8,6 +8,7 @@ import android.accounts.OperationCanceledException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -26,6 +27,7 @@ import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
@@ -33,10 +35,13 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import blagodarie.rating.OnThanksListener;
@@ -44,6 +49,7 @@ import blagodarie.rating.R;
 import blagodarie.rating.auth.AccountGeneral;
 import blagodarie.rating.databinding.NavHeaderLayoutBinding;
 import blagodarie.rating.databinding.ProfileActivityBinding;
+import blagodarie.rating.databinding.ThanksUserItemBinding;
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
 import blagodarie.rating.ui.AccountProvider;
@@ -73,6 +79,8 @@ public final class ProfileActivity
 
     private DrawerLayout mDrawerLayout;
 
+    private ThanksUserAdapter mThanksUserAdapter;
+
     @Override
     protected void onCreate (@Nullable final Bundle savedInstanceState) {
         Log.d(TAG, "onCreate");
@@ -89,6 +97,7 @@ public final class ProfileActivity
                 initBinding();
                 setupToolbar();
                 setupNavigationDrawer();
+                initThanksUserAdapter();
                 AccountProvider.getAccount(
                         this,
                         new AccountProvider.OnAccountSelectListener() {
@@ -143,6 +152,27 @@ public final class ProfileActivity
             mActivityBinding.ivQRCode.setImageBitmap(bmp);
         } catch (WriterException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void initThanksUserAdapter () {
+        mViewModel.getThanksUsers().observe(this, displayThanksUsers -> {
+            if (mThanksUserAdapter == null) {
+                mThanksUserAdapter = new ThanksUserAdapter(this::onThanksUserClick);
+                mActivityBinding.rvThanksUsers.setLayoutManager(new GridLayoutManager(this, 5));
+                mActivityBinding.rvThanksUsers.setAdapter(mThanksUserAdapter);
+            }
+            mThanksUserAdapter.setData(displayThanksUsers);
+        });
+    }
+
+    private void onThanksUserClick(@NonNull final View view) {
+        final ThanksUserItemBinding thanksUserItemBinding = ((ThanksUserItemBinding)DataBindingUtil.findBinding(view));
+        if (thanksUserItemBinding != null) {
+            final String userId = thanksUserItemBinding.getThanksUser().getUserUUID();
+            final Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(getString(R.string.url_profile, userId)));
+            startActivity(i);
         }
     }
 
@@ -433,6 +463,19 @@ public final class ProfileActivity
                     } catch (JSONException e) {
                         mViewModel.getIsTrust().set(null);
                     }
+
+                    final List<DisplayThanksUser> thanksUsers = new ArrayList<>();
+                    final JSONArray thanksUsersJSONArray = userJSON.getJSONArray("thanks_users");
+                    for (int i = 0; i < thanksUsersJSONArray.length(); i++) {
+                        final JSONObject thanksUserJSONObject = thanksUsersJSONArray.getJSONObject(i);
+                        final String thanksUserPhoto = thanksUserJSONObject.getString("photo");
+                        final String thanksUserUUID = thanksUserJSONObject.getString("user_uuid");
+                        //for (int j = 0; j < 10; j++) {
+                            thanksUsers.add(new DisplayThanksUser(thanksUserPhoto, thanksUserUUID));
+                        //}
+                    }
+                    mViewModel.getThanksUsers().setValue(thanksUsers);
+
                 } catch (JSONException e) {
                     Log.e(TAG, Log.getStackTraceString(e));
                     Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();

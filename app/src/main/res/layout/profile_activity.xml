@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawer_layout"
@@ -171,6 +170,19 @@
                         android:text="@string/btn_thanks"
                         android:visibility="@{!ViewModel.isSelfProfile ? View.VISIBLE : View.GONE}" />
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:text="@string/txt_thanks_users" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvThanksUsers"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fadeScrollbars="false"
+                        android:scrollbars="vertical" />
+
                 </LinearLayout>
 
             </FrameLayout>
@@ -182,7 +194,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            android:fitsSystemWindows="true"/>
+            android:fitsSystemWindows="true" />
 
     </androidx.drawerlayout.widget.DrawerLayout>
 

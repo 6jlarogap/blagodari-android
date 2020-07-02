@@ -4,7 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableField;
 import androidx.databinding.ObservableInt;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
+import java.util.List;
 
 public final class ProfileViewModel
         extends ViewModel {
@@ -48,6 +51,9 @@ public final class ProfileViewModel
 
     @NonNull
     private final ObservableBoolean mSelfProfile = new ObservableBoolean(false);
+
+    @NonNull
+    private final MutableLiveData<List<DisplayThanksUser>> mThanksUsers = new MutableLiveData<>();
 
     public ProfileViewModel () {
     }
@@ -113,6 +119,11 @@ public final class ProfileViewModel
 
     public final ObservableBoolean getIsSelfProfile () {
         return mSelfProfile;
+    }
+
+    @NonNull
+    public MutableLiveData<List<DisplayThanksUser>> getThanksUsers () {
+        return mThanksUsers;
     }
 
 }
