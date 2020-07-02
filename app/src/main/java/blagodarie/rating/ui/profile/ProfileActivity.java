@@ -166,8 +166,8 @@ public final class ProfileActivity
         });
     }
 
-    private void onThanksUserClick(@NonNull final View view) {
-        final ThanksUserItemBinding thanksUserItemBinding = ((ThanksUserItemBinding)DataBindingUtil.findBinding(view));
+    private void onThanksUserClick (@NonNull final View view) {
+        final ThanksUserItemBinding thanksUserItemBinding = ((ThanksUserItemBinding) DataBindingUtil.findBinding(view));
         if (thanksUserItemBinding != null) {
             final String userId = thanksUserItemBinding.getThanksUser().getUserUUID();
             final Intent i = new Intent(Intent.ACTION_VIEW);
@@ -470,9 +470,7 @@ public final class ProfileActivity
                         final JSONObject thanksUserJSONObject = thanksUsersJSONArray.getJSONObject(i);
                         final String thanksUserPhoto = thanksUserJSONObject.getString("photo");
                         final String thanksUserUUID = thanksUserJSONObject.getString("user_uuid");
-                        //for (int j = 0; j < 10; j++) {
-                            thanksUsers.add(new DisplayThanksUser(thanksUserPhoto, thanksUserUUID));
-                        //}
+                        thanksUsers.add(new DisplayThanksUser(thanksUserPhoto, thanksUserUUID));
                     }
                     mViewModel.getThanksUsers().setValue(thanksUsers);
 
