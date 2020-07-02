@@ -266,7 +266,9 @@ public final class ProfileActivity
         );
     }
 
-    private void onUpdateDataComplete (@NonNull final ServerApiResponse serverApiResponse) {
+    private void onUpdateDataComplete (
+            @NonNull final ServerApiResponse serverApiResponse
+    ) {
         Log.d(TAG, "onUpdateDataComplete serverApiResponse=" + serverApiResponse);
         if (serverApiResponse.getCode() == 200) {
             mViewModel.getCardNumber().set(mActivityBinding.etCardNumber.getText().toString());
@@ -277,11 +279,18 @@ public final class ProfileActivity
         }
     }
 
-    private void onAddThanksComplete (@NonNull final ServerApiResponse serverApiResponse) {
+    private void onAddThanksComplete (
+            @NonNull final ServerApiResponse serverApiResponse
+    ) {
         Log.d(TAG, "onUpdateDataComplete serverApiResponse=" + serverApiResponse);
         if (serverApiResponse.getCode() == 200) {
             final Integer thanksCount = mViewModel.getThanksCount().get();
-            mViewModel.getThanksCount().set(thanksCount != null ? thanksCount + 1 : 0);
+            if (thanksCount == null) {
+                mViewModel.getFame().set(mViewModel.getFame().get() + 1);
+                mViewModel.getThanksCount().set(1);
+            } else {
+                mViewModel.getThanksCount().set(thanksCount + 1);
+            }
             mViewModel.getSumThanksCount().set(mViewModel.getSumThanksCount().get() + 1);
             Toast.makeText(this, R.string.info_msg_add_thanks_complete, Toast.LENGTH_LONG).show();
         } else {
