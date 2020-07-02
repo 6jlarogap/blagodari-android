@@ -135,7 +135,7 @@ public final class ProfileActivity
                     bmp.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.TRANSPARENT);
                 }
             }
-            mActivityBinding.ivQRCode.setImageBitmap(bmp);
+            //mActivityBinding.ivQRCode.setImageBitmap(bmp);
         } catch (WriterException e) {
             e.printStackTrace();
         }
@@ -148,7 +148,7 @@ public final class ProfileActivity
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(false);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
-            actionBar.setDisplayHomeAsUpEnabled(true);
+            //actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
 
@@ -157,7 +157,7 @@ public final class ProfileActivity
             @NonNull final Menu menu
     ) {
         Log.d(TAG, "onCreateOptionsMenu");
-        getMenuInflater().inflate(R.menu.profile_activity, menu);
+        //getMenuInflater().inflate(R.menu.profile_activity, menu);
         return true;
     }
 
