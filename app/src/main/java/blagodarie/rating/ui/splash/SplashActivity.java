@@ -105,5 +105,6 @@ public final class SplashActivity
         final Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(getString(R.string.url_profile, userId)));
         startActivity(i);
+        finish();
     }
 }
