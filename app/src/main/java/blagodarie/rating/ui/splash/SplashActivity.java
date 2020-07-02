@@ -2,22 +2,28 @@ package blagodarie.rating.ui.splash;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.AlertDialog;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.Arrays;
+import java.io.IOException;
 
 import blagodarie.rating.R;
 import blagodarie.rating.auth.AccountGeneral;
+import blagodarie.rating.ui.AccountProvider;
 
 public final class SplashActivity
-        extends AppCompatActivity {
+        extends AppCompatActivity
+        implements AccountProvider.OnAccountSelectListener {
 
     private static final String TAG = SplashActivity.class.getSimpleName();
 
@@ -37,24 +43,20 @@ public final class SplashActivity
     protected void onResume () {
         super.onResume();
         Log.d(TAG, "onResume");
-        chooseAccount();
+        AccountProvider.getAccount(
+                this,
+                this
+        );
     }
 
-    private void chooseAccount () {
-        Log.d(TAG, "chooseAccount");
-        final String accountType = getString(R.string.account_type);
-        final Account[] accounts = mAccountManager.getAccountsByType(accountType);
-        if (accounts.length == 1) {
-                final String userId = mAccountManager.getUserData(accounts[0], AccountGeneral.USER_DATA_USER_ID);
-                if (userId == null) {
-                    mAccountManager.setUserData(accounts[0], AccountGeneral.USER_DATA_USER_ID, accounts[0].name);
-                }
-            toMainActivity(accounts[0]);
-        } else if (accounts.length > 1) {
-            showAccountPicker(accounts);
-        } else {
-            addNewAccount(accountType);
-        }
+    @Override
+    public void onNoAccount () {
+        addNewAccount(getString(R.string.account_type));
+    }
+
+    @Override
+    public void onAccountSelected (@NonNull final Account account) {
+        toProfile(account);
     }
 
     private void addNewAccount (
@@ -67,39 +69,42 @@ public final class SplashActivity
                 null,
                 null,
                 this,
-                future -> chooseAccount(),
+                this::onAddAccountFinished,
                 null
         );
     }
 
-    private void showAccountPicker (
-            @NonNull final Account[] accounts
-    ) {
-        Log.d(TAG, "showAccountPicker accounts=" + Arrays.toString(accounts));
-        final String[] names = new String[accounts.length];
-        for (int i = 0; i < accounts.length; i++) {
-            names[i] = accounts[i].name;
+    public void onAddAccountFinished (final AccountManagerFuture<Bundle> result) {
+        Log.d(TAG, "onAddAccountFinish");
+        try {
+            final Bundle bundle = result.getResult();
+            final Account account = new Account(
+                    bundle.getString(AccountManager.KEY_ACCOUNT_NAME),
+                    bundle.getString(AccountManager.KEY_ACCOUNT_TYPE)
+            );
+            toProfile(account);
+        } catch (OperationCanceledException e) {
+            Log.e(TAG, Log.getStackTraceString(e));
+            Toast.makeText(this, getString(R.string.err_msg_account_not_created), Toast.LENGTH_LONG).show();
+            finish();
+        } catch (AuthenticatorException e) {
+            Log.e(TAG, Log.getStackTraceString(e));
+            Toast.makeText(this, getString(R.string.err_msg_authentication_error), Toast.LENGTH_LONG).show();
+            finish();
+        } catch (IOException e) {
+            Log.e(TAG, Log.getStackTraceString(e));
+            finish();
         }
-
-        new AlertDialog.
-                Builder(this).
-                setTitle(R.string.rqst_choose_account).
-                setCancelable(false).
-                setAdapter(
-                        new ArrayAdapter<>(
-                                getBaseContext(),
-                                android.R.layout.simple_list_item_1, names),
-                        (dialog, which) -> toMainActivity(accounts[which])
-                ).
-                create().
-                show();
     }
 
-    private void toMainActivity (
+    private void toProfile (
             @NonNull final Account account
     ) {
-        Log.d(TAG, "toMainActivity account=" + account);
-        //startActivity(MessagesActivity.createSelfIntent(this, account));
-        //finish();
+        Log.d(TAG, "toProfile account=" + account);
+        final String userId = mAccountManager.getUserData(account, AccountGeneral.USER_DATA_USER_ID);
+        final Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(getString(R.string.url_profile, userId)));
+        startActivity(i);
+        finish();
     }
 }

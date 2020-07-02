@@ -1,4 +1,18 @@
 package blagodarie.rating;
 
-public class RatingApp {
+import android.app.Application;
+import android.util.Log;
+
+import blagodarie.rating.ui.profile.ProfileActivity;
+
+public final class RatingApp
+        extends Application {
+
+    private static final String TAG = ProfileActivity.class.getSimpleName();
+
+    @Override
+    public final void onCreate () {
+        Log.d(TAG, "start RatingApp");
+        super.onCreate();
+    }
 }

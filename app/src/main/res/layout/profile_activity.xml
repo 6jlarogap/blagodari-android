@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <com.google.android.material.appbar.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+                <include layout="@layout/toolbar" />
+
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <androidx.coordinatorlayout.widget.CoordinatorLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="@{ViewModel.downloadInProgress ? View.VISIBLE : View.GONE}" />
+
+                <androidx.core.widget.NestedScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingLeft="@dimen/activity_horizontal_margin"
+                        android:paddingTop="@dimen/activity_vertical_margin"
+                        android:paddingRight="@dimen/activity_horizontal_margin"
+                        android:paddingBottom="@dimen/activity_vertical_margin">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:visibility="@{ViewModel.downloadInProgress ? View.GONE : View.VISIBLE}">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/ivPhoto"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:scaleType="center" />
+
+                            <TextView
+                                style="@style/TextAppearance.AppCompat.Headline"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:text='@{ViewModel.lastName + " " + ViewModel.firstName + (ViewModel.middleName.equals("") ? "" : " " + ViewModel.middleName)}' />
+
+                            <TextView
+                                style="@style/TextAppearance.AppCompat.Body1"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@{String.format(@string/txt_fame, ViewModel.fame)}" />
+
+                            <TextView
+                                style="@style/TextAppearance.AppCompat.Body1"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@{String.format(@string/txt_sum_thanks_count, ViewModel.sumThanksCount)}" />
+
+                            <TextView
+                                style="@style/TextAppearance.AppCompat.Body1"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@{String.format(@string/txt_trustless_count, ViewModel.trustlessCount)}" />
+
+                            <TextView
+                                style="@style/TextAppearance.AppCompat.Body1"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@{String.format(@string/txt_thanks_count, ViewModel.thanksCount)}"
+                                android:visibility="@{ViewModel.thanksCount != null ? View.VISIBLE : View.GONE}" />
+
+                            <TextView
+                                style="@style/TextAppearance.AppCompat.Body1"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@{String.format(@string/txt_is_trust, (ViewModel.isTrust ? @string/txt_yes : @string/txt_no))}"
+                                android:visibility="@{ViewModel.isTrust != null ? View.VISIBLE : View.GONE}" />
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <com.google.android.material.textfield.TextInputLayout
+                                    android:id="@+id/tilCardNumber"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_alignParentStart="true"
+                                    android:layout_alignParentTop="true"
+                                    android:layout_toStartOf="@+id/llButtons">
+
+                                    <EditText
+                                        android:id="@+id/etCardNumber"
+                                        style="@style/TextAppearance.AppCompat.Body1"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:enabled="@{ViewModel.currentMode == Mode.EDIT ? true : false}"
+                                        android:hint="@string/txt_card_number"
+                                        android:importantForAutofill="no"
+                                        android:inputType="number"
+                                        android:maxLength="16"
+                                        android:text="@{ViewModel.cardNumber}" />
+
+                                </com.google.android.material.textfield.TextInputLayout>
+
+                                <LinearLayout
+                                    android:id="@+id/llButtons"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_alignParentEnd="true"
+                                    android:layout_centerVertical="true"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatImageButton
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_gravity="center_vertical"
+                                        android:onClick="@{() -> ProfileEditor.onEdit()}"
+                                        android:src="@drawable/pencil"
+                                        android:visibility="@{ViewModel.isSelfProfile &amp;&amp; ViewModel.currentMode == Mode.VIEW ? View.VISIBLE : View.GONE}" />
+
+                                    <androidx.appcompat.widget.AppCompatImageButton
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_gravity="center_vertical"
+                                        android:onClick="onCopyClick"
+                                        android:src="@drawable/content_copy"
+                                        android:visibility='@{ViewModel.currentMode == Mode.VIEW &amp;&amp; !ViewModel.cardNumber.equals("") ? View.VISIBLE : View.GONE}' />
+
+                                    <androidx.appcompat.widget.AppCompatImageButton
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_gravity="center_vertical"
+                                        android:onClick="@{() -> ProfileEditor.onSave()}"
+                                        android:src="@drawable/content_save"
+                                        android:visibility="@{ViewModel.currentMode == Mode.EDIT ? View.VISIBLE : View.GONE}" />
+
+                                    <androidx.appcompat.widget.AppCompatImageButton
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_gravity="center_vertical"
+                                        android:onClick="@{() -> ProfileEditor.onCancel()}"
+                                        android:src="@drawable/cancel"
+                                        android:visibility="@{ViewModel.currentMode == Mode.EDIT ? View.VISIBLE : View.GONE}" />
+
+                                </LinearLayout>
+
+                            </RelativeLayout>
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/ivQRCode"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_horizontal"
+                                android:orientation="horizontal">
+
+                                <Button
+                                    style="?android:attr/buttonStyle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
+                                    android:onClick="@{() -> OnOperationListener.onThanks()}"
+                                    android:text="@string/btn_thanks"
+                                    android:visibility="@{!ViewModel.isSelfProfile ? View.VISIBLE : View.GONE}" />
+
+                                <Button
+                                    style="?android:attr/buttonStyle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
+                                    android:onClick="@{() -> OnOperationListener.onTrustless()}"
+                                    android:text="@string/btn_trustless"
+                                    android:visibility="@{!ViewModel.isSelfProfile &amp;&amp; (ViewModel.isTrust == null || ViewModel.isTrust) ? View.VISIBLE : View.GONE}" />
+
+                                <Button
+                                    style="?android:attr/buttonStyle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
+                                    android:onClick="@{() -> OnOperationListener.onTrustlessCancel()}"
+                                    android:text="@string/btn_cancel_trustless"
+                                    android:visibility="@{!ViewModel.isSelfProfile &amp;&amp; ViewModel.isTrust != null &amp;&amp; !ViewModel.isTrust ? View.VISIBLE : View.GONE}" />
+
+                            </LinearLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:text="@string/txt_thanks_users" />
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/rvThanksUsers"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fadeScrollbars="false"
+                                android:scrollbars="vertical" />
+
+                        </LinearLayout>
+
+                    </FrameLayout>
+
+                </androidx.core.widget.NestedScrollView>
+
+            </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+        </LinearLayout>
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/nvNavigation"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:fitsSystemWindows="true" />
+
+    </androidx.drawerlayout.widget.DrawerLayout>
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <import type="blagodarie.rating.ui.profile.ProfileViewModel.Mode" />
+
+        <variable
+            name="ViewModel"
+            type="blagodarie.rating.ui.profile.ProfileViewModel" />
+
+        <variable
+            name="ProfileEditor"
+            type="blagodarie.rating.ui.profile.ProfileEditor" />
+
+        <variable
+            name="OnOperationListener"
+            type="blagodarie.rating.OnOperationListener" />
+
+    </data>
+
+</layout>

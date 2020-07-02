@@ -22,6 +22,8 @@ import com.google.android.gms.tasks.Task;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.UUID;
+
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
 import io.reactivex.Observable;
@@ -61,7 +63,13 @@ public final class SignUpFragment
 
     private void initViews (final View view) {
         Log.d(TAG, "initViews");
-        view.findViewById(R.id.btnSignIn).setOnClickListener(v -> AuthenticationActivity.googleSignIn(requireActivity(), this, getString(R.string.oauth2_client_id)));
+        view.findViewById(R.id.btnSignIn).setOnClickListener(
+                v -> AuthenticationActivity.googleSignIn(
+                        requireActivity(),
+                        this,
+                        getString(R.string.oauth2_client_id)
+                )
+        );
     }
 
     @Override
@@ -120,34 +128,40 @@ public final class SignUpFragment
                 final String responseBody = serverApiResponse.getBody();
                 try {
                     final JSONObject userJSON = new JSONObject(responseBody);
-                    final long userId = userJSON.getLong("user_id");
+                    final String userIdString = userJSON.getString("user_uuid");
+                    final UUID userId = UUID.fromString(userIdString);
                     final String first_name = userJSON.getString("first_name");
                     final String middleName = userJSON.getString("middle_name");
                     final String lastName = userJSON.getString("last_name");
                     final String authToken = userJSON.getString("token");
                     createAccount(userId, first_name, middleName, lastName, authToken);
                 } catch (JSONException e) {
-                    Log.e(TAG, e.toString());
                     Log.e(TAG, Log.getStackTraceString(e));
                     Toast.makeText(requireActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+                } catch (IllegalArgumentException e) {
+                    Log.e(TAG, Log.getStackTraceString(e));
+                    Toast.makeText(requireActivity(), getString(R.string.err_msg_incorrect_user_id), Toast.LENGTH_LONG).show();
                 }
             }
         }
     }
 
     private void createAccount (
-            @NonNull final Long userId,
+            @NonNull final UUID userId,
             @NonNull final String firstName,
             @NonNull final String middleName,
             @NonNull final String lastName,
             @NonNull final String authToken
     ) {
         Log.d(TAG, "createAccount");
-        final String accountName = lastName + middleName + firstName;
+        final String accountName = userId.toString();
         final AccountManager accountManager = AccountManager.get(getContext());
         final Account account = new Account(accountName, getString(R.string.account_type));
         final Bundle userData = new Bundle();
         userData.putString(AccountGeneral.USER_DATA_USER_ID, userId.toString());
+        userData.putString(AccountGeneral.USER_DATA_FIRST_NAME, firstName);
+        userData.putString(AccountGeneral.USER_DATA_MIDDLE_NAME, middleName);
+        userData.putString(AccountGeneral.USER_DATA_LAST_NAME, lastName);
         accountManager.addAccountExplicitly(account, "", userData);
         accountManager.setAuthToken(account, getString(R.string.token_type), authToken);
 
@@ -155,6 +169,7 @@ public final class SignUpFragment
         bundle.putString(AccountManager.KEY_ACCOUNT_NAME, accountName);
         bundle.putString(AccountManager.KEY_ACCOUNT_TYPE, getString(R.string.account_type));
         bundle.putString(AccountManager.KEY_AUTHTOKEN, authToken);
+
         final Intent res = new Intent();
         res.putExtras(bundle);
 
