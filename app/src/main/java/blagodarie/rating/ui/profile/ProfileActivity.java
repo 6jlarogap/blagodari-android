@@ -5,6 +5,9 @@ import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -12,6 +15,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -38,6 +42,7 @@ import java.util.Locale;
 import blagodarie.rating.OnThanksListener;
 import blagodarie.rating.R;
 import blagodarie.rating.auth.AccountGeneral;
+import blagodarie.rating.databinding.NavHeaderLayoutBinding;
 import blagodarie.rating.databinding.ProfileActivityBinding;
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
@@ -164,6 +169,9 @@ public final class ProfileActivity
     private void setupNavigationDrawer () {
         Log.d(TAG, "setupNavigationDrawer");
         mDrawerLayout = findViewById(R.id.drawer_layout);
+
+        final NavHeaderLayoutBinding binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.nav_header_layout, null, false);
+        mActivityBinding.nvNavigation.addHeaderView(binding.getRoot());
     }
 
     @Override
@@ -449,7 +457,7 @@ public final class ProfileActivity
         mViewModel.setCurrentMode(ProfileViewModel.Mode.VIEW);
 
         final String cardNumber = mActivityBinding.etCardNumber.getText().toString();
-        if (cardNumber.length() == 16) {
+        if (cardNumber.isEmpty() || cardNumber.length() == 16) {
             getAuthTokenAndUpdateProfileData(cardNumber);
         } else {
             mViewModel.getCardNumber().notifyChange();
@@ -501,6 +509,15 @@ public final class ProfileActivity
         } catch (IOException e) {
             Log.e(TAG, Log.getStackTraceString(e));
             finish();
+        }
+    }
+
+    public void onCopyClick (@NonNull final View view) {
+        final ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        final ClipData clip = ClipData.newPlainText(getText(R.string.txt_card_number), mActivityBinding.etCardNumber.getText().toString());
+        if (clipboard != null) {
+            clipboard.setPrimaryClip(clip);
+            Toast.makeText(this, R.string.info_msg_copied_to_clipboard, Toast.LENGTH_SHORT).show();
         }
     }
 }

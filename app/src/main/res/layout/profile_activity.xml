@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawer_layout"
@@ -132,6 +133,14 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_vertical"
+                                android:onClick="onCopyClick"
+                                android:src="@drawable/content_copy"
+                                android:visibility='@{ViewModel.currentMode == Mode.VIEW &amp;&amp; !ViewModel.cardNumber.equals("") ? View.VISIBLE : View.GONE}' />
+
+                            <androidx.appcompat.widget.AppCompatImageButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
                                 android:onClick="@{() -> ProfileEditor.onSave()}"
                                 android:src="@drawable/content_save"
                                 android:visibility="@{ViewModel.currentMode == Mode.EDIT ? View.VISIBLE : View.GONE}" />
@@ -173,7 +182,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            android:fitsSystemWindows="true" />
+            android:fitsSystemWindows="true"/>
 
     </androidx.drawerlayout.widget.DrawerLayout>
 

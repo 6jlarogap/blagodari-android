@@ -7,6 +7,8 @@
 
     <string name="rqst_choose_account">Выберите аккаунт</string>
 
+    <string name="info_msg_copied_to_clipboard">Скопировано в буффер обмена</string>
+
     <string name="err_msg_account_not_created">Аккаунт не был создан</string>
     <string name="err_msg_authentication_error">Ошибка аутентификации</string>
     <string name="err_msg_missing_profile_user_id">Не указан идентификатор пользователя</string>
@@ -19,4 +21,6 @@
     <string name="txt_yes">Да</string>
     <string name="txt_no">Нет</string>
     <string name="txt_card_number">Номер карты</string>
+    <string name="txt_version">Версия: %s</string>
+
 </resources>
