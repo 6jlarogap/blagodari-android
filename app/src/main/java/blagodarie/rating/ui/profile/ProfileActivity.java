@@ -6,7 +6,6 @@ import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
-import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -35,7 +34,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
-import com.google.zxing.client.android.Intents;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -131,8 +129,7 @@ public final class ProfileActivity
         }
     }
 
-    private void initViewModel (
-    ) {
+    private void initViewModel () {
         Log.d(TAG, "initViewModel");
         mViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
     }
@@ -142,6 +139,7 @@ public final class ProfileActivity
         Log.d(TAG, "initBinding");
         mActivityBinding = DataBindingUtil.setContentView(this, R.layout.profile_activity);
         mActivityBinding.setViewModel(mViewModel);
+        mActivityBinding.srlRefreshProfileInfo.setOnRefreshListener(this::getAuthTokenAndDownloadProfileData);
         mActivityBinding.setProfileEditor(this);
         mActivityBinding.setOnOperationListener(this);
 
@@ -166,15 +164,21 @@ public final class ProfileActivity
         mViewModel.getThanksUsers().observe(this, displayThanksUsers -> {
             if (mThanksUserAdapter == null) {
                 mThanksUserAdapter = new ThanksUserAdapter(this::onThanksUserClick);
-                mActivityBinding.rvThanksUsers.setLayoutManager(new GridLayoutManager(this, 5));
+                mActivityBinding.rvThanksUsers.setLayoutManager(new GridLayoutManager(this, calcSpanCount()));
                 mActivityBinding.rvThanksUsers.setAdapter(mThanksUserAdapter);
             }
             mThanksUserAdapter.setData(displayThanksUsers);
         });
     }
 
+    private int calcSpanCount () {
+        int layoutWidthDp = (int) (mActivityBinding.rvThanksUsers.getWidth() / getResources().getDisplayMetrics().density);
+        int itemWidthDp = (int) ((getResources().getDimension(R.dimen.thanks_user_photo_width) + (getResources().getDimension(R.dimen.thanks_user_photo_margin) * 2)) / getResources().getDisplayMetrics().density);
+        return layoutWidthDp / itemWidthDp;
+    }
+
     private void onThanksUserClick (@NonNull final View view) {
-        final ThanksUserItemBinding thanksUserItemBinding = ((ThanksUserItemBinding) DataBindingUtil.findBinding(view));
+        final ThanksUserItemBinding thanksUserItemBinding = DataBindingUtil.findBinding(view);
         if (thanksUserItemBinding != null) {
             final String userId = thanksUserItemBinding.getThanksUser().getUserUUID();
             final Intent i = new Intent(Intent.ACTION_VIEW);
@@ -256,7 +260,7 @@ public final class ProfileActivity
                     final String url = result.getContents();
                     final Intent i = new Intent(Intent.ACTION_VIEW);
                     i.setData(Uri.parse(url));
-                    if (i.resolveActivity(getPackageManager()) != null){
+                    if (i.resolveActivity(getPackageManager()) != null) {
                         startActivity(i);
                     } else {
                         Toast.makeText(this, R.string.err_msg_incorrect_link, Toast.LENGTH_LONG).show();
@@ -398,34 +402,19 @@ public final class ProfileActivity
         if (serverApiResponse.getCode() == 200) {
             switch (operationTypeId) {
                 case 1: {
-                    final Integer thanksCount = mViewModel.getThanksCount().get();
-                    if (thanksCount == null) {
-                        mViewModel.getFame().set(mViewModel.getFame().get() + 1);
-                        mViewModel.getThanksCount().set(1);
-                        mViewModel.getIsTrust().set(true);
-                    } else {
-                        mViewModel.getThanksCount().set(thanksCount + 1);
-                    }
-                    mViewModel.getSumThanksCount().set(mViewModel.getSumThanksCount().get() + 1);
                     Toast.makeText(this, R.string.info_msg_add_thanks_complete, Toast.LENGTH_LONG).show();
                     break;
                 }
                 case 2: {
-                    mViewModel.getTrustlessCount().set(mViewModel.getTrustlessCount().get() + 1);
-                    mViewModel.getIsTrust().set(false);
-                    if (mViewModel.getThanksCount().get() == null) {
-                        mViewModel.getThanksCount().set(0);
-                    }
                     Toast.makeText(this, R.string.info_msg_trust_is_lost, Toast.LENGTH_LONG).show();
                     break;
                 }
                 case 3: {
-                    mViewModel.getTrustlessCount().set(mViewModel.getTrustlessCount().get() - 1);
-                    mViewModel.getIsTrust().set(true);
                     Toast.makeText(this, R.string.info_msg_trust_restored, Toast.LENGTH_LONG).show();
                     break;
                 }
             }
+            getAuthTokenAndDownloadProfileData();
         } else {
             Toast.makeText(this, R.string.err_msg_add_thanks_failed, Toast.LENGTH_LONG).show();
         }

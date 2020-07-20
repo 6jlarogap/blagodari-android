@@ -54,7 +54,6 @@ public final class SignUpFragment
         return view;
     }
 
-
     @Override
     public void onActivityCreated (@Nullable final Bundle savedInstanceState) {
         Log.d(TAG, "onActivityCreated");
