@@ -1,17 +1,26 @@
 package blagodarie.rating.ui.profile;
 
+import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,26 +31,38 @@ import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
-import blagodarie.rating.OnThanksListener;
+import blagodarie.rating.OnOperationListener;
 import blagodarie.rating.R;
 import blagodarie.rating.auth.AccountGeneral;
+import blagodarie.rating.databinding.NavHeaderLayoutBinding;
 import blagodarie.rating.databinding.ProfileActivityBinding;
+import blagodarie.rating.databinding.ThanksUserItemBinding;
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
 import blagodarie.rating.ui.AccountProvider;
+import blagodarie.rating.ui.splash.SplashActivity;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -50,7 +71,7 @@ import io.reactivex.schedulers.Schedulers;
 public final class ProfileActivity
         extends AppCompatActivity
         implements ProfileEditor,
-        OnThanksListener {
+        OnOperationListener {
 
     private static final String TAG = ProfileActivity.class.getSimpleName();
 
@@ -68,6 +89,8 @@ public final class ProfileActivity
 
     private DrawerLayout mDrawerLayout;
 
+    private ThanksUserAdapter mThanksUserAdapter;
+
     @Override
     protected void onCreate (@Nullable final Bundle savedInstanceState) {
         Log.d(TAG, "onCreate");
@@ -84,6 +107,7 @@ public final class ProfileActivity
                 initBinding();
                 setupToolbar();
                 setupNavigationDrawer();
+                initThanksUserAdapter();
                 AccountProvider.getAccount(
                         this,
                         new AccountProvider.OnAccountSelectListener() {
@@ -110,8 +134,7 @@ public final class ProfileActivity
         }
     }
 
-    private void initViewModel (
-    ) {
+    private void initViewModel () {
         Log.d(TAG, "initViewModel");
         mViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
     }
@@ -121,12 +144,16 @@ public final class ProfileActivity
         Log.d(TAG, "initBinding");
         mActivityBinding = DataBindingUtil.setContentView(this, R.layout.profile_activity);
         mActivityBinding.setViewModel(mViewModel);
+        mActivityBinding.srlRefreshProfileInfo.setOnRefreshListener(this::getAuthTokenAndDownloadProfileData);
         mActivityBinding.setProfileEditor(this);
-        mActivityBinding.setOnThanksListener(this);
+        mActivityBinding.setOnOperationListener(this);
 
         final QRCodeWriter writer = new QRCodeWriter();
+        final Map<EncodeHintType, Object> hints = new EnumMap<EncodeHintType, Object>(EncodeHintType.class);
+        hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+        hints.put(EncodeHintType.MARGIN, 0); /* default = 4 */
         try {
-            final BitMatrix bitMatrix = writer.encode(getString(R.string.url_profile, mProfileUserId), BarcodeFormat.QR_CODE, 512, 512);
+            final BitMatrix bitMatrix = writer.encode(getString(R.string.url_profile, mProfileUserId), BarcodeFormat.QR_CODE, 500, 500, hints);
             final int width = bitMatrix.getWidth();
             final int height = bitMatrix.getHeight();
             final Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -138,6 +165,33 @@ public final class ProfileActivity
             //mActivityBinding.ivQRCode.setImageBitmap(bmp);
         } catch (WriterException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void initThanksUserAdapter () {
+        mViewModel.getThanksUsers().observe(this, displayThanksUsers -> {
+            if (mThanksUserAdapter == null) {
+                mThanksUserAdapter = new ThanksUserAdapter(this::onThanksUserClick);
+                mActivityBinding.rvThanksUsers.setLayoutManager(new GridLayoutManager(this, calcSpanCount()));
+                mActivityBinding.rvThanksUsers.setAdapter(mThanksUserAdapter);
+            }
+            mThanksUserAdapter.setData(displayThanksUsers);
+        });
+    }
+
+    private int calcSpanCount () {
+        int layoutWidthDp = (int) (mActivityBinding.rvThanksUsers.getWidth() / getResources().getDisplayMetrics().density);
+        int itemWidthDp = (int) ((getResources().getDimension(R.dimen.thanks_user_photo_width) + (getResources().getDimension(R.dimen.thanks_user_photo_margin) * 2)) / getResources().getDisplayMetrics().density);
+        return layoutWidthDp / itemWidthDp;
+    }
+
+    private void onThanksUserClick (@NonNull final View view) {
+        final ThanksUserItemBinding thanksUserItemBinding = DataBindingUtil.findBinding(view);
+        if (thanksUserItemBinding != null) {
+            final String userId = thanksUserItemBinding.getThanksUser().getUserUUID();
+            final Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(getString(R.string.url_profile, userId)));
+            startActivity(i);
         }
     }
 
@@ -164,6 +218,41 @@ public final class ProfileActivity
     private void setupNavigationDrawer () {
         Log.d(TAG, "setupNavigationDrawer");
         mDrawerLayout = findViewById(R.id.drawer_layout);
+
+        final NavHeaderLayoutBinding binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.nav_header_layout, null, false);
+        mActivityBinding.nvNavigation.addHeaderView(binding.getRoot());
+        mActivityBinding.nvNavigation.setNavigationItemSelectedListener(menuItem -> {
+            switch (menuItem.getItemId()) {
+                case R.id.miLogout:
+                    logout();
+                    break;
+                default:
+                    break;
+            }
+            mDrawerLayout.closeDrawers();
+            return true;
+        });
+    }
+
+    private void logout () {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            mAccountManager.removeAccount(
+                    mAccount,
+                    this,
+                    accountManagerFuture -> {
+                        startActivity(SplashActivity.createSelfIntent(this));
+                        finish();
+                    },
+                    null);
+        } else {
+            mAccountManager.removeAccount(
+                    mAccount,
+                    accountManagerFuture -> {
+                        startActivity(SplashActivity.createSelfIntent(this));
+                        finish();
+                    },
+                    null);
+        }
     }
 
     @Override
@@ -173,10 +262,75 @@ public final class ProfileActivity
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
+            case R.id.miShare:
+                share();
+                return true;
             case R.id.miQRCodeScan:
+                tryScanQRCode();
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void tryScanQRCode () {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                scanQRCode();
+            } else {
+                requestPermissions(new String[]{Manifest.permission.CAMERA}, 1);
+            }
+        }
+    }
+
+    private void scanQRCode () {
+        new IntentIntegrator(this).
+                setPrompt(getString(R.string.rqst_scan_qr_code)).
+                setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES).
+                setOrientationLocked(true).
+                initiateScan();
+    }
+
+    @Override
+    protected void onActivityResult (int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case IntentIntegrator.REQUEST_CODE: {
+                IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+                if (result.getContents() != null) {
+                    final String url = result.getContents();
+                    final Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(url));
+                    if (i.resolveActivity(getPackageManager()) != null) {
+                        startActivity(i);
+                    } else {
+                        Toast.makeText(this, R.string.err_msg_incorrect_link, Toast.LENGTH_LONG).show();
+                    }
+                }
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult (int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 1:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    scanQRCode();
+                }
+                break;
+        }
+    }
+
+    private void share () {
+        final Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.url_profile, mProfileUserId));
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, "Поделиться"));
     }
 
     @Override
@@ -241,12 +395,13 @@ public final class ProfileActivity
         );
     }
 
-    private void addThanks (
-            @NonNull final String authToken
+    private void addOperation (
+            @NonNull final String authToken,
+            final int operationTypeId
     ) {
-        Log.d(TAG, "updateProfileData");
+        Log.d(TAG, "addOperation");
 
-        final String content = String.format(Locale.ENGLISH, "{\"user_id_to\":\"%s\",\"operation_type_id\":1,\"timestamp\":%d}", mProfileUserId, System.currentTimeMillis());
+        final String content = String.format(Locale.ENGLISH, "{\"user_id_to\":\"%s\",\"operation_type_id\":%d,\"timestamp\":%d}", mProfileUserId, operationTypeId, System.currentTimeMillis());
 
         mCompositeDisposable.add(
                 Observable.
@@ -256,7 +411,7 @@ public final class ProfileActivity
                         subscribe(
                                 serverApiResponse -> {
                                     Log.d(TAG, serverApiResponse.toString());
-                                    onAddThanksComplete(serverApiResponse);
+                                    onAddOperationComplete(serverApiResponse, operationTypeId);
                                 },
                                 throwable -> {
                                     Log.e(TAG, Log.getStackTraceString(throwable));
@@ -279,20 +434,27 @@ public final class ProfileActivity
         }
     }
 
-    private void onAddThanksComplete (
-            @NonNull final ServerApiResponse serverApiResponse
+    private void onAddOperationComplete (
+            @NonNull final ServerApiResponse serverApiResponse,
+            final int operationTypeId
     ) {
         Log.d(TAG, "onUpdateDataComplete serverApiResponse=" + serverApiResponse);
         if (serverApiResponse.getCode() == 200) {
-            final Integer thanksCount = mViewModel.getThanksCount().get();
-            if (thanksCount == null) {
-                mViewModel.getFame().set(mViewModel.getFame().get() + 1);
-                mViewModel.getThanksCount().set(1);
-            } else {
-                mViewModel.getThanksCount().set(thanksCount + 1);
+            switch (operationTypeId) {
+                case 1: {
+                    Toast.makeText(this, R.string.info_msg_add_thanks_complete, Toast.LENGTH_LONG).show();
+                    break;
+                }
+                case 2: {
+                    Toast.makeText(this, R.string.info_msg_trust_is_lost, Toast.LENGTH_LONG).show();
+                    break;
+                }
+                case 3: {
+                    Toast.makeText(this, R.string.info_msg_trust_restored, Toast.LENGTH_LONG).show();
+                    break;
+                }
             }
-            mViewModel.getSumThanksCount().set(mViewModel.getSumThanksCount().get() + 1);
-            Toast.makeText(this, R.string.info_msg_add_thanks_complete, Toast.LENGTH_LONG).show();
+            getAuthTokenAndDownloadProfileData();
         } else {
             Toast.makeText(this, R.string.err_msg_add_thanks_failed, Toast.LENGTH_LONG).show();
         }
@@ -315,12 +477,12 @@ public final class ProfileActivity
         );
     }
 
-    private void getAuthTokenAndAddThanks () {
-        Log.d(TAG, "getAuthTokenAndUpdateProfileData");
+    private void getAuthTokenAndAddOperation (final int operationTypeId) {
+        Log.d(TAG, "getAuthTokenAndAddOperation");
         AccountProvider.getAuthToken(
                 this,
                 mAccount,
-                this::onGetAuthTokenForAddThanksComplete
+                accountManagerFuture -> onGetAuthTokenForAddOperationComplete(accountManagerFuture, operationTypeId)
         );
     }
 
@@ -355,8 +517,9 @@ public final class ProfileActivity
         }
     }
 
-    private void onGetAuthTokenForAddThanksComplete (
-            @NonNull final AccountManagerFuture<Bundle> future
+    private void onGetAuthTokenForAddOperationComplete (
+            @NonNull final AccountManagerFuture<Bundle> future,
+            final int operationTypeId
     ) {
         Log.d(TAG, "onGetAuthTokenForUpdateProfileDataComplete");
         try {
@@ -364,7 +527,7 @@ public final class ProfileActivity
             if (bundle != null) {
                 final String authToken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
                 if (authToken != null) {
-                    addThanks(authToken);
+                    addOperation(authToken, operationTypeId);
                 }
             }
         } catch (AuthenticatorException | IOException | OperationCanceledException e) {
@@ -425,6 +588,17 @@ public final class ProfileActivity
                     } catch (JSONException e) {
                         mViewModel.getIsTrust().set(null);
                     }
+
+                    final List<DisplayThanksUser> thanksUsers = new ArrayList<>();
+                    final JSONArray thanksUsersJSONArray = userJSON.getJSONArray("thanks_users");
+                    for (int i = 0; i < thanksUsersJSONArray.length(); i++) {
+                        final JSONObject thanksUserJSONObject = thanksUsersJSONArray.getJSONObject(i);
+                        final String thanksUserPhoto = thanksUserJSONObject.getString("photo");
+                        final String thanksUserUUID = thanksUserJSONObject.getString("user_uuid");
+                        thanksUsers.add(new DisplayThanksUser(thanksUserPhoto, thanksUserUUID));
+                    }
+                    mViewModel.getThanksUsers().setValue(thanksUsers);
+
                 } catch (JSONException e) {
                     Log.e(TAG, Log.getStackTraceString(e));
                     Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
@@ -449,7 +623,7 @@ public final class ProfileActivity
         mViewModel.setCurrentMode(ProfileViewModel.Mode.VIEW);
 
         final String cardNumber = mActivityBinding.etCardNumber.getText().toString();
-        if (cardNumber.length() == 16) {
+        if (cardNumber.isEmpty() || cardNumber.length() == 16) {
             getAuthTokenAndUpdateProfileData(cardNumber);
         } else {
             mViewModel.getCardNumber().notifyChange();
@@ -467,7 +641,7 @@ public final class ProfileActivity
     @Override
     public void onThanks () {
         if (mAccount != null) {
-            getAuthTokenAndAddThanks();
+            getAuthTokenAndAddOperation(1);
         } else {
             mAccountManager.addAccount(
                     getString(R.string.account_type),
@@ -475,13 +649,47 @@ public final class ProfileActivity
                     null,
                     null,
                     this,
-                    this::onAddAccountFinished,
+                    accountManagerFuture -> onAddAccountFinished(accountManagerFuture, 1),
                     null
             );
         }
     }
 
-    public void onAddAccountFinished (final AccountManagerFuture<Bundle> result) {
+    @Override
+    public void onTrustless () {
+        if (mAccount != null) {
+            getAuthTokenAndAddOperation(2);
+        } else {
+            mAccountManager.addAccount(
+                    getString(R.string.account_type),
+                    getString(R.string.token_type),
+                    null,
+                    null,
+                    this,
+                    accountManagerFuture -> onAddAccountFinished(accountManagerFuture, 2),
+                    null
+            );
+        }
+    }
+
+    @Override
+    public void onTrustlessCancel () {
+        if (mAccount != null) {
+            getAuthTokenAndAddOperation(3);
+        } else {
+            mAccountManager.addAccount(
+                    getString(R.string.account_type),
+                    getString(R.string.token_type),
+                    null,
+                    null,
+                    this,
+                    accountManagerFuture -> onAddAccountFinished(accountManagerFuture, 3),
+                    null
+            );
+        }
+    }
+
+    public void onAddAccountFinished (final AccountManagerFuture<Bundle> result, final int operationTypeId) {
         Log.d(TAG, "onAddAccountFinish");
         try {
             final Bundle bundle = result.getResult();
@@ -489,7 +697,7 @@ public final class ProfileActivity
                     bundle.getString(AccountManager.KEY_ACCOUNT_NAME),
                     bundle.getString(AccountManager.KEY_ACCOUNT_TYPE)
             );
-            getAuthTokenAndAddThanks();
+            getAuthTokenAndAddOperation(operationTypeId);
         } catch (OperationCanceledException e) {
             Log.e(TAG, Log.getStackTraceString(e));
             Toast.makeText(this, getString(R.string.err_msg_account_not_created), Toast.LENGTH_LONG).show();
@@ -501,6 +709,15 @@ public final class ProfileActivity
         } catch (IOException e) {
             Log.e(TAG, Log.getStackTraceString(e));
             finish();
+        }
+    }
+
+    public void onCopyClick (@NonNull final View view) {
+        final ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        final ClipData clip = ClipData.newPlainText(getText(R.string.txt_card_number), mActivityBinding.etCardNumber.getText().toString());
+        if (clipboard != null) {
+            clipboard.setPrimaryClip(clip);
+            Toast.makeText(this, R.string.info_msg_copied_to_clipboard, Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -4,12 +4,18 @@
     <string name="url_profile">https://blagodarie.org/profile?id=%s</string>
 
     <string name="btn_thanks">Благодарить</string>
+    <string name="btn_trustless">Утрата доверия</string>
+    <string name="btn_cancel_trustless">Восстановить доверие</string>
 
     <string name="rqst_choose_account">Выберите аккаунт</string>
+    <string name="rqst_scan_qr_code">Отсканируйте QR-код</string>
+
+    <string name="info_msg_copied_to_clipboard">Скопировано в буффер обмена</string>
 
     <string name="err_msg_account_not_created">Аккаунт не был создан</string>
     <string name="err_msg_authentication_error">Ошибка аутентификации</string>
     <string name="err_msg_missing_profile_user_id">Не указан идентификатор пользователя</string>
+    <string name="err_msg_incorrect_link">Неверная ссылка</string>
 
     <string name="txt_fame">Известность: %d</string>
     <string name="txt_sum_thanks_count">Всего благодарностей: %d</string>
@@ -19,4 +25,10 @@
     <string name="txt_yes">Да</string>
     <string name="txt_no">Нет</string>
     <string name="txt_card_number">Номер карты</string>
+    <string name="txt_thanks_users">Поблагодарившие и отблагодаренные</string>
+    <string name="txt_version">Версия: %s</string>
+    <string name="txt_share">Потелиться</string>
+    <string name="txt_logout">Выйти из аккаунта</string>
+    <string name="txt_qr_code_scan">Сканировать QR-код</string>
+
 </resources>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="@dimen/thanks_user_photo_width"
+        android:layout_height="@dimen/thanks_user_photo_height"
+        android:layout_margin="@dimen/thanks_user_photo_margin">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivPhoto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerInside" />
+
+    </androidx.cardview.widget.CardView>
+
+    <data>
+
+        <variable
+            name="ThanksUser"
+            type="blagodarie.rating.ui.profile.DisplayThanksUser" />
+
+    </data>
+
+</layout>
