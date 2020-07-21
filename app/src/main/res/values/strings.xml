@@ -28,6 +28,7 @@
     <string name="txt_thanks_users">Поблагодарившие и отблагодаренные</string>
     <string name="txt_version">Версия: %s</string>
     <string name="txt_share">Потелиться</string>
+    <string name="txt_logout">Выйти из аккаунта</string>
     <string name="txt_qr_code_scan">Сканировать QR-код</string>
 
 </resources>

@@ -3,6 +3,7 @@ package blagodarie.rating.ui.profile;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
@@ -33,6 +34,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -46,8 +48,10 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import blagodarie.rating.OnOperationListener;
 import blagodarie.rating.R;
@@ -58,6 +62,7 @@ import blagodarie.rating.databinding.ThanksUserItemBinding;
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
 import blagodarie.rating.ui.AccountProvider;
+import blagodarie.rating.ui.splash.SplashActivity;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -144,8 +149,11 @@ public final class ProfileActivity
         mActivityBinding.setOnOperationListener(this);
 
         final QRCodeWriter writer = new QRCodeWriter();
+        final Map<EncodeHintType, Object> hints = new EnumMap<EncodeHintType, Object>(EncodeHintType.class);
+        hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+        hints.put(EncodeHintType.MARGIN, 0); /* default = 4 */
         try {
-            final BitMatrix bitMatrix = writer.encode(getString(R.string.url_profile, mProfileUserId), BarcodeFormat.QR_CODE, 512, 512);
+            final BitMatrix bitMatrix = writer.encode(getString(R.string.url_profile, mProfileUserId), BarcodeFormat.QR_CODE, 500, 500, hints);
             final int width = bitMatrix.getWidth();
             final int height = bitMatrix.getHeight();
             final Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -213,6 +221,38 @@ public final class ProfileActivity
 
         final NavHeaderLayoutBinding binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.nav_header_layout, null, false);
         mActivityBinding.nvNavigation.addHeaderView(binding.getRoot());
+        mActivityBinding.nvNavigation.setNavigationItemSelectedListener(menuItem -> {
+            switch (menuItem.getItemId()) {
+                case R.id.miLogout:
+                    logout();
+                    break;
+                default:
+                    break;
+            }
+            mDrawerLayout.closeDrawers();
+            return true;
+        });
+    }
+
+    private void logout () {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            mAccountManager.removeAccount(
+                    mAccount,
+                    this,
+                    accountManagerFuture -> {
+                        startActivity(SplashActivity.createSelfIntent(this));
+                        finish();
+                    },
+                    null);
+        } else {
+            mAccountManager.removeAccount(
+                    mAccount,
+                    accountManagerFuture -> {
+                        startActivity(SplashActivity.createSelfIntent(this));
+                        finish();
+                    },
+                    null);
+        }
     }
 
     @Override

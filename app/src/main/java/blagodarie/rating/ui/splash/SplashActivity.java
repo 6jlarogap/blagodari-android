@@ -5,6 +5,7 @@ import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import blagodarie.rating.R;
 import blagodarie.rating.auth.AccountGeneral;
 import blagodarie.rating.ui.AccountProvider;
+import blagodarie.rating.ui.main.MainActivity;
 
 public final class SplashActivity
         extends AppCompatActivity
@@ -106,5 +108,12 @@ public final class SplashActivity
         i.setData(Uri.parse(getString(R.string.url_profile, userId)));
         startActivity(i);
         finish();
+    }
+
+    public static Intent createSelfIntent (
+            @NonNull final Context context
+    ) {
+        Log.d(TAG, "createSelfIntent");
+        return new Intent(context, SplashActivity.class);
     }
 }
