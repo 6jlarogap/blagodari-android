@@ -151,7 +151,7 @@ public final class ProfileActivity
         final QRCodeWriter writer = new QRCodeWriter();
         final Map<EncodeHintType, Object> hints = new EnumMap<EncodeHintType, Object>(EncodeHintType.class);
         hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
-        hints.put(EncodeHintType.MARGIN, 0); /* default = 4 */
+        hints.put(EncodeHintType.MARGIN, 1); /* default = 4 */
         try {
             final BitMatrix bitMatrix = writer.encode(getString(R.string.url_profile, mProfileUserId), BarcodeFormat.QR_CODE, 500, 500, hints);
             final int width = bitMatrix.getWidth();
@@ -159,7 +159,7 @@ public final class ProfileActivity
             final Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
-                    bmp.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.TRANSPARENT);
+                    bmp.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
                 }
             }
             mActivityBinding.ivQRCode.setImageBitmap(bmp);
