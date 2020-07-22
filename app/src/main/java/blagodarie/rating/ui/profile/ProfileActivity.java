@@ -215,14 +215,18 @@ public final class ProfileActivity
     ) {
         Log.d(TAG, "onCreateOptionsMenu");
         getMenuInflater().inflate(R.menu.profile_activity, menu);
-        if (mAccount != null && !mViewModel.getIsSelfProfile().get()) {
+        if (mAccount != null) {
             final MenuItem miMyAccount = menu.findItem(R.id.miMyAccount);
             miMyAccount.setVisible(true);
             mIvMyAccount = (AppCompatImageView) miMyAccount.getActionView().findViewById(R.id.ivAccountPhoto);
             mIvMyAccount.setOnClickListener(view -> {
-                final Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(getString(R.string.url_profile, mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID))));
-                startActivity(i);
+                if (mViewModel.getIsSelfProfile().get()) {
+                    getAuthTokenAndDownloadProfileData();
+                } else {
+                    final Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(getString(R.string.url_profile, mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID))));
+                    startActivity(i);
+                }
             });
         }
         return true;
@@ -562,7 +566,7 @@ public final class ProfileActivity
                     final String photo = userJSON.getString("photo");
                     Picasso.get().load(photo).into(mActivityBinding.ivPhoto);
 
-                    if (mAccount != null && !mViewModel.getIsSelfProfile().get()) {
+                    if (mAccount != null) {
                         if (mViewModel.getIsSelfProfile().get()) {
                             mAccountManager.setUserData(mAccount, AccountGeneral.USER_DATA_PHOTO, photo);
                             Picasso.get().load(photo).into(mIvMyAccount);
@@ -743,5 +747,9 @@ public final class ProfileActivity
             clipboard.setPrimaryClip(clip);
             Toast.makeText(this, R.string.info_msg_copied_to_clipboard, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void onShareClick (@NonNull final View view) {
+        share();
     }
 }
