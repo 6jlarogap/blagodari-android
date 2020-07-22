@@ -221,6 +221,7 @@ public final class ProfileActivity
 
         final NavHeaderLayoutBinding binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.nav_header_layout, null, false);
         mActivityBinding.nvNavigation.addHeaderView(binding.getRoot());
+        mActivityBinding.nvNavigation.getMenu().findItem(R.id.miLogout).setEnabled(mAccount != null);
         mActivityBinding.nvNavigation.setNavigationItemSelectedListener(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.miLogout:
