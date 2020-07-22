@@ -27,6 +27,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -119,6 +120,11 @@ public final class ProfileActivity
                             @Override
                             public void onAccountSelected (@NonNull final Account account) {
                                 mAccount = account;
+                                findViewById(R.id.ivAccountPhoto).setOnClickListener(view -> {
+                                    final Intent i = new Intent(Intent.ACTION_VIEW);
+                                    i.setData(Uri.parse(getString(R.string.url_profile, mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID))));
+                                    startActivity(i);
+                                });
                                 mViewModel.getIsSelfProfile().set(mProfileUserId.equals(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID)));
                                 getAuthTokenAndDownloadProfileData();
                             }
@@ -545,8 +551,16 @@ public final class ProfileActivity
                     final JSONObject userJSON = new JSONObject(responseBody);
 
                     final String photo = userJSON.getString("photo");
-                    mViewModel.getLastName().set(photo);
                     Picasso.get().load(photo).into(mActivityBinding.ivPhoto);
+
+                    if (mAccount != null) {
+                        if(mViewModel.getIsSelfProfile().get()) {
+                            mAccountManager.setUserData(mAccount, AccountGeneral.USER_DATA_PHOTO, photo);
+                            Picasso.get().load(photo).into((AppCompatImageView) findViewById(R.id.ivAccountPhoto));
+                        } else {
+                            Picasso.get().load(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_PHOTO)).into((AppCompatImageView) findViewById(R.id.ivAccountPhoto));
+                        }
+                    }
 
                     final String lastName = userJSON.getString("last_name");
                     mViewModel.getLastName().set(lastName);
