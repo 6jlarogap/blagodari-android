@@ -92,6 +92,8 @@ public final class ProfileActivity
 
     private ThanksUserAdapter mThanksUserAdapter;
 
+    private AppCompatImageView mIvMyAccount;
+
     @Override
     protected void onCreate (@Nullable final Bundle savedInstanceState) {
         Log.d(TAG, "onCreate");
@@ -120,11 +122,6 @@ public final class ProfileActivity
                             @Override
                             public void onAccountSelected (@NonNull final Account account) {
                                 mAccount = account;
-                                findViewById(R.id.ivAccountPhoto).setOnClickListener(view -> {
-                                    final Intent i = new Intent(Intent.ACTION_VIEW);
-                                    i.setData(Uri.parse(getString(R.string.url_profile, mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID))));
-                                    startActivity(i);
-                                });
                                 mViewModel.getIsSelfProfile().set(mProfileUserId.equals(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID)));
                                 getAuthTokenAndDownloadProfileData();
                             }
@@ -218,6 +215,16 @@ public final class ProfileActivity
     ) {
         Log.d(TAG, "onCreateOptionsMenu");
         getMenuInflater().inflate(R.menu.profile_activity, menu);
+        if (mAccount != null && !mViewModel.getIsSelfProfile().get()) {
+            final MenuItem miMyAccount = menu.findItem(R.id.miMyAccount);
+            miMyAccount.setVisible(true);
+            mIvMyAccount = (AppCompatImageView) miMyAccount.getActionView().findViewById(R.id.ivAccountPhoto);
+            mIvMyAccount.setOnClickListener(view -> {
+                final Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(getString(R.string.url_profile, mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID))));
+                startActivity(i);
+            });
+        }
         return true;
     }
 
@@ -269,8 +276,10 @@ public final class ProfileActivity
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
-            case R.id.miShare:
-                share();
+            case R.id.miMyAccount:
+                final Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(getString(R.string.url_profile, mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID))));
+                startActivity(i);
                 return true;
             case R.id.miQRCodeScan:
                 tryScanQRCode();
@@ -553,12 +562,12 @@ public final class ProfileActivity
                     final String photo = userJSON.getString("photo");
                     Picasso.get().load(photo).into(mActivityBinding.ivPhoto);
 
-                    if (mAccount != null) {
-                        if(mViewModel.getIsSelfProfile().get()) {
+                    if (mAccount != null && !mViewModel.getIsSelfProfile().get()) {
+                        if (mViewModel.getIsSelfProfile().get()) {
                             mAccountManager.setUserData(mAccount, AccountGeneral.USER_DATA_PHOTO, photo);
-                            Picasso.get().load(photo).into((AppCompatImageView) findViewById(R.id.ivAccountPhoto));
+                            Picasso.get().load(photo).into(mIvMyAccount);
                         } else {
-                            Picasso.get().load(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_PHOTO)).into((AppCompatImageView) findViewById(R.id.ivAccountPhoto));
+                            Picasso.get().load(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_PHOTO)).into(mIvMyAccount);
                         }
                     }
 
