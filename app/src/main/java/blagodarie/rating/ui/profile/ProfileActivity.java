@@ -27,6 +27,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -91,6 +92,8 @@ public final class ProfileActivity
 
     private ThanksUserAdapter mThanksUserAdapter;
 
+    private AppCompatImageView mIvMyAccount;
+
     @Override
     protected void onCreate (@Nullable final Bundle savedInstanceState) {
         Log.d(TAG, "onCreate");
@@ -119,6 +122,7 @@ public final class ProfileActivity
                             @Override
                             public void onAccountSelected (@NonNull final Account account) {
                                 mAccount = account;
+                                mActivityBinding.nvNavigation.getMenu().findItem(R.id.miLogout).setEnabled(mAccount != null);
                                 mViewModel.getIsSelfProfile().set(mProfileUserId.equals(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID)));
                                 getAuthTokenAndDownloadProfileData();
                             }
@@ -162,7 +166,7 @@ public final class ProfileActivity
                     bmp.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.TRANSPARENT);
                 }
             }
-            //mActivityBinding.ivQRCode.setImageBitmap(bmp);
+            mActivityBinding.ivQRCode.setImageBitmap(bmp);
         } catch (WriterException e) {
             e.printStackTrace();
         }
@@ -202,7 +206,7 @@ public final class ProfileActivity
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(false);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
-            //actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
 
@@ -211,7 +215,21 @@ public final class ProfileActivity
             @NonNull final Menu menu
     ) {
         Log.d(TAG, "onCreateOptionsMenu");
-        //getMenuInflater().inflate(R.menu.profile_activity, menu);
+        getMenuInflater().inflate(R.menu.profile_activity, menu);
+        if (mAccount != null) {
+            final MenuItem miMyAccount = menu.findItem(R.id.miMyAccount);
+            miMyAccount.setVisible(true);
+            mIvMyAccount = (AppCompatImageView) miMyAccount.getActionView().findViewById(R.id.ivAccountPhoto);
+            mIvMyAccount.setOnClickListener(view -> {
+                if (mViewModel.getIsSelfProfile().get()) {
+                    getAuthTokenAndDownloadProfileData();
+                } else {
+                    final Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(getString(R.string.url_profile, mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID))));
+                    startActivity(i);
+                }
+            });
+        }
         return true;
     }
 
@@ -262,8 +280,10 @@ public final class ProfileActivity
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
-            case R.id.miShare:
-                share();
+            case R.id.miMyAccount:
+                final Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(getString(R.string.url_profile, mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID))));
+                startActivity(i);
                 return true;
             case R.id.miQRCodeScan:
                 tryScanQRCode();
@@ -544,8 +564,16 @@ public final class ProfileActivity
                     final JSONObject userJSON = new JSONObject(responseBody);
 
                     final String photo = userJSON.getString("photo");
-                    mViewModel.getLastName().set(photo);
                     Picasso.get().load(photo).into(mActivityBinding.ivPhoto);
+
+                    if (mAccount != null) {
+                        if (mViewModel.getIsSelfProfile().get()) {
+                            mAccountManager.setUserData(mAccount, AccountGeneral.USER_DATA_PHOTO, photo);
+                            Picasso.get().load(photo).into(mIvMyAccount);
+                        } else {
+                            Picasso.get().load(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_PHOTO)).into(mIvMyAccount);
+                        }
+                    }
 
                     final String lastName = userJSON.getString("last_name");
                     mViewModel.getLastName().set(lastName);
@@ -719,5 +747,9 @@ public final class ProfileActivity
             clipboard.setPrimaryClip(clip);
             Toast.makeText(this, R.string.info_msg_copied_to_clipboard, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void onShareClick (@NonNull final View view) {
+        share();
     }
 }
