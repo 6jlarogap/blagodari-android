@@ -122,6 +122,7 @@ public final class ProfileActivity
                             @Override
                             public void onAccountSelected (@NonNull final Account account) {
                                 mAccount = account;
+                                mActivityBinding.nvNavigation.getMenu().findItem(R.id.miLogout).setEnabled(mAccount != null);
                                 mViewModel.getIsSelfProfile().set(mProfileUserId.equals(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID)));
                                 getAuthTokenAndDownloadProfileData();
                             }
@@ -238,7 +239,6 @@ public final class ProfileActivity
 
         final NavHeaderLayoutBinding binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.nav_header_layout, null, false);
         mActivityBinding.nvNavigation.addHeaderView(binding.getRoot());
-        mActivityBinding.nvNavigation.getMenu().findItem(R.id.miLogout).setEnabled(mAccount != null);
         mActivityBinding.nvNavigation.setNavigationItemSelectedListener(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.miLogout:
