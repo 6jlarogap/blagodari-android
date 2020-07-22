@@ -8,12 +8,12 @@ android {
         applicationId "blagodarie.rating"
         minSdkVersion 19
         targetSdkVersion 30
-        versionCode 5
-        versionName "0.0.5"
+        versionCode 6
+        versionName "0.0.6"
 
         project.ext.set("archivesBaseName", "rating-" + defaultConfig.versionName);
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        multiDexEnabled true
+        //multiDexEnabled true
     }
 
     buildTypes {
@@ -28,8 +28,8 @@ android {
             debuggable true
             applicationIdSuffix ".dbg"
 
-            minifyEnabled false
-            shrinkResources false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
             manifestPlaceholders = [hostName:"dev.blagodarie.org"]
