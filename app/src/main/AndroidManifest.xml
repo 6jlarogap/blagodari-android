@@ -41,7 +41,6 @@
 
         <activity
             android:name=".ui.profile.ProfileActivity"
-            android:noHistory="true"
             android:screenOrientation="portrait">
             <intent-filter
                 android:autoVerify="true"
