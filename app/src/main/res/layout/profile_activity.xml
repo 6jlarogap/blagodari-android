@@ -36,7 +36,7 @@
                     app:backgroundTint="@color/colorPrimary"
                     app:borderWidth="0dp"
                     app:elevation="6dp"
-                    app:fabSize="mini"/>
+                    app:fabSize="mini" />
 
                 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                     android:id="@+id/srlRefreshProfileInfo"
@@ -186,6 +186,12 @@
                                 </LinearLayout>
 
                             </RelativeLayout>
+
+                            <Button
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onWishesClick"
+                                android:text="@string/btn_wishes" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"

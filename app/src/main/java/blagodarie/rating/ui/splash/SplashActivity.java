@@ -21,7 +21,6 @@ import java.io.IOException;
 import blagodarie.rating.R;
 import blagodarie.rating.auth.AccountGeneral;
 import blagodarie.rating.ui.AccountProvider;
-import blagodarie.rating.ui.main.MainActivity;
 
 public final class SplashActivity
         extends AppCompatActivity
