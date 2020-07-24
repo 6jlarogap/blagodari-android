@@ -50,6 +50,9 @@ public final class ProfileViewModel
     private final ObservableBoolean mDownloadInProgress = new ObservableBoolean(false);
 
     @NonNull
+    private final ObservableBoolean mIsProfile = new ObservableBoolean(false);
+
+    @NonNull
     private final ObservableBoolean mSelfProfile = new ObservableBoolean(false);
 
     @NonNull
@@ -119,6 +122,11 @@ public final class ProfileViewModel
 
     public final ObservableBoolean getIsSelfProfile () {
         return mSelfProfile;
+    }
+
+    @NonNull
+    public ObservableBoolean isProfile () {
+        return mIsProfile;
     }
 
     @NonNull
