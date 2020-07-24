@@ -3,7 +3,6 @@ package blagodarie.rating.ui.profile;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
@@ -53,6 +52,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 import blagodarie.rating.OnOperationListener;
 import blagodarie.rating.R;
@@ -64,6 +64,7 @@ import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
 import blagodarie.rating.ui.AccountProvider;
 import blagodarie.rating.ui.splash.SplashActivity;
+import blagodarie.rating.ui.wishes.WishesActivity;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -86,7 +87,9 @@ public final class ProfileActivity
 
     private Account mAccount;
 
-    private String mProfileUserId;
+    private UUID mProfileUserId;
+
+    private String mJustText;
 
     private DrawerLayout mDrawerLayout;
 
@@ -104,37 +107,68 @@ public final class ProfileActivity
         final Uri data = getIntent().getData();
 
         if (data != null) {
-            mProfileUserId = data.getQueryParameter("id");
-            if (mProfileUserId != null && !mProfileUserId.isEmpty()) {
-                initViewModel();
-                initBinding();
-                setupToolbar();
-                setupNavigationDrawer();
-                initThanksUserAdapter();
-                AccountProvider.getAccount(
-                        this,
-                        new AccountProvider.OnAccountSelectListener() {
-                            @Override
-                            public void onNoAccount () {
-                                downloadProfileData(null);
-                            }
+            final String profileUserId = data.getQueryParameter("id");
+            try {
+                mProfileUserId = UUID.fromString(profileUserId);
+                if (mProfileUserId != null) {
+                    initViewModel();
+                    mViewModel.isProfile().set(true);
+                    initBinding();
+                    setupToolbar();
+                    setupNavigationDrawer();
+                    initThanksUserAdapter();
+                    AccountProvider.getAccount(
+                            this,
+                            new AccountProvider.OnAccountSelectListener() {
+                                @Override
+                                public void onNoAccount () {
+                                    downloadProfileData(null);
+                                }
 
-                            @Override
-                            public void onAccountSelected (@NonNull final Account account) {
-                                mAccount = account;
-                                mActivityBinding.nvNavigation.getMenu().findItem(R.id.miLogout).setEnabled(mAccount != null);
-                                mViewModel.getIsSelfProfile().set(mProfileUserId.equals(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID)));
-                                getAuthTokenAndDownloadProfileData();
+                                @Override
+                                public void onAccountSelected (@NonNull final Account account) {
+                                    mAccount = account;
+                                    mActivityBinding.nvNavigation.getMenu().findItem(R.id.miLogout).setEnabled(mAccount != null);
+                                    mViewModel.getIsSelfProfile().set(mProfileUserId.toString().equals(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID)));
+                                    getAuthTokenAndDownloadProfileData();
+                                }
                             }
-                        }
-                );
-            } else {
-                Toast.makeText(this, R.string.err_msg_missing_profile_user_id, Toast.LENGTH_LONG).show();
+                    );
+                } else {
+                    Toast.makeText(this, R.string.err_msg_missing_profile_user_id, Toast.LENGTH_LONG).show();
+                    finish();
+                }
+            } catch (IllegalArgumentException e) {
+                Toast.makeText(this, R.string.err_msg_incorrect_user_id, Toast.LENGTH_LONG).show();
                 finish();
             }
+
         } else {
-            Toast.makeText(this, R.string.err_msg_missing_profile_user_id, Toast.LENGTH_LONG).show();
-            finish();
+            mJustText = getIntent().getStringExtra("text");
+            initViewModel();
+            mViewModel.isProfile().set(false);
+            mViewModel.getLastName().set(mJustText);
+            initBinding();
+            setupToolbar();
+            setupNavigationDrawer();
+            initThanksUserAdapter();
+            AccountProvider.getAccount(
+                    this,
+                    new AccountProvider.OnAccountSelectListener() {
+                        @Override
+                        public void onNoAccount () {
+                            downloadProfileData(null);
+                        }
+
+                        @Override
+                        public void onAccountSelected (@NonNull final Account account) {
+                            mAccount = account;
+                            mActivityBinding.nvNavigation.getMenu().findItem(R.id.miLogout).setEnabled(mAccount != null);
+                            mViewModel.getIsSelfProfile().set((mProfileUserId != null ? mProfileUserId.toString() : mJustText).equals(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID)));
+                            getAuthTokenAndDownloadProfileData();
+                        }
+                    }
+            );
         }
     }
 
@@ -153,11 +187,16 @@ public final class ProfileActivity
         mActivityBinding.setOnOperationListener(this);
 
         final QRCodeWriter writer = new QRCodeWriter();
-        final Map<EncodeHintType, Object> hints = new EnumMap<EncodeHintType, Object>(EncodeHintType.class);
+        final Map<EncodeHintType, Object> hints = new EnumMap<>(EncodeHintType.class);
         hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
         hints.put(EncodeHintType.MARGIN, 0); /* default = 4 */
         try {
-            final BitMatrix bitMatrix = writer.encode(getString(R.string.url_profile, mProfileUserId), BarcodeFormat.QR_CODE, 500, 500, hints);
+            final BitMatrix bitMatrix = writer.encode(
+                    (mProfileUserId != null ? getString(R.string.url_profile, mProfileUserId.toString()) : mJustText),
+                    BarcodeFormat.QR_CODE,
+                    500,
+                    500,
+                    hints);
             final int width = bitMatrix.getWidth();
             final int height = bitMatrix.getHeight();
             final Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -219,7 +258,7 @@ public final class ProfileActivity
         if (mAccount != null) {
             final MenuItem miMyAccount = menu.findItem(R.id.miMyAccount);
             miMyAccount.setVisible(true);
-            mIvMyAccount = (AppCompatImageView) miMyAccount.getActionView().findViewById(R.id.ivAccountPhoto);
+            mIvMyAccount = miMyAccount.getActionView().findViewById(R.id.ivAccountPhoto);
             mIvMyAccount.setOnClickListener(view -> {
                 if (mViewModel.getIsSelfProfile().get()) {
                     getAuthTokenAndDownloadProfileData();
@@ -317,13 +356,18 @@ public final class ProfileActivity
             case IntentIntegrator.REQUEST_CODE: {
                 IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
                 if (result.getContents() != null) {
-                    final String url = result.getContents();
-                    final Intent i = new Intent(Intent.ACTION_VIEW);
-                    i.setData(Uri.parse(url));
-                    if (i.resolveActivity(getPackageManager()) != null) {
+                    final String content = result.getContents();
+                    try {
+                        final Uri uri = Uri.parse(content);
+                        final String profileUserIdString = uri.getQueryParameter("id");
+                        UUID profileUserId = UUID.fromString(profileUserIdString);
+                        final Intent i = new Intent(Intent.ACTION_VIEW);
+                        i.setData(Uri.parse(getString(R.string.url_profile, profileUserId)));
                         startActivity(i);
-                    } else {
-                        Toast.makeText(this, R.string.err_msg_incorrect_link, Toast.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        final Intent i = new Intent(this, ProfileActivity.class);
+                        i.putExtra("text", content);
+                        startActivity(i);
                     }
                 }
                 break;
@@ -348,7 +392,7 @@ public final class ProfileActivity
     private void share () {
         final Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.url_profile, mProfileUserId));
+        sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.url_profile, (mProfileUserId != null ? mProfileUserId.toString() : mJustText)));
         sendIntent.setType("text/plain");
         startActivity(Intent.createChooser(sendIntent, "Поделиться"));
     }
@@ -369,9 +413,9 @@ public final class ProfileActivity
                 Observable.
                         fromCallable(() -> {
                             if (authToken != null) {
-                                return ServerConnector.sendAuthRequestAndGetResponse("getprofileinfo?uuid=" + mProfileUserId, authToken);
+                                return ServerConnector.sendAuthRequestAndGetResponse("getprofileinfo?uuid=" + (mProfileUserId != null ? mProfileUserId.toString() : mJustText), authToken);
                             } else {
-                                return ServerConnector.sendRequestAndGetResponse("getprofileinfo?uuid=" + mProfileUserId);
+                                return ServerConnector.sendRequestAndGetResponse("getprofileinfo?uuid=" + (mProfileUserId != null ? mProfileUserId.toString() : mJustText));
                             }
                         }).
                         subscribeOn(Schedulers.io()).
@@ -421,7 +465,7 @@ public final class ProfileActivity
     ) {
         Log.d(TAG, "addOperation");
 
-        final String content = String.format(Locale.ENGLISH, "{\"user_id_to\":\"%s\",\"operation_type_id\":%d,\"timestamp\":%d}", mProfileUserId, operationTypeId, System.currentTimeMillis());
+        final String content = String.format(Locale.ENGLISH, "{\"user_id_to\":\"%s\",\"operation_type_id\":%d,\"timestamp\":%d}", (mProfileUserId != null ? mProfileUserId.toString() : mJustText), operationTypeId, System.currentTimeMillis());
 
         mCompositeDisposable.add(
                 Observable.
@@ -751,5 +795,14 @@ public final class ProfileActivity
 
     public void onShareClick (@NonNull final View view) {
         share();
+    }
+
+    public void onWishesClick (@NonNull final View view) {
+        toWishes();
+    }
+
+    private void toWishes () {
+        final Intent intent = WishesActivity.createSelfIntent(this, mProfileUserId);
+        startActivity(intent);
     }
 }

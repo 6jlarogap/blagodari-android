@@ -25,6 +25,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ui.splash.SplashActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,7 +33,32 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.main.MainActivity" />
+        <activity
+            android:name=".ui.wishes.WishesActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.wishes.WishActivity"
+            android:screenOrientation="portrait">
+            <intent-filter
+                android:autoVerify="true"
+                tools:targetApi="m">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="${hostName}"
+                    android:pathPrefix="/wish"
+                    android:scheme="https" />
+            </intent-filter>
+
+        </activity>
+
+        <activity
+            android:name=".ui.wishes.EditWishActivity"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
@@ -41,7 +67,6 @@
 
         <activity
             android:name=".ui.profile.ProfileActivity"
-            android:noHistory="true"
             android:screenOrientation="portrait">
             <intent-filter
                 android:autoVerify="true"

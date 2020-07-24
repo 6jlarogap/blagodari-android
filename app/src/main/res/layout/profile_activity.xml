@@ -36,7 +36,7 @@
                     app:backgroundTint="@color/colorPrimary"
                     app:borderWidth="0dp"
                     app:elevation="6dp"
-                    app:fabSize="mini"/>
+                    app:fabSize="mini" />
 
                 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                     android:id="@+id/srlRefreshProfileInfo"
@@ -119,7 +119,8 @@
 
                             <RelativeLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content">
+                                android:layout_height="wrap_content"
+                                android:visibility="@{ViewModel.isProfile() ? View.VISIBLE : View.GONE}">
 
                                 <com.google.android.material.textfield.TextInputLayout
                                     android:id="@+id/tilCardNumber"
@@ -186,6 +187,13 @@
                                 </LinearLayout>
 
                             </RelativeLayout>
+
+                            <Button
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onWishesClick"
+                                android:text="@string/btn_wishes"
+                                android:visibility="@{ViewModel.isProfile() ? View.VISIBLE : View.GONE}" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
