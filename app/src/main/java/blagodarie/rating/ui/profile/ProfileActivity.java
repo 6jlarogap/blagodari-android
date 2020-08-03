@@ -805,4 +805,8 @@ public final class ProfileActivity
         final Intent intent = WishesActivity.createSelfIntent(this, mProfileUserId);
         startActivity(intent);
     }
+
+    public void onAbilityClick (View view) {
+        Toast.makeText(this, getString(R.string.info_msg_function_in_developing), Toast.LENGTH_LONG).show();
+    }
 }
