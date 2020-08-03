@@ -8,6 +8,7 @@
     <string name="btn_trustless">Утрата доверия</string>
     <string name="btn_cancel_trustless">Восстановить доверие</string>
     <string name="btn_wishes">Желания</string>
+    <string name="btn_ability">Возможности</string>
     <string name="btn_edit">Редактировать</string>
     <string name="btn_delete">Удалить</string>
 

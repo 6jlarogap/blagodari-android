@@ -11,10 +11,10 @@
       "type": "SINGLE",
       "filters": [],
       "properties": [],
-      "versionCode": 7,
-      "versionName": "7",
+      "versionCode": 8,
+      "versionName": "8",
       "enabled": true,
-      "outputFile": "rating-0.0.7-release.apk"
+      "outputFile": "rating-0.0.8-release.apk"
     }
   ]
 }

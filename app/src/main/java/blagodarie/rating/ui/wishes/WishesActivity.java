@@ -91,9 +91,6 @@ public final class WishesActivity
         Log.d(TAG, "initViewModel");
         mViewModel = new ViewModelProvider(this).get(WishesViewModel.class);
         List<Wish> wishes = new ArrayList<>();
-        wishes.add(new Wish(UUID.randomUUID(), mOwnerId, "Желание 1", new Date()));
-        wishes.add(new Wish(UUID.randomUUID(), mOwnerId, "Желание 2", new Date()));
-        wishes.add(new Wish(UUID.randomUUID(), mOwnerId, "Желание 3", new Date()));
         mViewModel.getWishes().setValue(wishes);
     }
 

@@ -66,7 +66,7 @@
             android:layout_height="wrap_content"
             android:onClick="onDeleteWishClick"
             android:text="Отправить"
-            android:visibility="@{ViewModel.isSelfProfile() ? View.VISIBLE : View.GONE}" />
+            android:visibility="@{!ViewModel.isSelfProfile() ? View.VISIBLE : View.GONE}" />
 
     </LinearLayout>
 
