@@ -359,11 +359,22 @@ public final class ProfileActivity
                     final String content = result.getContents();
                     try {
                         final Uri uri = Uri.parse(content);
-                        final String profileUserIdString = uri.getQueryParameter("id");
-                        UUID profileUserId = UUID.fromString(profileUserIdString);
-                        final Intent i = new Intent(Intent.ACTION_VIEW);
-                        i.setData(Uri.parse(getString(R.string.url_profile, profileUserId)));
-                        startActivity(i);
+                        if (uri.getPath() != null) {
+                            if (uri.getPath().equals("/profile")){
+                                final String profileUserIdString = uri.getQueryParameter("id");
+                                UUID profileUserId = UUID.fromString(profileUserIdString);
+                                final Intent i = new Intent(Intent.ACTION_VIEW);
+                                i.setData(Uri.parse(getString(R.string.url_profile, profileUserId)));
+                                startActivity(i);
+                            } else if (uri.getPath().equals("/wish")){
+                                final String profileUserIdString = uri.getQueryParameter("id");
+                                UUID profileUserId = UUID.fromString(profileUserIdString);
+                                final Intent i = new Intent(Intent.ACTION_VIEW);
+                                i.setData(Uri.parse(getString(R.string.url_wish, profileUserId)));
+                                startActivity(i);
+                            }
+                        }
+
                     } catch (Exception e) {
                         final Intent i = new Intent(this, ProfileActivity.class);
                         i.putExtra("text", content);

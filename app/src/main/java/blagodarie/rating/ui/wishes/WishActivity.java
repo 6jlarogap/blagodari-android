@@ -2,6 +2,9 @@ package blagodarie.rating.ui.wishes;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -24,16 +27,20 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.Date;
 import java.util.EnumMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import blagodarie.rating.R;
 import blagodarie.rating.auth.AccountGeneral;
 import blagodarie.rating.databinding.WishActivityBinding;
+import blagodarie.rating.server.ServerApiResponse;
+import blagodarie.rating.server.ServerConnector;
 import blagodarie.rating.ui.AccountProvider;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -44,8 +51,6 @@ public final class WishActivity
         extends AppCompatActivity {
 
     private static final String TAG = WishActivity.class.getSimpleName();
-
-    public static final String EXTRA_WISH = "blagodarie.rating.ui.wishes.EditWishActivity.WISH";
 
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
 
@@ -78,23 +83,20 @@ public final class WishActivity
                     initViewModel();
                     initBinding();
                     downloadWishData();
-                    /*AccountProvider.getAccount(
+                    AccountProvider.getAccount(
                             this,
                             new AccountProvider.OnAccountSelectListener() {
                                 @Override
                                 public void onNoAccount () {
-                                    downloadProfileData(null);
+                                    mViewModel.isSelfWish().set(false);
                                 }
 
                                 @Override
                                 public void onAccountSelected (@NonNull final Account account) {
                                     mAccount = account;
-                                    mActivityBinding.nvNavigation.getMenu().findItem(R.id.miLogout).setEnabled(mAccount != null);
-                                    mViewModel.getIsSelfProfile().set(mProfileUserId.toString().equals(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID)));
-                                    getAuthTokenAndDownloadProfileData();
                                 }
                             }
-                    );*/
+                    );
                 } else {
                     Toast.makeText(this, R.string.err_msg_missing_profile_user_id, Toast.LENGTH_LONG).show();
                     finish();
@@ -110,6 +112,13 @@ public final class WishActivity
         }
     }
 
+    @Override
+    protected void onDestroy () {
+        Log.d(TAG, "onDestroy");
+        super.onDestroy();
+        mCompositeDisposable.clear();
+    }
+
     private void initViewModel () {
         Log.d(TAG, "initViewModel");
         mViewModel = new ViewModelProvider(this).get(WishViewModel.class);
@@ -120,14 +129,14 @@ public final class WishActivity
         Log.d(TAG, "initBinding");
         mActivityBinding = DataBindingUtil.setContentView(this, R.layout.wish_activity);
         mActivityBinding.setViewModel(mViewModel);
-        //mActivityBinding.srlRefreshProfileInfo.setOnRefreshListener(this::getAuthTokenAndDownloadProfileData);
+        mActivityBinding.srlRefreshProfileInfo.setOnRefreshListener(this::downloadWishData);
 
         final QRCodeWriter writer = new QRCodeWriter();
         final Map<EncodeHintType, Object> hints = new EnumMap<>(EncodeHintType.class);
         hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
         hints.put(EncodeHintType.MARGIN, 0); /* default = 4 */
         try {
-            final BitMatrix bitMatrix = writer.encode(getString(R.string.url_profile, mWishId.toString()), BarcodeFormat.QR_CODE, 500, 500, hints);
+            final BitMatrix bitMatrix = writer.encode(getString(R.string.url_wish, mWishId.toString()), BarcodeFormat.QR_CODE, 500, 500, hints);
             final int width = bitMatrix.getWidth();
             final int height = bitMatrix.getHeight();
             final Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -148,28 +157,13 @@ public final class WishActivity
         mViewModel.getDownloadInProgress().set(true);
         mCompositeDisposable.add(
                 Observable.
-                        fromCallable(() -> (Wish) getIntent().getSerializableExtra(EXTRA_WISH)).
+                        fromCallable(() -> ServerConnector.sendRequestAndGetResponse("getwishinfo?uuid=" + mWishId)).
                         subscribeOn(Schedulers.io()).
                         observeOn(AndroidSchedulers.mainThread()).
                         subscribe(
-                                wish -> {
-                                    mWish = wish;
+                                serverApiResponse -> {
                                     mViewModel.getDownloadInProgress().set(false);
-                                    mViewModel.getWishText().set(wish.getText());
-                                    AccountProvider.getAccount(
-                                            this,
-                                            new AccountProvider.OnAccountSelectListener() {
-                                                @Override
-                                                public void onNoAccount () {
-                                                    mViewModel.isSelfProfile().set(false);
-                                                }
-
-                                                @Override
-                                                public void onAccountSelected (@NonNull final Account account) {
-                                                    mAccount = account;
-                                                    mViewModel.isSelfProfile().set(wish.getOwnerUuid().toString().equals(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID)));
-                                                }
-                                            });
+                                    extractWishFromServerApiResponse(serverApiResponse);
                                 },
                                 throwable -> {
                                     mViewModel.getDownloadInProgress().set(false);
@@ -177,6 +171,37 @@ public final class WishActivity
                                 }
                         )
         );
+    }
+
+    private void extractWishFromServerApiResponse (
+            @NonNull final ServerApiResponse serverApiResponse
+    ) {
+        Log.d(TAG, "extractDataFromServerApiResponse");
+        if (serverApiResponse.getCode() == 200) {
+            if (serverApiResponse.getBody() != null) {
+                final String responseBody = serverApiResponse.getBody();
+                try {
+                    final JSONObject wishJSON = new JSONObject(responseBody);
+                    final String ownerUuidString = wishJSON.getString("owner_id");
+                    final UUID ownerUuid = UUID.fromString(ownerUuidString);
+                    final String text = wishJSON.getString("text");
+                    final long timestamp = wishJSON.getLong("last_edit");
+                    mWish = new Wish(mWishId, ownerUuid, text, new Date(timestamp));
+                    mViewModel.getWishText().set(mWish.getText());
+                    if (mAccount != null) {
+                        mViewModel.isSelfWish().set(ownerUuid.toString().equals(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID)));
+                    } else {
+                        mViewModel.isSelfWish().set(false);
+                    }
+                } catch (JSONException e) {
+                    Log.e(TAG, Log.getStackTraceString(e));
+                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+                } catch (IllegalArgumentException e) {
+                    Log.e(TAG, Log.getStackTraceString(e));
+                    Toast.makeText(this, getString(blagodarie.rating.auth.R.string.err_msg_incorrect_user_id), Toast.LENGTH_LONG).show();
+                }
+            }
+        }
     }
 
     @Override
@@ -187,12 +212,8 @@ public final class WishActivity
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case 1:
-                if (resultCode == Activity.RESULT_OK &&
-                        data != null) {
-                    final Wish wish = (Wish) data.getSerializableExtra(EditWishActivity.EXTRA_WISH);
-                    if (wish != null) {
-                        mViewModel.getWishText().set(wish.getText());
-                    }
+                if (resultCode == Activity.RESULT_OK) {
+                    downloadWishData();
                 }
                 break;
             default:
@@ -201,11 +222,65 @@ public final class WishActivity
     }
 
     public void onEditWishClick (@NonNull final View view) {
-        final Intent intent = EditWishActivity.createSelfIntent(this, mWish);
+        final Intent intent = EditWishActivity.createSelfIntent(this, mWish, mAccount);
         startActivityForResult(intent, 1);
     }
 
     public void onDeleteWishClick (View view) {
+        getAuthTokenAndDeleteWish();
+    }
+
+    private void getAuthTokenAndDeleteWish () {
+        Log.d(TAG, "getAuthTokenAndDeleteWish");
+        AccountProvider.getAuthToken(
+                this,
+                mAccount,
+                this::onGetAuthTokenAndDeleteWishComplete);
+    }
+
+    private void onGetAuthTokenAndDeleteWishComplete (@NonNull final AccountManagerFuture<Bundle> future) {
+        Log.d(TAG, "onGetAuthTokenAndAddOrUpdateWishComplete");
+        try {
+            final Bundle bundle = future.getResult();
+            if (bundle != null) {
+                final String authToken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
+                if (authToken != null) {
+                    deleteWish(authToken);
+                }
+            }
+        } catch (AuthenticatorException | IOException | OperationCanceledException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void deleteWish (
+            @NonNull final String authToken
+    ) {
+        Log.d(TAG, "deleteWish");
+        mCompositeDisposable.add(
+                Observable.
+                        fromCallable(() -> ServerConnector.sendAuthRequestAndGetResponse("deletewish?uuid=" + mWishId, authToken)).
+                        subscribeOn(Schedulers.io()).
+                        observeOn(AndroidSchedulers.mainThread()).
+                        subscribe(
+                                this::onDeleteComplete,
+                                throwable -> Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_LONG).show()
+                        )
+        );
+    }
+
+    private void onDeleteComplete (
+            @NonNull final ServerApiResponse serverApiResponse) {
+        Log.d(TAG, "extractDataFromServerApiResponse");
+        if (serverApiResponse.getCode() == 200) {
+            Toast.makeText(this, R.string.info_msg_wish_deleted, Toast.LENGTH_LONG).show();
+            finish();
+        } else {
+            Toast.makeText(this, R.string.err_msg_delete_wish_failed, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void onDonateWishClick (View view) {
         Toast.makeText(this, R.string.info_msg_function_in_developing, Toast.LENGTH_LONG).show();
     }
 }

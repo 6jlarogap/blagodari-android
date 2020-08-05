@@ -1,7 +1,6 @@
 package blagodarie.rating.ui.wishes;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableField;
 import androidx.lifecycle.ViewModel;
@@ -13,7 +12,7 @@ public final class WishViewModel
     private final ObservableField<String> mWishText = new ObservableField<>("");
 
     @NonNull
-    private final ObservableBoolean mSelfProfile = new ObservableBoolean(false);
+    private final ObservableBoolean mSelfWish = new ObservableBoolean(false);
 
     @NonNull
     private final ObservableBoolean mDownloadInProgress = new ObservableBoolean(false);
@@ -24,8 +23,8 @@ public final class WishViewModel
     }
 
     @NonNull
-    public final ObservableBoolean isSelfProfile () {
-        return mSelfProfile;
+    public final ObservableBoolean isSelfWish () {
+        return mSelfWish;
     }
 
     @NonNull

@@ -17,6 +17,9 @@ public final class WishesViewModel
     private final ObservableBoolean mSelfProfile = new ObservableBoolean(false);
 
     @NonNull
+    private final ObservableBoolean mDownloadInProgress = new ObservableBoolean(false);
+
+    @NonNull
     public MutableLiveData<List<Wish>> getWishes () {
         return mWishes;
     }
@@ -24,6 +27,11 @@ public final class WishesViewModel
     @NonNull
     public final ObservableBoolean isSelfProfile () {
         return mSelfProfile;
+    }
+
+    @NonNull
+    public final ObservableBoolean getDownloadInProgress () {
+        return mDownloadInProgress;
     }
 
 }
