@@ -7,6 +7,8 @@
     <string name="info_msg_one_account_only">Нельзя добавить больше аккаунтов</string>
     <string name="info_msg_update_data_complete">Данные обновлены</string>
     <string name="info_msg_add_thanks_complete">Благодарность добавлена</string>
+    <string name="info_msg_wish_saved">Желание сохранено</string>
+    <string name="info_msg_wish_deleted">Желание удалено</string>
     <string name="info_msg_trust_is_lost">Доверие утрачено</string>
     <string name="info_msg_trust_restored">Доверие восстановлено</string>
     <string name="info_msg_in_developing">Функция в разработке</string>
@@ -16,6 +18,8 @@
     <string name="err_msg_incorrect_card_number">Неверный номер карты</string>
     <string name="err_msg_update_data_failed">Не удалось обновить данные</string>
     <string name="err_msg_add_thanks_failed">Не удалось добавить благодарность</string>
+    <string name="err_msg_save_wish_failed">Не удалось сохранить желание</string>
+    <string name="err_msg_delete_wish_failed">Не удалось удалить желание</string>
 
     <string name="txt_hello">Здравствуйте!</string>
 </resources>
