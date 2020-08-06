@@ -17,6 +17,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +26,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.core.view.GravityCompat;
@@ -57,6 +59,7 @@ import java.util.UUID;
 import blagodarie.rating.OnOperationListener;
 import blagodarie.rating.R;
 import blagodarie.rating.auth.AccountGeneral;
+import blagodarie.rating.databinding.EnterOperationCommentDialogBinding;
 import blagodarie.rating.databinding.NavHeaderLayoutBinding;
 import blagodarie.rating.databinding.ProfileActivityBinding;
 import blagodarie.rating.databinding.ThanksUserItemBinding;
@@ -360,13 +363,13 @@ public final class ProfileActivity
                     try {
                         final Uri uri = Uri.parse(content);
                         if (uri.getPath() != null) {
-                            if (uri.getPath().equals("/profile")){
+                            if (uri.getPath().equals("/profile")) {
                                 final String profileUserIdString = uri.getQueryParameter("id");
                                 UUID profileUserId = UUID.fromString(profileUserIdString);
                                 final Intent i = new Intent(Intent.ACTION_VIEW);
                                 i.setData(Uri.parse(getString(R.string.url_profile, profileUserId)));
                                 startActivity(i);
-                            } else if (uri.getPath().equals("/wish")){
+                            } else if (uri.getPath().equals("/wish")) {
                                 final String profileUserIdString = uri.getQueryParameter("id");
                                 UUID profileUserId = UUID.fromString(profileUserIdString);
                                 final Intent i = new Intent(Intent.ACTION_VIEW);
@@ -472,11 +475,12 @@ public final class ProfileActivity
 
     private void addOperation (
             @NonNull final String authToken,
-            final int operationTypeId
+            final int operationTypeId,
+            final String operationComment
     ) {
         Log.d(TAG, "addOperation");
 
-        final String content = String.format(Locale.ENGLISH, "{\"user_id_to\":\"%s\",\"operation_type_id\":%d,\"timestamp\":%d}", (mProfileUserId != null ? mProfileUserId.toString() : mJustText), operationTypeId, System.currentTimeMillis());
+        final String content = String.format(Locale.ENGLISH, "{\"user_id_to\":\"%s\",\"operation_type_id\":%d,\"timestamp\":%d,\"comment\":\"%s\"}", (mProfileUserId != null ? mProfileUserId.toString() : mJustText), operationTypeId, System.currentTimeMillis(), operationComment);
 
         mCompositeDisposable.add(
                 Observable.
@@ -552,12 +556,15 @@ public final class ProfileActivity
         );
     }
 
-    private void getAuthTokenAndAddOperation (final int operationTypeId) {
+    private void getAuthTokenAndAddOperation (
+            final int operationTypeId,
+            final String operationComment
+    ) {
         Log.d(TAG, "getAuthTokenAndAddOperation");
         AccountProvider.getAuthToken(
                 this,
                 mAccount,
-                accountManagerFuture -> onGetAuthTokenForAddOperationComplete(accountManagerFuture, operationTypeId)
+                accountManagerFuture -> onGetAuthTokenForAddOperationComplete(accountManagerFuture, operationTypeId, operationComment)
         );
     }
 
@@ -594,7 +601,8 @@ public final class ProfileActivity
 
     private void onGetAuthTokenForAddOperationComplete (
             @NonNull final AccountManagerFuture<Bundle> future,
-            final int operationTypeId
+            final int operationTypeId,
+            final String operationComment
     ) {
         Log.d(TAG, "onGetAuthTokenForUpdateProfileDataComplete");
         try {
@@ -602,7 +610,7 @@ public final class ProfileActivity
             if (bundle != null) {
                 final String authToken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
                 if (authToken != null) {
-                    addOperation(authToken, operationTypeId);
+                    addOperation(authToken, operationTypeId, operationComment);
                 }
             }
         } catch (AuthenticatorException | IOException | OperationCanceledException e) {
@@ -723,56 +731,53 @@ public final class ProfileActivity
 
     @Override
     public void onThanks () {
-        if (mAccount != null) {
-            getAuthTokenAndAddOperation(1);
-        } else {
-            mAccountManager.addAccount(
-                    getString(R.string.account_type),
-                    getString(R.string.token_type),
-                    null,
-                    null,
-                    this,
-                    accountManagerFuture -> onAddAccountFinished(accountManagerFuture, 1),
-                    null
-            );
-        }
+        addOperationComment(1);
     }
 
     @Override
     public void onTrustless () {
-        if (mAccount != null) {
-            getAuthTokenAndAddOperation(2);
-        } else {
-            mAccountManager.addAccount(
-                    getString(R.string.account_type),
-                    getString(R.string.token_type),
-                    null,
-                    null,
-                    this,
-                    accountManagerFuture -> onAddAccountFinished(accountManagerFuture, 2),
-                    null
-            );
-        }
+        addOperationComment(2);
     }
 
     @Override
     public void onTrustlessCancel () {
-        if (mAccount != null) {
-            getAuthTokenAndAddOperation(3);
-        } else {
-            mAccountManager.addAccount(
-                    getString(R.string.account_type),
-                    getString(R.string.token_type),
-                    null,
-                    null,
-                    this,
-                    accountManagerFuture -> onAddAccountFinished(accountManagerFuture, 3),
-                    null
-            );
-        }
+        addOperationComment(3);
     }
 
-    public void onAddAccountFinished (final AccountManagerFuture<Bundle> result, final int operationTypeId) {
+    private void addOperationComment (final int operationTypeId) {
+        final EnterOperationCommentDialogBinding binding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.enter_operation_comment_dialog, null, false);
+        new AlertDialog.
+                Builder(this).
+                setCancelable(false).
+                setTitle(R.string.txt_comment).
+                setView(binding.getRoot()).
+                setNegativeButton(android.R.string.cancel, null).
+                setPositiveButton(android.R.string.ok,
+                        (dialogInterface, i) -> {
+                            final String operationComment = binding.etOperationComment.getText().toString();
+                            if (mAccount != null) {
+                                getAuthTokenAndAddOperation(operationTypeId, operationComment);
+                            } else {
+                                mAccountManager.addAccount(
+                                        getString(R.string.account_type),
+                                        getString(R.string.token_type),
+                                        null,
+                                        null,
+                                        this,
+                                        accountManagerFuture -> onAddAccountFinished(accountManagerFuture, 1, operationComment),
+                                        null
+                                );
+                            }
+                        }).
+                create().
+                show();
+    }
+
+    public void onAddAccountFinished (
+            final AccountManagerFuture<Bundle> result,
+            final int operationTypeId,
+            final String operationComment
+    ) {
         Log.d(TAG, "onAddAccountFinish");
         try {
             final Bundle bundle = result.getResult();
@@ -780,7 +785,7 @@ public final class ProfileActivity
                     bundle.getString(AccountManager.KEY_ACCOUNT_NAME),
                     bundle.getString(AccountManager.KEY_ACCOUNT_TYPE)
             );
-            getAuthTokenAndAddOperation(operationTypeId);
+            getAuthTokenAndAddOperation(operationTypeId, operationComment);
         } catch (OperationCanceledException e) {
             Log.e(TAG, Log.getStackTraceString(e));
             Toast.makeText(this, getString(R.string.err_msg_account_not_created), Toast.LENGTH_LONG).show();
