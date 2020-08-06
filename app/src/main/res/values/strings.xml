@@ -15,6 +15,7 @@
     <string name="rqst_choose_account">Выберите аккаунт</string>
     <string name="rqst_scan_qr_code">Отсканируйте QR-код</string>
     <string name="rqst_enter_your_wish">Напишите ваше желание</string>
+    <string name="rqst_enter_your_comment">Напишите ваш комментарий</string>
 
     <string name="info_msg_copied_to_clipboard">Скопировано в буффер обмена</string>
     <string name="info_msg_function_in_developing">Функция в разработке</string>
@@ -40,5 +41,10 @@
     <string name="txt_my_account">Мой профиль</string>
     <string name="txt_logout">Выйти из аккаунта</string>
     <string name="txt_qr_code_scan">Сканировать QR-код</string>
+    <string name="txt_comment">Комментарий</string>
+
+    <string name="operation_type_name_thanks">Благодарность</string>
+    <string name="operation_type_name_trustless">Утрата доверия</string>
+    <string name="operation_type_name_trustless_cancel">Восстановление доверия</string>
 
 </resources>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/etOperationComment"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:hint="@string/rqst_enter_your_comment"
+            android:importantForAutofill="no"
+            android:gravity="start"
+            android:inputType="textMultiLine"
+            android:maxLength="2000"
+            android:singleLine="false" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+</layout>

@@ -38,6 +38,10 @@
             android:screenOrientation="portrait" />
 
         <activity
+            android:name=".ui.operations.OperationsActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
             android:name=".ui.wishes.WishActivity"
             android:screenOrientation="portrait">
             <intent-filter

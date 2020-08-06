@@ -74,7 +74,7 @@ public final class WishesActivity
         if (mOwnerId != null) {
             initViewModel();
             initBinding();
-            initThanksUserAdapter();
+            initWishesAdapter();
             AccountProvider.getAccount(
                     this,
                     new AccountProvider.OnAccountSelectListener() {
@@ -178,7 +178,7 @@ public final class WishesActivity
         }
     }
 
-    private void initThanksUserAdapter () {
+    private void initWishesAdapter () {
         mViewModel.getWishes().observe(this, wishes -> {
             if (mWishesAdapter == null) {
                 mWishesAdapter = new WishesAdapter(this::onWishClick);
