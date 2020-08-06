@@ -13,7 +13,7 @@ android {
 
         project.ext.set("archivesBaseName", "rating-" + defaultConfig.versionName);
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        multiDexEnabled false
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -28,8 +28,8 @@ android {
             debuggable true
             applicationIdSuffix ".dbg"
 
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
             manifestPlaceholders = [hostName:"dev.blagodarie.org"]
@@ -61,6 +61,7 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation project(path: ':auth')
     implementation project(path: ':server')
+    implementation "android.arch.paging:runtime:1.0.1"
     implementation 'androidx.appcompat:appcompat:1.1.0'
 
     implementation 'com.google.android.material:material:1.3.0-alpha02'
@@ -74,6 +75,7 @@ dependencies {
     implementation "com.squareup.picasso:picasso:2.71828"
     implementation 'org.jetbrains:annotations:15.0'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+
 
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'

@@ -11,8 +11,6 @@
     <string name="btn_ability">Возможности</string>
     <string name="btn_edit">Редактировать</string>
     <string name="btn_delete">Удалить</string>
-    <string name="btn_cancel">Отмена</string>
-    <string name="btn_">OK</string>
 
     <string name="rqst_choose_account">Выберите аккаунт</string>
     <string name="rqst_scan_qr_code">Отсканируйте QR-код</string>
@@ -44,5 +42,9 @@
     <string name="txt_logout">Выйти из аккаунта</string>
     <string name="txt_qr_code_scan">Сканировать QR-код</string>
     <string name="txt_comment">Комментарий</string>
+
+    <string name="operation_type_name_thanks">Благодарность</string>
+    <string name="operation_type_name_trustless">Утрата доверия</string>
+    <string name="operation_type_name_trustless_cancel">Восстановление доверия</string>
 
 </resources>

@@ -66,6 +66,7 @@ import blagodarie.rating.databinding.ThanksUserItemBinding;
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
 import blagodarie.rating.ui.AccountProvider;
+import blagodarie.rating.ui.operations.OperationsActivity;
 import blagodarie.rating.ui.splash.SplashActivity;
 import blagodarie.rating.ui.wishes.WishesActivity;
 import io.reactivex.Observable;
@@ -824,5 +825,10 @@ public final class ProfileActivity
 
     public void onAbilityClick (View view) {
         Toast.makeText(this, getString(R.string.info_msg_function_in_developing), Toast.LENGTH_LONG).show();
+    }
+
+    public void onThanksClick (View view) {
+        final Intent intent = OperationsActivity.createSelfIntent(this, mProfileUserId);
+        startActivity(intent);
     }
 }
