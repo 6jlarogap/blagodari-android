@@ -13,7 +13,7 @@ android {
 
         project.ext.set("archivesBaseName", "rating-" + defaultConfig.versionName);
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        multiDexEnabled false
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -28,8 +28,8 @@ android {
             debuggable true
             applicationIdSuffix ".dbg"
 
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
             manifestPlaceholders = [hostName:"dev.blagodarie.org"]
@@ -76,6 +76,7 @@ dependencies {
     implementation 'org.jetbrains:annotations:15.0'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
+    implementation 'com.yandex.money.api:yandex-money-sdk-java:7.2.23'
 
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'

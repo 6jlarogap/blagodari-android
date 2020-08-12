@@ -8,7 +8,7 @@
         <EditText
             android:id="@+id/etOperationComment"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="wrap_content"
             android:hint="@string/rqst_enter_your_comment"
             android:importantForAutofill="no"
             android:gravity="start"

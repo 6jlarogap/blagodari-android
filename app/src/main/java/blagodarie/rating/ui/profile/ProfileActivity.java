@@ -21,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -67,6 +68,7 @@ import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
 import blagodarie.rating.ui.AccountProvider;
 import blagodarie.rating.ui.operations.OperationsActivity;
+import blagodarie.rating.ui.pay.PayActivity;
 import blagodarie.rating.ui.splash.SplashActivity;
 import blagodarie.rating.ui.wishes.WishesActivity;
 import io.reactivex.Observable;
@@ -746,15 +748,19 @@ public final class ProfileActivity
     }
 
     private void addOperationComment (final int operationTypeId) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         final EnterOperationCommentDialogBinding binding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.enter_operation_comment_dialog, null, false);
         new AlertDialog.
                 Builder(this).
                 setCancelable(false).
                 setTitle(R.string.txt_comment).
                 setView(binding.getRoot()).
-                setNegativeButton(android.R.string.cancel, null).
+                setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> {
+                    imm.hideSoftInputFromWindow(binding.etOperationComment.getWindowToken(), 0);
+                }).
                 setPositiveButton(android.R.string.ok,
                         (dialogInterface, i) -> {
+                            imm.hideSoftInputFromWindow(binding.etOperationComment.getWindowToken(), 0);
                             final String operationComment = binding.etOperationComment.getText().toString();
                             if (mAccount != null) {
                                 getAuthTokenAndAddOperation(operationTypeId, operationComment);
@@ -772,6 +778,8 @@ public final class ProfileActivity
                         }).
                 create().
                 show();
+        binding.etOperationComment.requestFocus();
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
     }
 
     public void onAddAccountFinished (
@@ -830,5 +838,10 @@ public final class ProfileActivity
     public void onThanksClick (View view) {
         final Intent intent = OperationsActivity.createSelfIntent(this, mProfileUserId);
         startActivity(intent);
+    }
+
+    public void onFameClick (View view) {
+        final Intent intent = PayActivity.createSelfIntent(this);
+        //startActivity(intent);
     }
 }

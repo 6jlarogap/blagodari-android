@@ -15,6 +15,9 @@ public final class OperationsViewModel
     private final ObservableBoolean mDownloadInProgress = new ObservableBoolean(false);
 
     @NonNull
+    private final ObservableBoolean mSelfProfile = new ObservableBoolean(false);
+
+    @NonNull
     public ObservableBoolean getDownloadInProgress () {
         return mDownloadInProgress;
     }
@@ -26,5 +29,10 @@ public final class OperationsViewModel
 
     public void setOperations (@NonNull final LiveData<PagedList<Operation>> operations) {
         mOperations = operations;
+    }
+
+    @NonNull
+    public final ObservableBoolean isSelfProfile () {
+        return mSelfProfile;
     }
 }
