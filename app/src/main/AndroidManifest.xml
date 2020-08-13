@@ -75,7 +75,7 @@
             tools:replace="screenOrientation" />
 
         <activity
-            android:name=".ui.profile.ProfileActivity"
+            android:name=".ui.user.UserActivity"
             android:screenOrientation="portrait">
             <intent-filter
                 android:autoVerify="true"

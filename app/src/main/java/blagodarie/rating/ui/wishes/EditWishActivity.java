@@ -93,10 +93,10 @@ public final class EditWishActivity
 
     private void getAuthTokenAndAddOrUpdateWish () {
         Log.d(TAG, "getAuthTokenAndAddOrUpdateWish");
-        AccountProvider.getAuthToken(
+        /*AccountProvider.getAuthToken(
                 this,
                 mAccount,
-                this::onGetAuthTokenAndAddOrUpdateWishComplete);
+                this::onGetAuthTokenAndAddOrUpdateWishComplete);*/
     }
 
     private void onGetAuthTokenAndAddOrUpdateWishComplete (@NonNull final AccountManagerFuture<Bundle> future) {

@@ -74,7 +74,7 @@ public final class WishesActivity
         if (mOwnerId != null) {
             initViewModel();
             initBinding();
-            initWishesAdapter();
+            initWishesAdapter();/*
             AccountProvider.getAccount(
                     this,
                     new AccountProvider.OnAccountSelectListener() {
@@ -89,9 +89,9 @@ public final class WishesActivity
                             mViewModel.isSelfProfile().set(mOwnerId.toString().equals(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID)));
                         }
                     }
-            );
+            );*/
         } else {
-            Toast.makeText(this, R.string.err_msg_missing_profile_user_id, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.err_msg_missing_user_id, Toast.LENGTH_LONG).show();
             finish();
         }
     }

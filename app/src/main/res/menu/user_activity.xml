@@ -9,10 +9,10 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/miMyAccount"
+        android:id="@+id/miOwnAccount"
         android:title="@string/txt_my_account"
         android:visible="false"
         app:actionLayout="@layout/photo"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
 </menu>

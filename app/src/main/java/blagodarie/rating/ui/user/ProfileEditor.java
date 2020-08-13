@@ -1,4 +1,4 @@
-package blagodarie.rating.ui.profile;
+package blagodarie.rating.ui.user;
 
 public interface ProfileEditor {
 

@@ -1,4 +1,4 @@
-package blagodarie.rating.ui.profile;
+package blagodarie.rating.ui.user.profile;
 
 import android.view.LayoutInflater;
 import android.view.View;

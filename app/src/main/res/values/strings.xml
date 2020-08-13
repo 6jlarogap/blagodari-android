@@ -22,7 +22,7 @@
 
     <string name="err_msg_account_not_created">Аккаунт не был создан</string>
     <string name="err_msg_authentication_error">Ошибка аутентификации</string>
-    <string name="err_msg_missing_profile_user_id">Не указан идентификатор пользователя</string>
+    <string name="err_msg_missing_user_id">Не указан идентификатор пользователя</string>
     <string name="err_msg_missing_wish">Не указано желание</string>
     <string name="err_msg_missing_account">Не указан аккаунт</string>
     <string name="err_msg_incorrect_link">Неверная ссылка</string>

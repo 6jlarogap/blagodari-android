@@ -77,21 +77,17 @@ public final class OperationsActivity
             initOperationsAdapter();
             AccountProvider.getAccount(
                     this,
-                    new AccountProvider.OnAccountSelectListener() {
-                        @Override
-                        public void onNoAccount () {
-                            mViewModel.isSelfProfile().set(false);
-                        }
-
-                        @Override
-                        public void onAccountSelected (@NonNull final Account account) {
+                    account -> {
+                        if (account != null) {
                             mAccount = account;
                             mViewModel.isSelfProfile().set(mUserId.toString().equals(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID)));
+                        } else {
+                            mViewModel.isSelfProfile().set(false);
                         }
                     }
             );
         } else {
-            Toast.makeText(this, R.string.err_msg_missing_profile_user_id, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.err_msg_missing_user_id, Toast.LENGTH_LONG).show();
             finish();
         }
     }
@@ -231,11 +227,11 @@ public final class OperationsActivity
             final String operationComment
     ) {
         Log.d(TAG, "getAuthTokenAndAddOperation");
-        AccountProvider.getAuthToken(
+        /*AccountProvider.getAuthToken(
                 this,
                 mAccount,
                 accountManagerFuture -> onGetAuthTokenForAddOperationComplete(accountManagerFuture, operationTypeId, operationComment)
-        );
+        );*/
     }
 
 

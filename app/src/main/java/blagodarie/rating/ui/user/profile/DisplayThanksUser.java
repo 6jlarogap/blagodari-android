@@ -1,9 +1,7 @@
-package blagodarie.rating.ui.profile;
+package blagodarie.rating.ui.user.profile;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import java.util.UUID;
 
 public final class DisplayThanksUser {
 

@@ -5,7 +5,7 @@
     android:padding="10dp">
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivAccountPhoto"
+        android:id="@+id/ivOwnAccountPhoto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerInside"

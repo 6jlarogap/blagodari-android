@@ -82,7 +82,7 @@ public final class WishActivity
                 if (mWishId != null) {
                     initViewModel();
                     initBinding();
-                    downloadWishData();
+                    downloadWishData();/*
                     AccountProvider.getAccount(
                             this,
                             new AccountProvider.OnAccountSelectListener() {
@@ -96,9 +96,9 @@ public final class WishActivity
                                     mAccount = account;
                                 }
                             }
-                    );
+                    );*/
                 } else {
-                    Toast.makeText(this, R.string.err_msg_missing_profile_user_id, Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.err_msg_missing_user_id, Toast.LENGTH_LONG).show();
                     finish();
                 }
             } catch (IllegalArgumentException e) {
@@ -107,7 +107,7 @@ public final class WishActivity
             }
 
         } else {
-            Toast.makeText(this, R.string.err_msg_missing_profile_user_id, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.err_msg_missing_user_id, Toast.LENGTH_LONG).show();
             finish();
         }
     }
@@ -231,11 +231,11 @@ public final class WishActivity
     }
 
     private void getAuthTokenAndDeleteWish () {
-        Log.d(TAG, "getAuthTokenAndDeleteWish");
+        Log.d(TAG, "getAuthTokenAndDeleteWish");/*
         AccountProvider.getAuthToken(
                 this,
                 mAccount,
-                this::onGetAuthTokenAndDeleteWishComplete);
+                this::onGetAuthTokenAndDeleteWishComplete);*/
     }
 
     private void onGetAuthTokenAndDeleteWishComplete (@NonNull final AccountManagerFuture<Bundle> future) {

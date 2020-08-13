@@ -2,7 +2,8 @@ package blagodarie.rating.ui;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.accounts.AccountManagerCallback;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -11,7 +12,9 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import blagodarie.rating.R;
@@ -21,14 +24,19 @@ public final class AccountProvider {
     private static final String TAG = AccountProvider.class.getSimpleName();
 
     public interface OnAccountSelectListener {
-        void onNoAccount ();
+        void onAccountSelected (@Nullable final Account account);
+    }
 
-        void onAccountSelected (@NonNull final Account account);
+    public interface OnGetTokenListener {
+        void onGetToken (@Nullable final String authToken);
+    }
+
+    public interface OnTokenErrorListener {
+        void onError (@NonNull final Throwable throwable);
     }
 
     private AccountProvider (
     ) {
-
     }
 
     public static void getAccount (
@@ -41,7 +49,7 @@ public final class AccountProvider {
 
         final Account[] accounts = accountManager.getAccountsByType(context.getString(R.string.account_type));
         if (accounts.length == 0) {
-            onAccountSelectListener.onNoAccount();
+            onAccountSelectListener.onAccountSelected(null);
         } else if (accounts.length == 1) {
             onAccountSelectListener.onAccountSelected(accounts[0]);
         } else {
@@ -77,7 +85,7 @@ public final class AccountProvider {
     public static void getAuthToken (
             @NonNull final Activity activity,
             @NonNull final Account account,
-            @NonNull final AccountManagerCallback<Bundle> callback
+            @NonNull final OnGetTokenListener onGetTokenListener
     ) {
         Log.d(TAG, "getAuthToken");
         AccountManager.get(activity).getAuthToken(
@@ -85,7 +93,47 @@ public final class AccountProvider {
                 activity.getString(R.string.token_type),
                 null,
                 activity,
-                callback,
+                accountManagerFuture -> {
+                    try {
+                        final Bundle bundle = accountManagerFuture.getResult();
+                        if (bundle != null) {
+                            onGetTokenListener.onGetToken(bundle.getString(AccountManager.KEY_AUTHTOKEN));
+                        } else {
+                            onGetTokenListener.onGetToken(null);
+                        }
+                    } catch (AuthenticatorException | IOException | OperationCanceledException e) {
+                        Log.e(TAG, Log.getStackTraceString(e));
+                    }
+                },
+                null
+        );
+    }
+
+    public static void getAuthToken (
+            @NonNull final Activity activity,
+            @NonNull final Account account,
+            @NonNull final OnGetTokenListener onGetTokenListener,
+            @NonNull final OnTokenErrorListener onTokenErrorListener
+    ) {
+        Log.d(TAG, "getAuthToken");
+        AccountManager.get(activity).getAuthToken(
+                account,
+                activity.getString(R.string.token_type),
+                null,
+                activity,
+                accountManagerFuture -> {
+                    try {
+                        final Bundle bundle = accountManagerFuture.getResult();
+                        if (bundle != null) {
+                            onGetTokenListener.onGetToken(bundle.getString(AccountManager.KEY_AUTHTOKEN));
+                        } else {
+                            onGetTokenListener.onGetToken(null);
+                        }
+                    } catch (AuthenticatorException | IOException | OperationCanceledException e) {
+                        Log.e(TAG, Log.getStackTraceString(e));
+                        onTokenErrorListener.onError(e);
+                    }
+                },
                 null
         );
     }
