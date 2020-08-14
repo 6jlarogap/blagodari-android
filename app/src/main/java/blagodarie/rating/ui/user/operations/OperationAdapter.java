@@ -1,4 +1,4 @@
-package blagodarie.rating.ui.operations;
+package blagodarie.rating.ui.user.operations;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -14,7 +14,7 @@ import com.squareup.picasso.Picasso;
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.OperationItemBinding;
 
-public class OperationAdapter
+public final class OperationAdapter
         extends PagedListAdapter<Operation, OperationAdapter.OperationViewHolder> {
 
     protected OperationAdapter () {

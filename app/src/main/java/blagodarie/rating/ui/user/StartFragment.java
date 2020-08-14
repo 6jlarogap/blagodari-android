@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment;
 public final class StartFragment
         extends Fragment {
 
-    private static final String TAG = blagodarie.rating.auth.StartFragment.class.getSimpleName();
+    private static final String TAG = StartFragment.class.getSimpleName();
 
     @Override
     public View onCreateView (

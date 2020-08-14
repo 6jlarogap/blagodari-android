@@ -1,4 +1,4 @@
-package blagodarie.rating.ui.operations;
+package blagodarie.rating.ui.user.operations;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

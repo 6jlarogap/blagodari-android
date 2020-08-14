@@ -1,4 +1,4 @@
-package blagodarie.rating.ui.operations;
+package blagodarie.rating.ui.user.operations;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.ObservableBoolean;
@@ -12,15 +12,8 @@ public final class OperationsViewModel
     private LiveData<PagedList<Operation>> mOperations;
 
     @NonNull
-    private final ObservableBoolean mDownloadInProgress = new ObservableBoolean(false);
+    private final ObservableBoolean mOwnProfile = new ObservableBoolean(false);
 
-    @NonNull
-    private final ObservableBoolean mSelfProfile = new ObservableBoolean(false);
-
-    @NonNull
-    public ObservableBoolean getDownloadInProgress () {
-        return mDownloadInProgress;
-    }
 
     @NonNull
     public LiveData<PagedList<Operation>> getOperations () {
@@ -32,7 +25,7 @@ public final class OperationsViewModel
     }
 
     @NonNull
-    public final ObservableBoolean isSelfProfile () {
-        return mSelfProfile;
+    public final ObservableBoolean isOwnProfile () {
+        return mOwnProfile;
     }
 }

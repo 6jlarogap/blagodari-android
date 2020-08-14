@@ -1,6 +1,7 @@
 package blagodarie.rating.ui.user.profile;
 
 import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -10,25 +11,30 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.databinding.BindingAdapter;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -44,12 +50,14 @@ import java.util.UUID;
 
 import blagodarie.rating.OperationType;
 import blagodarie.rating.R;
+import blagodarie.rating.auth.AccountGeneral;
 import blagodarie.rating.databinding.EnterOperationCommentDialogBinding;
 import blagodarie.rating.databinding.ProfileFragmentBinding;
 import blagodarie.rating.databinding.ThanksUserItemBinding;
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
 import blagodarie.rating.ui.AccountProvider;
+import blagodarie.rating.ui.user.UserViewModel;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -67,11 +75,74 @@ public final class ProfileFragment
         void toAbilities ();
     }
 
+    private static class GridAutofitLayoutManager
+            extends GridLayoutManager {
+        private int columnWidth;
+        private boolean isColumnWidthChanged = true;
+        private int lastWidth;
+        private int lastHeight;
+
+        public GridAutofitLayoutManager (@NonNull final Context context, final int columnWidth) {
+            /* Initially set spanCount to 1, will be changed automatically later. */
+            super(context, 1);
+            setColumnWidth(checkedColumnWidth(context, columnWidth));
+        }
+
+        public GridAutofitLayoutManager (
+                @NonNull final Context context,
+                final int columnWidth,
+                final int orientation,
+                final boolean reverseLayout) {
+
+            /* Initially set spanCount to 1, will be changed automatically later. */
+            super(context, 1, orientation, reverseLayout);
+            setColumnWidth(checkedColumnWidth(context, columnWidth));
+        }
+
+        private int checkedColumnWidth (@NonNull final Context context, int columnWidth) {
+            if (columnWidth <= 0) {
+            /* Set default columnWidth value (48dp here). It is better to move this constant
+            to static constant on top, but we need context to convert it to dp, so can't really
+            do so. */
+                columnWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48,
+                        context.getResources().getDisplayMetrics());
+            }
+            return columnWidth;
+        }
+
+        public void setColumnWidth (final int newColumnWidth) {
+            if (newColumnWidth > 0 && newColumnWidth != columnWidth) {
+                columnWidth = newColumnWidth;
+                isColumnWidthChanged = true;
+            }
+        }
+
+        @Override
+        public void onLayoutChildren (@NonNull final RecyclerView.Recycler recycler, @NonNull final RecyclerView.State state) {
+            final int width = getWidth();
+            final int height = getHeight();
+            if (columnWidth > 0 && width > 0 && height > 0 && (isColumnWidthChanged || lastWidth != width || lastHeight != height)) {
+                final int totalSpace;
+                if (getOrientation() == VERTICAL) {
+                    totalSpace = width - getPaddingRight() - getPaddingLeft();
+                } else {
+                    totalSpace = height - getPaddingTop() - getPaddingBottom();
+                }
+                final int spanCount = Math.max(1, totalSpace / columnWidth);
+                setSpanCount(spanCount);
+                isColumnWidthChanged = false;
+            }
+            lastWidth = width;
+            lastHeight = height;
+            super.onLayoutChildren(recycler, state);
+        }
+    }
+
     private static final String TAG = ProfileFragment.class.getSimpleName();
 
     private ProfileViewModel mViewModel;
 
-    private ProfileFragmentBinding mProfileBinding;
+    private ProfileFragmentBinding mBinding;
 
     private ThanksUserAdapter mThanksUserAdapter;
 
@@ -93,7 +164,7 @@ public final class ProfileFragment
     ) {
         Log.d(TAG, "onCreateView");
         initBinding(inflater, container);
-        return mProfileBinding.getRoot();
+        return mBinding.getRoot();
     }
 
     @Override
@@ -103,25 +174,11 @@ public final class ProfileFragment
     ) {
         Log.d(TAG, "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
-        initViewModel();
-        setupBinding();
-        initThanksUserAdapter();
-        if (getArguments() != null) {
-            final ProfileFragmentArgs args = ProfileFragmentArgs.fromBundle(getArguments());
 
-            mUserId = args.getUserId();
-            setupQrCode();
+        final ProfileFragmentArgs args = ProfileFragmentArgs.fromBundle(requireArguments());
 
-            mAccount = args.getAccount();
-            if (mAccount != null) {
-                mViewModel.getIsSelfProfile().set(mAccount.name.equals(mUserId.toString()));
-            } else {
-                mViewModel.getIsSelfProfile().set(false);
-            }
-            refreshProfileData();
-        } else {
-            requireActivity().finish();
-        }
+        mAccount = args.getAccount();
+        mUserId = args.getUserId();
     }
 
     @Override
@@ -134,6 +191,12 @@ public final class ProfileFragment
             Log.e(TAG, requireActivity().getClass().getName() + " must implement " + FragmentCommunicator.class.getName());
             throw new ClassCastException(requireActivity().getClass().getName() + " must implement " + FragmentCommunicator.class.getName());
         }
+
+        initThanksUserAdapter();
+        initViewModel();
+        setupBinding();
+
+        refreshProfileData();
     }
 
     @Override
@@ -141,6 +204,7 @@ public final class ProfileFragment
         Log.d(TAG, "onDestroy");
         super.onDestroy();
         mDisposables.clear();
+        mBinding = null;
     }
 
     private void initBinding (
@@ -148,27 +212,38 @@ public final class ProfileFragment
             @Nullable final ViewGroup container
     ) {
         Log.d(TAG, "initBinding");
-        mProfileBinding = ProfileFragmentBinding.inflate(inflater, container, false);
-        mProfileBinding.setUserActionListener(this);
-        mProfileBinding.srlRefreshProfileInfo.setOnRefreshListener(this::refreshProfileData);
-        /*
-            mActivityBinding.setViewModel(mViewModel);
-            mActivityBinding.setProfileEditor(this);
-            mActivityBinding.setOnOperationListener(this);
+        mBinding = ProfileFragmentBinding.inflate(inflater, container, false);
+    }
 
-        }*/
+    private void initThanksUserAdapter () {
+        Log.d(TAG, "initThanksUserAdapter");
+        mThanksUserAdapter = new ThanksUserAdapter(this::onThanksUserClick);
     }
 
     private void initViewModel () {
+        Log.d(TAG, "initViewModel");
         mViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
         mViewModel.isProfile().set(true);
+        mViewModel.isOwnProfile().set(mAccount != null && mAccount.name.equals(mUserId.toString()));
+        mViewModel.getThanksUsers().observe(requireActivity(), mThanksUserAdapter::setData);
+        mViewModel.getQrCode().set(createQrCodeBitmap());
     }
 
     private void setupBinding () {
-        mProfileBinding.setViewModel(mViewModel);
+        Log.d(TAG, "setupBinding");
+        mBinding.setUserActionListener(this);
+        mBinding.srlRefreshProfileInfo.setOnRefreshListener(this::refreshProfileData);
+        mBinding.rvThanksUsers.setLayoutManager(new GridAutofitLayoutManager(requireContext(), (int) ((getResources().getDimension(R.dimen.thanks_user_photo_width) + (getResources().getDimension(R.dimen.thanks_user_photo_margin) * 2)))));
+        mBinding.rvThanksUsers.setAdapter(mThanksUserAdapter);
+        mBinding.setViewModel(mViewModel);
     }
 
-    private void setupQrCode () {
+    @NonNull
+    private Bitmap createQrCodeBitmap () {
+        Log.d(TAG, "createQrCodeBitmap");
+        final int width = 500;
+        final int height = 500;
+        Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         final QRCodeWriter writer = new QRCodeWriter();
         final Map<EncodeHintType, Object> hints = new EnumMap<>(EncodeHintType.class);
         hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
@@ -177,24 +252,23 @@ public final class ProfileFragment
             final BitMatrix bitMatrix = writer.encode(
                     getString(R.string.url_profile, mUserId.toString()),
                     BarcodeFormat.QR_CODE,
-                    500,
-                    500,
-                    hints);
-            final int width = bitMatrix.getWidth();
-            final int height = bitMatrix.getHeight();
-            final Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                    width,
+                    height,
+                    hints
+            );
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
-                    bmp.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.TRANSPARENT);
+                    result.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.TRANSPARENT);
                 }
             }
-            mProfileBinding.ivQRCode.setImageBitmap(bmp);
         } catch (WriterException e) {
             Log.e(TAG, Log.getStackTraceString(e));
         }
+        return result;
     }
 
     private void refreshProfileData () {
+        Log.d(TAG, "refreshProfileData");
         if (mAccount != null) {
             AccountProvider.getAuthToken(requireActivity(), mAccount, this::downloadProfileData);
         } else {
@@ -202,24 +276,8 @@ public final class ProfileFragment
         }
     }
 
-    private void initThanksUserAdapter () {
-        mViewModel.getThanksUsers().observe(requireActivity(), displayThanksUsers -> {
-            if (mThanksUserAdapter == null) {
-                mThanksUserAdapter = new ThanksUserAdapter(this::onThanksUserClick);
-                mProfileBinding.rvThanksUsers.setLayoutManager(new GridLayoutManager(getContext(), calcSpanCount()));
-                mProfileBinding.rvThanksUsers.setAdapter(mThanksUserAdapter);
-            }
-            mThanksUserAdapter.setData(displayThanksUsers);
-        });
-    }
-
-    private int calcSpanCount () {
-        int layoutWidthDp = (int) (mProfileBinding.rvThanksUsers.getWidth() / getResources().getDisplayMetrics().density);
-        int itemWidthDp = (int) ((getResources().getDimension(R.dimen.thanks_user_photo_width) + (getResources().getDimension(R.dimen.thanks_user_photo_margin) * 2)) / getResources().getDisplayMetrics().density);
-        return layoutWidthDp / itemWidthDp;
-    }
-
     private void onThanksUserClick (@NonNull final View view) {
+        Log.d(TAG, "onThanksUserClick");
         final ThanksUserItemBinding thanksUserItemBinding = DataBindingUtil.findBinding(view);
         if (thanksUserItemBinding != null) {
             final String userId = thanksUserItemBinding.getThanksUser().getUserUUID();
@@ -265,19 +323,15 @@ public final class ProfileFragment
                 final String responseBody = serverApiResponse.getBody();
                 try {
                     final JSONObject userJSON = new JSONObject(responseBody);
-/*
-                    final String photo = userJSON.getString("photo");
-                    Picasso.get().load(photo).into(mActivityBinding.ivPhoto);
 
-                    if (mAccount != null) {
-                        if (mViewModel.getIsSelfProfile().get()) {
-                            mAccountManager.setUserData(mAccount, AccountGeneral.USER_DATA_PHOTO, photo);
-                            Picasso.get().load(photo).into(mIvMyAccount);
-                        } else {
-                            Picasso.get().load(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_PHOTO)).into(mIvMyAccount);
-                        }
+                    final String photo = userJSON.getString("photo");
+                    mViewModel.getPhoto().set(photo);
+
+                    if (mViewModel.isOwnProfile().get()) {
+                        AccountManager.get(requireContext()).setUserData(mAccount, AccountGeneral.USER_DATA_PHOTO, photo);
+                        new ViewModelProvider(requireActivity()).get(UserViewModel.class).getOwnAccountPhotoUrl().setValue(photo);
                     }
-*/
+
                     final String lastName = userJSON.getString("last_name");
                     mViewModel.getLastName().set(lastName);
 
@@ -342,6 +396,18 @@ public final class ProfileFragment
         }
     }
 
+    @BindingAdapter({"imageUrl"})
+    public static void loadImage (ImageView view, String url) {
+        if (url != null && !url.isEmpty()) {
+            Picasso.get().load(url).into(view);
+        }
+    }
+
+    @BindingAdapter({"imageBitmap"})
+    public static void loadImage (ImageView view, Bitmap bitmap) {
+        view.setImageBitmap(bitmap);
+    }
+
     @Override
     public void onShareProfile () {
         final Intent sendIntent = new Intent();
@@ -361,7 +427,7 @@ public final class ProfileFragment
     public void onCopyCardNumber () {
         Log.d(TAG, "onCopyCardNumber");
         final ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
-        final ClipData clip = ClipData.newPlainText(getText(R.string.txt_card_number), mProfileBinding.etCardNumber.getText().toString());
+        final ClipData clip = ClipData.newPlainText(getText(R.string.txt_card_number), mBinding.etCardNumber.getText().toString());
         if (clipboard != null) {
             clipboard.setPrimaryClip(clip);
             Toast.makeText(requireContext(), R.string.info_msg_copied_to_clipboard, Toast.LENGTH_SHORT).show();
@@ -379,7 +445,7 @@ public final class ProfileFragment
         Log.d(TAG, "onSaveCardNumber");
         mViewModel.setCurrentMode(ProfileViewModel.Mode.VIEW);
 
-        final String cardNumber = mProfileBinding.etCardNumber.getText().toString();
+        final String cardNumber = mBinding.etCardNumber.getText().toString();
         if (cardNumber.isEmpty() || cardNumber.length() == 16) {
             AccountProvider.getAuthToken(
                     requireActivity(),
@@ -448,7 +514,7 @@ public final class ProfileFragment
     ) {
         Log.d(TAG, "onUpdateCardNumberComplete serverApiResponse=" + serverApiResponse);
         if (serverApiResponse.getCode() == 200) {
-            mViewModel.getCardNumber().set(mProfileBinding.etCardNumber.getText().toString());
+            mViewModel.getCardNumber().set(mBinding.etCardNumber.getText().toString());
             Toast.makeText(requireContext(), R.string.info_msg_update_data_complete, Toast.LENGTH_LONG).show();
         } else {
             mViewModel.getCardNumber().notifyChange();
@@ -532,11 +598,11 @@ public final class ProfileFragment
                     Toast.makeText(requireContext(), R.string.info_msg_add_thanks_complete, Toast.LENGTH_LONG).show();
                     break;
                 }
-                case MISTRUST: {
+                case MISSTRUST: {
                     Toast.makeText(requireContext(), R.string.info_msg_trust_is_lost, Toast.LENGTH_LONG).show();
                     break;
                 }
-                case MISTRUST_CANCEL: {
+                case MISSTRUST_CANCEL: {
                     Toast.makeText(requireContext(), R.string.info_msg_trust_restored, Toast.LENGTH_LONG).show();
                     break;
                 }

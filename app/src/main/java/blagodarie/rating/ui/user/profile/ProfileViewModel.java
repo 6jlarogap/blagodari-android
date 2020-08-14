@@ -1,5 +1,7 @@
 package blagodarie.rating.ui.user.profile;
 
+import android.graphics.Bitmap;
+
 import androidx.annotation.NonNull;
 import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableField;
@@ -29,6 +31,12 @@ public final class ProfileViewModel
     private final ObservableField<String> mMiddleName = new ObservableField<>("");
 
     @NonNull
+    private final ObservableField<String> mPhoto = new ObservableField<>("");
+
+    @NonNull
+    private final ObservableField<Bitmap> mQrCode = new ObservableField<>();
+
+    @NonNull
     private final ObservableField<String> mCardNumber = new ObservableField<>("");
 
     @NonNull
@@ -53,7 +61,7 @@ public final class ProfileViewModel
     private final ObservableBoolean mIsProfile = new ObservableBoolean(false);
 
     @NonNull
-    private final ObservableBoolean mSelfProfile = new ObservableBoolean(false);
+    private final ObservableBoolean mOwnProfile = new ObservableBoolean(false);
 
     @NonNull
     private final MutableLiveData<List<DisplayThanksUser>> mThanksUsers = new MutableLiveData<>();
@@ -83,6 +91,16 @@ public final class ProfileViewModel
     @NonNull
     public final ObservableField<String> getMiddleName () {
         return mMiddleName;
+    }
+
+    @NonNull
+    public final ObservableField<String> getPhoto () {
+        return mPhoto;
+    }
+
+    @NonNull
+    public final ObservableField<Bitmap> getQrCode () {
+        return mQrCode;
     }
 
     @NonNull
@@ -120,8 +138,8 @@ public final class ProfileViewModel
         return mDownloadInProgress;
     }
 
-    public final ObservableBoolean getIsSelfProfile () {
-        return mSelfProfile;
+    public final ObservableBoolean isOwnProfile () {
+        return mOwnProfile;
     }
 
     @NonNull

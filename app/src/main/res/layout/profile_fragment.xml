@@ -54,7 +54,8 @@
                         android:layout_margin="5dp"
                         android:adjustViewBounds="true"
                         android:maxWidth="200dp"
-                        android:scaleType="centerInside" />
+                        android:scaleType="centerInside"
+                        imageUrl="@{ViewModel.photo}"/>
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/ivQRCode"
@@ -64,7 +65,8 @@
                         android:layout_margin="5dp"
                         android:adjustViewBounds="true"
                         android:maxWidth="200dp"
-                        android:scaleType="centerInside" />
+                        android:scaleType="centerInside"
+                        imageBitmap="@{ViewModel.qrCode}"/>
 
                     <RelativeLayout
                         android:layout_width="wrap_content"
@@ -85,7 +87,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/tvFame"
-                            android:text="@{ViewModel.isSelfProfile ? String.format(@string/txt_self_profile_thanks_count, ViewModel.sumThanksCount) : String.format(@string/txt_thanks_count, ViewModel.thanksCount, ViewModel.sumThanksCount)}" />
+                            android:text="@{ViewModel.isOwnProfile ? String.format(@string/txt_self_profile_thanks_count, ViewModel.sumThanksCount) : String.format(@string/txt_thanks_count, ViewModel.thanksCount, ViewModel.sumThanksCount)}" />
 
                         <androidx.appcompat.widget.AppCompatImageButton
                             android:layout_width="wrap_content"
@@ -102,7 +104,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/tvThanksCount"
-                            android:text="@{ViewModel.isSelfProfile ? String.format(@string/txt_self_profile_trust, ViewModel.trustlessCount) : String.format(@string/txt_trust, (ViewModel.isTrust ? @string/txt_yes : @string/txt_no), ViewModel.trustlessCount)}" />
+                            android:text="@{ViewModel.isOwnProfile ? String.format(@string/txt_self_profile_trust, ViewModel.trustlessCount) : String.format(@string/txt_trust, (ViewModel.isTrust ? @string/txt_yes : @string/txt_no), ViewModel.trustlessCount)}" />
 
                     </RelativeLayout>
 
@@ -147,7 +149,7 @@
                                 android:layout_gravity="center_vertical"
                                 android:onClick="@{() -> UserActionListener.onEditCardNumber()}"
                                 android:src="@drawable/pencil"
-                                android:visibility="@{ViewModel.isSelfProfile &amp;&amp; ViewModel.currentMode == Mode.VIEW ? View.VISIBLE : View.GONE}" />
+                                android:visibility="@{ViewModel.isOwnProfile &amp;&amp; ViewModel.currentMode == Mode.VIEW ? View.VISIBLE : View.GONE}" />
 
                             <androidx.appcompat.widget.AppCompatImageButton
                                 android:layout_width="wrap_content"
@@ -204,25 +206,25 @@
                             android:layout_gravity="center_horizontal"
                             android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.THANKS)}"
                             android:text="@string/btn_thanks"
-                            android:visibility="@{!ViewModel.isSelfProfile ? View.VISIBLE : View.GONE}" />
+                            android:visibility="@{!ViewModel.isOwnProfile ? View.VISIBLE : View.GONE}" />
 
                         <Button
                             style="?android:attr/buttonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
-                            android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISTRUST)}"
+                            android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISSTRUST)}"
                             android:text="@string/btn_trustless"
-                            android:visibility="@{!ViewModel.isSelfProfile &amp;&amp; (ViewModel.isTrust == null || ViewModel.isTrust) ? View.VISIBLE : View.GONE}" />
+                            android:visibility="@{!ViewModel.isOwnProfile &amp;&amp; (ViewModel.isTrust == null || ViewModel.isTrust) ? View.VISIBLE : View.GONE}" />
 
                         <Button
                             style="?android:attr/buttonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
-                            android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISTRUST_CANCEL)}"
+                            android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISSTRUST_CANCEL)}"
                             android:text="@string/btn_cancel_trustless"
-                            android:visibility="@{!ViewModel.isSelfProfile &amp;&amp; ViewModel.isTrust != null &amp;&amp; !ViewModel.isTrust ? View.VISIBLE : View.GONE}" />
+                            android:visibility="@{!ViewModel.isOwnProfile &amp;&amp; ViewModel.isTrust != null &amp;&amp; !ViewModel.isTrust ? View.VISIBLE : View.GONE}" />
 
                     </LinearLayout>
 

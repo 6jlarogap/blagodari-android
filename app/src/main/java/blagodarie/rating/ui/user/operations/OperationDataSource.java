@@ -1,4 +1,4 @@
-package blagodarie.rating.ui.operations;
+package blagodarie.rating.ui.user.operations;
 
 import android.util.Log;
 
@@ -21,7 +21,7 @@ import blagodarie.rating.OperationType;
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
 
-public class OperationDataSource
+final class OperationDataSource
         extends PositionalDataSource<Operation> {
 
     private static final String TAG = OperationDataSource.class.getSimpleName();
