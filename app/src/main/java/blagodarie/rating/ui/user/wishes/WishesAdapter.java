@@ -1,4 +1,4 @@
-package blagodarie.rating.ui.wishes;
+package blagodarie.rating.ui.user.wishes;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -6,54 +6,43 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.paging.PagedListAdapter;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.WishItemBinding;
-
-public final class WishesAdapter
-        extends RecyclerView.Adapter<WishesAdapter.WishViewHolder> {
-
-    @NonNull
-    private final List<Wish> mWishes = new ArrayList<>();
+final class WishesAdapter
+        extends PagedListAdapter<Wish, WishesAdapter.WishViewHolder> {
 
     @NonNull
     private final OnWishClickListener mOnWishClickListener;
 
-    public WishesAdapter (@NonNull final OnWishClickListener onWishClickListener) {
-        mOnWishClickListener = onWishClickListener;
+    protected WishesAdapter (@NonNull final OnWishClickListener mOnWishClickListener) {
+        super(DIFF_CALLBACK);
+        this.mOnWishClickListener = mOnWishClickListener;
     }
 
     @NonNull
     @Override
-    public WishViewHolder onCreateViewHolder (@NonNull ViewGroup parent, int viewType) {
+    public WishesAdapter.WishViewHolder onCreateViewHolder (
+            @NonNull ViewGroup parent,
+            int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         final WishItemBinding binding = DataBindingUtil.inflate(inflater, R.layout.wish_item, parent, false);
         return new WishesAdapter.WishViewHolder(binding);
     }
 
+
     @Override
-    public void onBindViewHolder (@NonNull WishViewHolder holder, int position) {
-        final Wish wish = mWishes.get(position);
+    public void onBindViewHolder (
+            @NonNull WishViewHolder holder,
+            int position
+    ) {
+        final Wish wish = getItem(position);
         if (wish != null) {
             holder.bind(wish, view -> mOnWishClickListener.onClick(wish));
         }
-    }
-
-    @Override
-    public int getItemCount () {
-        return mWishes.size();
-    }
-
-    final void setData (
-            @NonNull final List<Wish> wishes
-    ) {
-        mWishes.clear();
-        mWishes.addAll(wishes);
-        notifyDataSetChanged();
     }
 
     static final class WishViewHolder
@@ -75,4 +64,24 @@ public final class WishesAdapter
             mBinding.setWish(wish);
         }
     }
+
+    private static DiffUtil.ItemCallback<Wish> DIFF_CALLBACK =
+            new DiffUtil.ItemCallback<Wish>() {
+
+                @Override
+                public boolean areItemsTheSame (
+                        Wish oldWish,
+                        Wish newWish
+                ) {
+                    return false;
+                }
+
+                @Override
+                public boolean areContentsTheSame (
+                        Wish oldWish,
+                        Wish newWish
+                ) {
+                    return false;
+                }
+            };
 }

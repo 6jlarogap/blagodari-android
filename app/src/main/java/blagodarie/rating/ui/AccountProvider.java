@@ -2,6 +2,8 @@ package blagodarie.rating.ui;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
+import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.app.Activity;
@@ -10,6 +12,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,6 +28,10 @@ public final class AccountProvider {
 
     public interface OnAccountSelectListener {
         void onAccountSelected (@Nullable final Account account);
+    }
+
+    public interface OnAccountCreateListener {
+        void onAccountCreated (@Nullable final Account account);
     }
 
     public interface OnGetTokenListener {
@@ -132,6 +139,41 @@ public final class AccountProvider {
                     } catch (AuthenticatorException | IOException | OperationCanceledException e) {
                         Log.e(TAG, Log.getStackTraceString(e));
                         onTokenErrorListener.onError(e);
+                    }
+                },
+                null
+        );
+    }
+
+    public static void createAccount(
+            @NonNull final Activity activity,
+            @NonNull final OnAccountCreateListener onAccountCreateListener
+            ){
+        AccountManager.get(activity).addAccount(
+                activity.getString(R.string.account_type),
+                activity.getString(R.string.token_type),
+                null,
+                null,
+                activity,
+                accountManagerFuture -> {
+                    try {
+                        final Bundle bundle = accountManagerFuture.getResult();
+                        final Account account = new Account(
+                                bundle.getString(AccountManager.KEY_ACCOUNT_NAME),
+                                bundle.getString(AccountManager.KEY_ACCOUNT_TYPE)
+                        );
+                        onAccountCreateListener.onAccountCreated(account);
+                    } catch (OperationCanceledException e) {
+                        Log.e(TAG, Log.getStackTraceString(e));
+                        Toast.makeText(activity, activity.getString(R.string.err_msg_account_not_created), Toast.LENGTH_LONG).show();
+                        onAccountCreateListener.onAccountCreated(null);
+                    } catch (AuthenticatorException e) {
+                        Log.e(TAG, Log.getStackTraceString(e));
+                        Toast.makeText(activity, activity.getString(R.string.err_msg_authentication_error), Toast.LENGTH_LONG).show();
+                        onAccountCreateListener.onAccountCreated(null);
+                    } catch (IOException e) {
+                        Log.e(TAG, Log.getStackTraceString(e));
+                        onAccountCreateListener.onAccountCreated(null);
                     }
                 },
                 null

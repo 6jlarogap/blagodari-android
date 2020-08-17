@@ -1,4 +1,4 @@
-package blagodarie.rating.ui.wishes;
+package blagodarie.rating.ui.user.wishes;
 
 import androidx.annotation.NonNull;
 

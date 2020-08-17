@@ -34,10 +34,6 @@
         </activity>
 
         <activity
-            android:name=".ui.wishes.WishesActivity"
-            android:screenOrientation="portrait" />
-
-        <activity
             android:name=".ui.operations.OperationsActivity"
             android:screenOrientation="portrait" />
 

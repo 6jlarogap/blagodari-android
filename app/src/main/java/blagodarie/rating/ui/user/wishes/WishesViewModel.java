@@ -1,32 +1,34 @@
-package blagodarie.rating.ui.wishes;
+package blagodarie.rating.ui.user.wishes;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.ObservableBoolean;
-import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
-
-import java.util.List;
+import androidx.paging.PagedList;
 
 public final class WishesViewModel
         extends ViewModel {
 
-    @NonNull
-    private final MutableLiveData<List<Wish>> mWishes = new MutableLiveData<>();
+    private LiveData<PagedList<Wish>> mWishes;
 
     @NonNull
-    private final ObservableBoolean mSelfProfile = new ObservableBoolean(false);
+    private final ObservableBoolean mOwnProfile = new ObservableBoolean(false);
 
     @NonNull
     private final ObservableBoolean mDownloadInProgress = new ObservableBoolean(false);
 
     @NonNull
-    public MutableLiveData<List<Wish>> getWishes () {
+    public LiveData<PagedList<Wish>> getWishes () {
         return mWishes;
     }
 
+    public void setWishes (@NonNull final LiveData<PagedList<Wish>> wishes) {
+        mWishes = wishes;
+    }
+
     @NonNull
-    public final ObservableBoolean isSelfProfile () {
-        return mSelfProfile;
+    public final ObservableBoolean isOwnProfile () {
+        return mOwnProfile;
     }
 
     @NonNull

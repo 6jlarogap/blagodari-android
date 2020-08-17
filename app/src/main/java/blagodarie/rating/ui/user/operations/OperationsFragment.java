@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -48,7 +49,7 @@ public final class OperationsFragment
 
     private OperationsFragmentBinding mBinding;
 
-    private OperationAdapter mOperationsAdapter;
+    private OperationsAdapter mOperationsAdapter;
 
     private Account mAccount;
 
@@ -91,6 +92,12 @@ public final class OperationsFragment
         initViewModel();
         setupBinding();
     }
+    @Override
+    public void onStart () {
+        Log.d(TAG, "onStart");
+        super.onStart();
+        refreshOperations();
+    }
 
     @Override
     public void onDestroy () {
@@ -111,11 +118,10 @@ public final class OperationsFragment
     private void initViewModel () {
         mViewModel = new ViewModelProvider(requireActivity()).get(OperationsViewModel.class);
         mViewModel.isOwnProfile().set(mAccount != null && mAccount.name.equals(mUserId.toString()));
-        refreshOperations();
     }
 
     private void refreshOperations () {
-        final OperationDataSource.OperationSourceFactory sourceFactory = new OperationDataSource.OperationSourceFactory(mUserId);
+        final OperationsDataSource.OperationsDataSourceFactory sourceFactory = new OperationsDataSource.OperationsDataSourceFactory(mUserId);
 
         final PagedList.Config config = new PagedList.Config.Builder()
                 .setEnablePlaceholders(false)
@@ -135,10 +141,15 @@ public final class OperationsFragment
         mBinding.setUserActionsListener(this::addOperationComment);
         mBinding.rvOperations.setLayoutManager(new LinearLayoutManager(requireContext()));
         mBinding.rvOperations.setAdapter(mOperationsAdapter);
+        mBinding.srlRefreshProfileInfo.setOnRefreshListener(() -> {
+            mViewModel.getDownloadInProgress().set(true);
+            refreshOperations();
+            mViewModel.getDownloadInProgress().set(false);
+        });
     }
 
     private void initOperationsAdapter () {
-        mOperationsAdapter = new OperationAdapter();
+        mOperationsAdapter = new OperationsAdapter();
     }
 
     private void addOperationComment (@NonNull final OperationType operationType) {

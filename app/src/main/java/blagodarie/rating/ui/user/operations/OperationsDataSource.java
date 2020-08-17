@@ -21,15 +21,15 @@ import blagodarie.rating.OperationType;
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
 
-final class OperationDataSource
+final class OperationsDataSource
         extends PositionalDataSource<Operation> {
 
-    private static final String TAG = OperationDataSource.class.getSimpleName();
+    private static final String TAG = OperationsDataSource.class.getSimpleName();
 
     @NonNull
     private final UUID mUserId;
 
-    OperationDataSource (@NonNull final UUID userId) {
+    OperationsDataSource (@NonNull final UUID userId) {
         Log.d(TAG, "OperationDataSource");
         mUserId = userId;
     }
@@ -122,19 +122,19 @@ final class OperationDataSource
         }
     }
 
-    static class OperationSourceFactory
+    static class OperationsDataSourceFactory
             extends Factory<Integer, Operation> {
 
         @NonNull
         private final UUID mUserId;
 
-        OperationSourceFactory (@NonNull final UUID userId) {
+        OperationsDataSourceFactory (@NonNull final UUID userId) {
             mUserId = userId;
         }
 
         @Override
         public DataSource<Integer, Operation> create () {
-            return new OperationDataSource(mUserId);
+            return new OperationsDataSource(mUserId);
         }
 
     }

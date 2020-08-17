@@ -21,6 +21,7 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
@@ -40,7 +41,6 @@ import blagodarie.rating.ui.AccountProvider;
 import blagodarie.rating.ui.splash.SplashActivity;
 import blagodarie.rating.ui.user.profile.ProfileFragment;
 import blagodarie.rating.ui.user.profile.ProfileFragmentDirections;
-import blagodarie.rating.ui.wishes.WishesActivity;
 
 public final class UserActivity
         extends AppCompatActivity
@@ -84,7 +84,7 @@ public final class UserActivity
             if (mUserId != null) {
                 initViewModel();
                 initBinding();
-                mNavController = Navigation.findNavController(this, blagodarie.rating.auth.R.id.nav_host_fragment);
+                mNavController = Navigation.findNavController(this, R.id.nav_host_fragment);
                 setupToolbar();
                 setupNavigationDrawer();
                 AccountProvider.getAccount(
@@ -96,73 +96,6 @@ public final class UserActivity
             Toast.makeText(this, R.string.err_msg_missing_user_id, Toast.LENGTH_LONG).show();
             finish();
         }
-/*
-        final Uri data = getIntent().getData();
-
-        if (data != null) {
-            final String userId = data.getQueryParameter("id");
-            try {
-                mUserId = UUID.fromString(userId);
-                if (mUserId != null) {
-                    initViewModel();
-                    mViewModel.isProfile().set(true);
-                    initBinding();
-                    setupToolbar();
-                    setupNavigationDrawer();
-                    initThanksUserAdapter();
-                    AccountProvider.getAccount(
-                            this,
-                            new AccountProvider.OnAccountSelectListener() {
-                                @Override
-                                public void onNoAccount () {
-                                    downloadProfileData(null);
-                                }
-
-                                @Override
-                                public void onAccountSelected (@NonNull final Account account) {
-                                    mAccount = account;
-                                    mActivityBinding.nvNavigation.getMenu().findItem(R.id.miLogout).setEnabled(mAccount != null);
-                                    mViewModel.getIsSelfProfile().set(mUserId.toString().equals(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID)));
-                                    getAuthTokenAndDownloadProfileData();
-                                }
-                            }
-                    );
-                } else {
-                    Toast.makeText(this, R.string.err_msg_missing_profile_user_id, Toast.LENGTH_LONG).show();
-                    finish();
-                }
-            } catch (IllegalArgumentException e) {
-                Toast.makeText(this, R.string.err_msg_incorrect_user_id, Toast.LENGTH_LONG).show();
-                finish();
-            }
-
-        } else {
-            mJustText = getIntent().getStringExtra("text");
-            initViewModel();
-            mViewModel.isProfile().set(false);
-            mViewModel.getLastName().set(mJustText);
-            initBinding();
-            setupToolbar();
-            setupNavigationDrawer();
-            initThanksUserAdapter();
-            AccountProvider.getAccount(
-                    this,
-                    new AccountProvider.OnAccountSelectListener() {
-                        @Override
-                        public void onNoAccount () {
-                            downloadProfileData(null);
-                        }
-
-                        @Override
-                        public void onAccountSelected (@NonNull final Account account) {
-                            mAccount = account;
-                            mActivityBinding.nvNavigation.getMenu().findItem(R.id.miLogout).setEnabled(mAccount != null);
-                            mViewModel.getIsSelfProfile().set((mUserId != null ? mUserId.toString() : mJustText).equals(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID)));
-                            getAuthTokenAndDownloadProfileData();
-                        }
-                    }
-            );
-        }*/
     }
 
     @Override
@@ -178,11 +111,13 @@ public final class UserActivity
     }
 
     public void onAccountSelected (@Nullable final Account account) {
+        Log.d(TAG, "onAccountSelected account=" + (account != null ? account.toString() : "null"));
         if (account != null) {
             mAccount = account;
-            mActivityBinding.nvNavigation.getMenu().findItem(R.id.miLogout).setEnabled(mAccount != null);
             mViewModel.getOwnAccountPhotoUrl().setValue(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_PHOTO));
         }
+        mActivityBinding.nvNavigation.getMenu().findItem(R.id.miLogout).setEnabled(mAccount != null);
+        mViewModel.isOwnProfile().set(mAccount != null && mAccount.name.equals(mUserId.toString()));
         toProfile();
     }
 
@@ -225,13 +160,19 @@ public final class UserActivity
             ivOwnAccountPhoto = miMyAccount.getActionView().findViewById(R.id.ivOwnAccountPhoto);
             mViewModel.getOwnAccountPhotoUrl().observe(this, s -> Picasso.get().load(s).into(ivOwnAccountPhoto));
             ivOwnAccountPhoto.setOnClickListener(view -> {
-                /*if (mViewModel.getIsSelfProfile().get()) {
-                    //getAuthTokenAndDownloadProfileData();
+                if (mViewModel.isOwnProfile().get()) {
+                    if (mNavController.getCurrentDestination() != null) {
+                        if (mNavController.getCurrentDestination().getId() == R.id.profileFragment) {
+                            ((ProfileFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment).getChildFragmentManager().getFragments().get(0)).refreshProfileData();
+                        } else {
+                            onBackPressed();
+                        }
+                    }
                 } else {
                     final Intent i = new Intent(Intent.ACTION_VIEW);
                     i.setData(Uri.parse(getString(R.string.url_profile, mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_USER_ID))));
                     startActivity(i);
-                }*/
+                }
             });
         }
         return true;
@@ -376,16 +317,17 @@ public final class UserActivity
     }
 
     @Override
-    public void toThanks () {
-        Log.d(TAG, "toThanks");
+    public void toOperations () {
+        Log.d(TAG, "toOperations");
         final NavDirections action = ProfileFragmentDirections.actionProfileFragmentToOperationsFragment(mUserId, mAccount);
         mNavController.navigate(action);
     }
 
     @Override
     public void toWishes () {
-        final Intent intent = WishesActivity.createSelfIntent(this, mUserId);
-        startActivity(intent);
+        Log.d(TAG, "toWishes");
+        final NavDirections action = ProfileFragmentDirections.actionProfileFragmentToWishesFragment(mUserId, mAccount);
+        mNavController.navigate(action);
     }
 
     @Override

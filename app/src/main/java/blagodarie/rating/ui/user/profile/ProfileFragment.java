@@ -68,7 +68,7 @@ public final class ProfileFragment
         implements ProfileUserActionListener {
 
     public interface FragmentCommunicator {
-        void toThanks ();
+        void toOperations ();
 
         void toWishes ();
 
@@ -224,6 +224,7 @@ public final class ProfileFragment
         Log.d(TAG, "initViewModel");
         mViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
         mViewModel.isProfile().set(true);
+        mViewModel.isHaveAccount().set(mAccount != null);
         mViewModel.isOwnProfile().set(mAccount != null && mAccount.name.equals(mUserId.toString()));
         mViewModel.getThanksUsers().observe(requireActivity(), mThanksUserAdapter::setData);
         mViewModel.getQrCode().set(createQrCodeBitmap());
@@ -267,7 +268,7 @@ public final class ProfileFragment
         return result;
     }
 
-    private void refreshProfileData () {
+    public final void refreshProfileData () {
         Log.d(TAG, "refreshProfileData");
         if (mAccount != null) {
             AccountProvider.getAuthToken(requireActivity(), mAccount, this::downloadProfileData);
@@ -470,7 +471,7 @@ public final class ProfileFragment
 
     @Override
     public void onOperations () {
-        mFragmentCommunicator.toThanks();
+        mFragmentCommunicator.toOperations();
     }
 
     @Override
@@ -542,17 +543,25 @@ public final class ProfileFragment
                                         addOperation(authToken, operationType, operationComment);
                                     }
                                 });
-                            }/* else {
-                                mAccountManager.addAccount(
-                                        getString(R.string.account_type),
-                                        getString(R.string.token_type),
-                                        null,
-                                        null,
-                                        this,
-                                        accountManagerFuture -> onAddAccountFinished(accountManagerFuture, 1, operationComment),
-                                        null
+                            } else {
+                                AccountProvider.createAccount(
+                                        requireActivity(),
+                                        account -> {
+                                            if (account != null) {
+                                                mAccount = account;
+                                                mViewModel.isHaveAccount().set(true);
+                                                mViewModel.isOwnProfile().set(mAccount.name.equals(mUserId.toString()));
+                                                if (!mViewModel.isOwnProfile().get()) {
+                                                    AccountProvider.getAuthToken(requireActivity(), account, authToken -> {
+                                                        if (authToken != null) {
+                                                            addOperation(authToken, operationType, operationComment);
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        }
                                 );
-                            }*/
+                            }
                         }).
                 create().
                 show();

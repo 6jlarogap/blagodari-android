@@ -14,10 +14,10 @@ import com.squareup.picasso.Picasso;
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.OperationItemBinding;
 
-public final class OperationAdapter
-        extends PagedListAdapter<Operation, OperationAdapter.OperationViewHolder> {
+final class OperationsAdapter
+        extends PagedListAdapter<Operation, OperationsAdapter.OperationViewHolder> {
 
-    protected OperationAdapter () {
+    protected OperationsAdapter () {
         super(DIFF_CALLBACK);
     }
 
@@ -28,7 +28,7 @@ public final class OperationAdapter
             int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         final OperationItemBinding binding = DataBindingUtil.inflate(inflater, R.layout.operation_item, parent, false);
-        return new OperationAdapter.OperationViewHolder(binding);
+        return new OperationsAdapter.OperationViewHolder(binding);
     }
 
 
@@ -37,9 +37,9 @@ public final class OperationAdapter
             @NonNull OperationViewHolder holder,
             int position
     ) {
-        final Operation concert = getItem(position);
-        if (concert != null) {
-            holder.bind(concert);
+        final Operation operation = getItem(position);
+        if (operation != null) {
+            holder.bind(operation);
         }
     }
 

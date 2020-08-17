@@ -26,9 +26,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/fab_margin"
-            android:onClick="onAddWishClick"
+            android:onClick="@{() -> UserActionListener.onAddWish()}"
             android:src="@drawable/plus"
-            android:visibility="@{ViewModel.isSelfProfile() ? View.VISIBLE : View.GONE}"
+            android:visibility="@{ViewModel.isOwnProfile() ? View.VISIBLE : View.GONE}"
             app:backgroundTint="@color/colorPrimary"
             app:borderWidth="0dp"
             app:elevation="6dp"
@@ -42,7 +42,11 @@
 
         <variable
             name="ViewModel"
-            type="blagodarie.rating.ui.wishes.WishesViewModel" />
+            type="blagodarie.rating.ui.user.wishes.WishesViewModel" />
+
+        <variable
+            name="UserActionListener"
+            type="blagodarie.rating.ui.user.wishes.WishesUserActionListener" />
 
     </data>
 

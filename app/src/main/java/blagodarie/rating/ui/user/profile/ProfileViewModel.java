@@ -61,6 +61,9 @@ public final class ProfileViewModel
     private final ObservableBoolean mIsProfile = new ObservableBoolean(false);
 
     @NonNull
+    private final ObservableBoolean mHaveAccount = new ObservableBoolean(false);
+
+    @NonNull
     private final ObservableBoolean mOwnProfile = new ObservableBoolean(false);
 
     @NonNull
@@ -136,6 +139,10 @@ public final class ProfileViewModel
     @NonNull
     public final ObservableBoolean getDownloadInProgress () {
         return mDownloadInProgress;
+    }
+
+    public final ObservableBoolean isHaveAccount () {
+        return mHaveAccount;
     }
 
     public final ObservableBoolean isOwnProfile () {
