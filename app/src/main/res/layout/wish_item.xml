@@ -20,7 +20,7 @@
 
         <variable
             name="Wish"
-            type="blagodarie.rating.ui.wishes.Wish" />
+            type="blagodarie.rating.ui.user.wishes.Wish" />
 
     </data>
 

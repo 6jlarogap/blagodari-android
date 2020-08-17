@@ -2,9 +2,6 @@ package blagodarie.rating.ui.wishes;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.accounts.AccountManagerFuture;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -30,7 +27,6 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.Map;
@@ -42,6 +38,7 @@ import blagodarie.rating.databinding.WishActivityBinding;
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
 import blagodarie.rating.ui.AccountProvider;
+import blagodarie.rating.ui.user.wishes.Wish;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -85,20 +82,16 @@ public final class WishActivity
                     downloadWishData();
                     AccountProvider.getAccount(
                             this,
-                            new AccountProvider.OnAccountSelectListener() {
-                                @Override
-                                public void onNoAccount () {
-                                    mViewModel.isSelfWish().set(false);
-                                }
-
-                                @Override
-                                public void onAccountSelected (@NonNull final Account account) {
+                            account -> {
+                                if (account != null) {
                                     mAccount = account;
+                                } else {
+                                    mViewModel.isSelfWish().set(false);
                                 }
                             }
                     );
                 } else {
-                    Toast.makeText(this, R.string.err_msg_missing_profile_user_id, Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.err_msg_missing_user_id, Toast.LENGTH_LONG).show();
                     finish();
                 }
             } catch (IllegalArgumentException e) {
@@ -107,7 +100,7 @@ public final class WishActivity
             }
 
         } else {
-            Toast.makeText(this, R.string.err_msg_missing_profile_user_id, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.err_msg_missing_user_id, Toast.LENGTH_LONG).show();
             finish();
         }
     }
@@ -235,22 +228,7 @@ public final class WishActivity
         AccountProvider.getAuthToken(
                 this,
                 mAccount,
-                this::onGetAuthTokenAndDeleteWishComplete);
-    }
-
-    private void onGetAuthTokenAndDeleteWishComplete (@NonNull final AccountManagerFuture<Bundle> future) {
-        Log.d(TAG, "onGetAuthTokenAndAddOrUpdateWishComplete");
-        try {
-            final Bundle bundle = future.getResult();
-            if (bundle != null) {
-                final String authToken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
-                if (authToken != null) {
-                    deleteWish(authToken);
-                }
-            }
-        } catch (AuthenticatorException | IOException | OperationCanceledException e) {
-            e.printStackTrace();
-        }
+                this::deleteWish);
     }
 
     private void deleteWish (

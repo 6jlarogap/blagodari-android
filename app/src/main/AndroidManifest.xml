@@ -34,11 +34,11 @@
         </activity>
 
         <activity
-            android:name=".ui.wishes.WishesActivity"
+            android:name=".ui.operations.OperationsActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".ui.operations.OperationsActivity"
+            android:name=".ui.pay.PayActivity"
             android:screenOrientation="portrait" />
 
         <activity
@@ -71,7 +71,7 @@
             tools:replace="screenOrientation" />
 
         <activity
-            android:name=".ui.profile.ProfileActivity"
+            android:name=".ui.user.UserActivity"
             android:screenOrientation="portrait">
             <intent-filter
                 android:autoVerify="true"

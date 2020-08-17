@@ -22,16 +22,16 @@
 
     <string name="err_msg_account_not_created">Аккаунт не был создан</string>
     <string name="err_msg_authentication_error">Ошибка аутентификации</string>
-    <string name="err_msg_missing_profile_user_id">Не указан идентификатор пользователя</string>
+    <string name="err_msg_missing_user_id">Не указан идентификатор пользователя</string>
     <string name="err_msg_missing_wish">Не указано желание</string>
     <string name="err_msg_missing_account">Не указан аккаунт</string>
     <string name="err_msg_incorrect_link">Неверная ссылка</string>
 
     <string name="txt_fame">Известность: %d</string>
-    <string name="txt_sum_thanks_count">Всего благодарностей: %d</string>
-    <string name="txt_trustless_count">Утраты доверия: %d</string>
-    <string name="txt_thanks_count">Мои благодарности: %d</string>
-    <string name="txt_is_trust">Доверие: %s</string>
+    <string name="txt_self_profile_thanks_count">Всего благодарностей: %d</string>
+    <string name="txt_thanks_count">Моих/всего благодарностей: %d/%d</string>
+    <string name="txt_self_profile_trust">Утраты доверия: %d</string>
+    <string name="txt_trust">Доверие/утраты: %s/%d</string>
     <string name="txt_yes">Да</string>
     <string name="txt_no">Нет</string>
     <string name="txt_card_number">Номер карты</string>

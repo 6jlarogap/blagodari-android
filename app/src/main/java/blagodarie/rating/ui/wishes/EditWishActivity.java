@@ -26,6 +26,7 @@ import blagodarie.rating.databinding.EditWishActivityBinding;
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
 import blagodarie.rating.ui.AccountProvider;
+import blagodarie.rating.ui.user.wishes.Wish;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -34,7 +35,7 @@ import io.reactivex.schedulers.Schedulers;
 public final class EditWishActivity
         extends AppCompatActivity {
 
-    private static final String TAG = WishesActivity.class.getSimpleName();
+    private static final String TAG = EditWishActivity.class.getSimpleName();
 
     public static final String EXTRA_WISH = "blagodarie.rating.ui.wishes.EditWishActivity.WISH";
 
@@ -93,25 +94,7 @@ public final class EditWishActivity
 
     private void getAuthTokenAndAddOrUpdateWish () {
         Log.d(TAG, "getAuthTokenAndAddOrUpdateWish");
-        AccountProvider.getAuthToken(
-                this,
-                mAccount,
-                this::onGetAuthTokenAndAddOrUpdateWishComplete);
-    }
-
-    private void onGetAuthTokenAndAddOrUpdateWishComplete (@NonNull final AccountManagerFuture<Bundle> future) {
-        Log.d(TAG, "onGetAuthTokenAndAddOrUpdateWishComplete");
-        try {
-            final Bundle bundle = future.getResult();
-            if (bundle != null) {
-                final String authToken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
-                if (authToken != null) {
-                    addOrUpdateWish(authToken);
-                }
-            }
-        } catch (AuthenticatorException | IOException | OperationCanceledException e) {
-            e.printStackTrace();
-        }
+        AccountProvider.getAuthToken(this, mAccount, this::addOrUpdateWish);
     }
 
     private void addOrUpdateWish (

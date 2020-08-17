@@ -73,7 +73,7 @@
 
         <variable
             name="Operation"
-            type="blagodarie.rating.ui.operations.Operation" />
+            type="blagodarie.rating.ui.user.operations.Operation" />
 
         <variable
             name="OperationName"

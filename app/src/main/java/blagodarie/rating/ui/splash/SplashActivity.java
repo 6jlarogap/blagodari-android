@@ -51,13 +51,12 @@ public final class SplashActivity
     }
 
     @Override
-    public void onNoAccount () {
-        addNewAccount(getString(R.string.account_type));
-    }
-
-    @Override
-    public void onAccountSelected (@NonNull final Account account) {
-        toProfile(account);
+    public void onAccountSelected (@Nullable final Account account) {
+        if (account != null) {
+            toProfile(account);
+        } else {
+            addNewAccount(getString(R.string.account_type));
+        }
     }
 
     private void addNewAccount (
