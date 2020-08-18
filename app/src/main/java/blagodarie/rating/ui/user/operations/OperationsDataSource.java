@@ -3,6 +3,7 @@ package blagodarie.rating.ui.user.operations;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.paging.DataSource;
 import androidx.paging.PositionalDataSource;
 
@@ -26,20 +27,27 @@ final class OperationsDataSource
 
     private static final String TAG = OperationsDataSource.class.getSimpleName();
 
-    @NonNull
+    @Nullable
     private final UUID mUserId;
 
-    OperationsDataSource (@NonNull final UUID userId) {
+    @Nullable
+    private final UUID mAnyTextId;
+
+    OperationsDataSource (
+            @NonNull final UUID userId,
+            @NonNull final UUID anyTextId
+    ) {
         Log.d(TAG, "OperationDataSource");
         mUserId = userId;
+        mAnyTextId = anyTextId;
     }
 
     @Override
     public void loadInitial (@NonNull LoadInitialParams params, @NonNull LoadInitialCallback<Operation> callback) {
         Log.d(TAG, "loadInitial from=" + params.requestedStartPosition + ", pageSize=" + params.pageSize);
-        final String content = String.format(Locale.ENGLISH, "{\"uuid\":\"%s\",\"from\":%d,\"count\":%d}", mUserId.toString(), params.requestedStartPosition, params.pageSize);
+        final String content = String.format(Locale.ENGLISH, "{\"uuid\":\"%s\",\"from\":%d,\"count\":%d}", (mUserId != null ? mUserId.toString() : (mAnyTextId != null ? mAnyTextId.toString() : null)), params.requestedStartPosition, params.pageSize);
         try {
-            final ServerApiResponse serverApiResponse = ServerConnector.sendRequestAndGetResponse("/getuseroperations", content);
+            final ServerApiResponse serverApiResponse = ServerConnector.sendRequestAndGetResponse((mUserId != null ? "/getuseroperations" : "/gettextoperations"), content);
             if (serverApiResponse.getCode() == 200) {
                 if (serverApiResponse.getBody() != null) {
                     final String responseBody = serverApiResponse.getBody();
@@ -125,16 +133,23 @@ final class OperationsDataSource
     static class OperationsDataSourceFactory
             extends Factory<Integer, Operation> {
 
-        @NonNull
+        @Nullable
         private final UUID mUserId;
 
-        OperationsDataSourceFactory (@NonNull final UUID userId) {
+        @Nullable
+        private final UUID mAnyTextId;
+
+        OperationsDataSourceFactory (
+                @NonNull final UUID userId,
+                @NonNull final UUID anyTextId
+        ) {
             mUserId = userId;
+            mAnyTextId = anyTextId;
         }
 
         @Override
         public DataSource<Integer, Operation> create () {
-            return new OperationsDataSource(mUserId);
+            return new OperationsDataSource(mUserId, mAnyTextId);
         }
 
     }

@@ -1,4 +1,4 @@
-package blagodarie.rating.ui.user.profile;
+package blagodarie.rating.ui.user;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,7 +56,7 @@ public final class ThanksUserAdapter
         return mThanksUsers.size();
     }
 
-    final void setData (
+    public final void setData (
             @NonNull final List<DisplayThanksUser> thanksUsers
     ) {
         mThanksUsers.clear();

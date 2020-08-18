@@ -19,7 +19,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -34,7 +33,6 @@ import blagodarie.rating.databinding.OperationsFragmentBinding;
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
 import blagodarie.rating.ui.AccountProvider;
-import blagodarie.rating.ui.user.profile.ProfileFragmentArgs;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -54,6 +52,8 @@ public final class OperationsFragment
     private Account mAccount;
 
     private UUID mUserId;
+
+    private UUID mAnyTextId;
 
     @NonNull
     private CompositeDisposable mDisposables = new CompositeDisposable();
@@ -78,9 +78,10 @@ public final class OperationsFragment
         Log.d(TAG, "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
 
-        final ProfileFragmentArgs args = ProfileFragmentArgs.fromBundle(requireArguments());
+        final OperationsFragmentArgs args = OperationsFragmentArgs.fromBundle(requireArguments());
 
         mUserId = args.getUserId();
+        mAnyTextId = args.getAnyTextId();
         mAccount = args.getAccount();
     }
 
@@ -92,6 +93,7 @@ public final class OperationsFragment
         initViewModel();
         setupBinding();
     }
+
     @Override
     public void onStart () {
         Log.d(TAG, "onStart");
@@ -117,11 +119,11 @@ public final class OperationsFragment
 
     private void initViewModel () {
         mViewModel = new ViewModelProvider(requireActivity()).get(OperationsViewModel.class);
-        mViewModel.isOwnProfile().set(mAccount != null && mAccount.name.equals(mUserId.toString()));
+        mViewModel.isOwnProfile().set(mAccount != null && mUserId != null && mAccount.name.equals(mUserId.toString()));
     }
 
     private void refreshOperations () {
-        final OperationsDataSource.OperationsDataSourceFactory sourceFactory = new OperationsDataSource.OperationsDataSourceFactory(mUserId);
+        final OperationsDataSource.OperationsDataSourceFactory sourceFactory = new OperationsDataSource.OperationsDataSourceFactory(mUserId, mAnyTextId);
 
         final PagedList.Config config = new PagedList.Config.Builder()
                 .setEnablePlaceholders(false)
@@ -228,11 +230,11 @@ public final class OperationsFragment
                     Toast.makeText(requireContext(), R.string.info_msg_add_thanks_complete, Toast.LENGTH_LONG).show();
                     break;
                 }
-                case MISSTRUST: {
+                case MISTRUST: {
                     Toast.makeText(requireContext(), R.string.info_msg_trust_is_lost, Toast.LENGTH_LONG).show();
                     break;
                 }
-                case MISSTRUST_CANCEL: {
+                case MISTRUST_CANCEL: {
                     Toast.makeText(requireContext(), R.string.info_msg_trust_restored, Toast.LENGTH_LONG).show();
                     break;
                 }

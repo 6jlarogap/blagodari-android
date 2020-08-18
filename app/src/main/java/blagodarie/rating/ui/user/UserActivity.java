@@ -21,7 +21,6 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
@@ -39,20 +38,27 @@ import blagodarie.rating.databinding.NavHeaderLayoutBinding;
 import blagodarie.rating.databinding.UserActivityBinding;
 import blagodarie.rating.ui.AccountProvider;
 import blagodarie.rating.ui.splash.SplashActivity;
+import blagodarie.rating.ui.user.anytext.AnyTextFragment;
+import blagodarie.rating.ui.user.anytext.AnyTextFragmentDirections;
 import blagodarie.rating.ui.user.profile.ProfileFragment;
 import blagodarie.rating.ui.user.profile.ProfileFragmentDirections;
 
 public final class UserActivity
         extends AppCompatActivity
-        implements ProfileFragment.FragmentCommunicator {
+        implements ProfileFragment.FragmentCommunicator,
+        AnyTextFragment.FragmentCommunicator {
 
     private static final String TAG = UserActivity.class.getSimpleName();
+
+    private static final String EXTRA_ANY_TEXT = "blagodarie.rating.ui.user.UserActivity.ANY_TEXT";
 
     private AccountManager mAccountManager;
 
     private Account mAccount;
 
     private UUID mUserId;
+
+    private String mAnyText;
 
     private UserViewModel mViewModel;
 
@@ -81,19 +87,22 @@ public final class UserActivity
                 Toast.makeText(this, R.string.err_msg_incorrect_user_id, Toast.LENGTH_LONG).show();
                 finish();
             }
-            if (mUserId != null) {
-                initViewModel();
-                initBinding();
-                mNavController = Navigation.findNavController(this, R.id.nav_host_fragment);
-                setupToolbar();
-                setupNavigationDrawer();
-                AccountProvider.getAccount(
-                        this,
-                        this::onAccountSelected
-                );
-            }
         } else {
-            Toast.makeText(this, R.string.err_msg_missing_user_id, Toast.LENGTH_LONG).show();
+            mAnyText = getIntent().getStringExtra(EXTRA_ANY_TEXT);
+        }
+
+        if (mUserId != null || mAnyText != null) {
+            initViewModel();
+            initBinding();
+            mNavController = Navigation.findNavController(this, R.id.nav_host_fragment);
+            setupToolbar();
+            setupNavigationDrawer();
+            AccountProvider.getAccount(
+                    this,
+                    this::onAccountSelected
+            );
+        } else {
+            Toast.makeText(this, R.string.err_msg_missing_data, Toast.LENGTH_LONG).show();
             finish();
         }
     }
@@ -102,7 +111,8 @@ public final class UserActivity
     public void onBackPressed () {
         Log.d(TAG, "onBackPressed");
         if (mNavController.getCurrentDestination() != null) {
-            if (mNavController.getCurrentDestination().getId() == R.id.profileFragment) {
+            if (mNavController.getCurrentDestination().getId() == R.id.profileFragment ||
+                    mNavController.getCurrentDestination().getId() == R.id.anyTextFragment) {
                 finish();
             } else {
                 super.onBackPressed();
@@ -117,13 +127,23 @@ public final class UserActivity
             mViewModel.getOwnAccountPhotoUrl().setValue(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_PHOTO));
         }
         mActivityBinding.nvNavigation.getMenu().findItem(R.id.miLogout).setEnabled(mAccount != null);
-        mViewModel.isOwnProfile().set(mAccount != null && mAccount.name.equals(mUserId.toString()));
-        toProfile();
+        mViewModel.isOwnProfile().set(mAccount != null && mUserId != null && mAccount.name.equals(mUserId.toString()));
+        if (mUserId != null) {
+            toProfile();
+        } else if (mAnyText != null) {
+            toAnyText();
+        }
     }
 
     void toProfile () {
         Log.d(TAG, "toProfile");
         final NavDirections action = StartFragmentDirections.actionStartFragment2ToProfileFragment(mUserId, mAccount);
+        mNavController.navigate(action);
+    }
+
+    void toAnyText () {
+        Log.d(TAG, "toAnyText");
+        final NavDirections action = StartFragmentDirections.actionStartFragment2ToAnyTextFragment(mAnyText, mAccount);
         mNavController.navigate(action);
     }
 
@@ -260,38 +280,47 @@ public final class UserActivity
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case IntentIntegrator.REQUEST_CODE: {
-                IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+                final IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
                 if (result.getContents() != null) {
                     final String content = result.getContents();
-                    try {
-                        final Uri uri = Uri.parse(content);
-                        if (uri.getPath() != null) {
+                    final Uri uri = Uri.parse(content);
+                    if (uri.getHost() != null &&
+                            uri.getHost().equals(getString(R.string.host)) &&
+                            uri.getPath() != null &&
+                            (uri.getPath().equals("/profile") || uri.getPath().equals("/wish")) &&
+                            uri.getQueryParameter("id") != null) {
+                        final String idString = uri.getQueryParameter("id");
+
+                        try {
+                            final UUID id = UUID.fromString(idString);
+
                             if (uri.getPath().equals("/profile")) {
-                                final String profileUserIdString = uri.getQueryParameter("id");
-                                UUID profileUserId = UUID.fromString(profileUserIdString);
                                 final Intent i = new Intent(Intent.ACTION_VIEW);
-                                i.setData(Uri.parse(getString(R.string.url_profile, profileUserId)));
+                                i.setData(Uri.parse(getString(R.string.url_profile, id)));
                                 startActivity(i);
                             } else if (uri.getPath().equals("/wish")) {
-                                final String profileUserIdString = uri.getQueryParameter("id");
-                                UUID profileUserId = UUID.fromString(profileUserIdString);
                                 final Intent i = new Intent(Intent.ACTION_VIEW);
-                                i.setData(Uri.parse(getString(R.string.url_wish, profileUserId)));
+                                i.setData(Uri.parse(getString(R.string.url_wish, id)));
                                 startActivity(i);
                             }
+                        } catch (IllegalArgumentException e) {
+                            toAnyText(content);
                         }
-
-                    } catch (Exception e) {
-                        final Intent i = new Intent(this, UserActivity.class);
-                        i.putExtra("text", content);
-                        startActivity(i);
+                    } else {
+                        toAnyText(content);
                     }
                 }
-                break;
+
             }
-            default:
-                break;
+            break;
         }
+    }
+
+
+    private void toAnyText (@NonNull final String text) {
+        final Intent i = new Intent(this, UserActivity.class);
+        i.putExtra(EXTRA_ANY_TEXT, text);
+        startActivity(i);
     }
 
     @Override
@@ -317,9 +346,16 @@ public final class UserActivity
     }
 
     @Override
-    public void toOperations () {
-        Log.d(TAG, "toOperations");
-        final NavDirections action = ProfileFragmentDirections.actionProfileFragmentToOperationsFragment(mUserId, mAccount);
+    public void toOperationsFromProfile () {
+        Log.d(TAG, "toOperationsFromProfile");
+        final NavDirections action = ProfileFragmentDirections.actionProfileFragmentToOperationsFragment(mUserId, null, mAccount);
+        mNavController.navigate(action);
+    }
+
+    @Override
+    public void toOperationsFromAnyText (@NonNull final UUID anyTextId) {
+        Log.d(TAG, "toOperationsFromAnyText");
+        final NavDirections action = AnyTextFragmentDirections.actionAnyTextFragmentToOperationsFragment(mUserId, anyTextId, mAccount);
         mNavController.navigate(action);
     }
 

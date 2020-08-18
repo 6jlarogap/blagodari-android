@@ -1,9 +1,6 @@
-package blagodarie.rating.ui.user.profile;
+package blagodarie.rating.ui.user.anytext;
 
 import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -15,13 +12,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.databinding.BindingAdapter;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -31,7 +26,6 @@ import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
-import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -47,9 +41,8 @@ import java.util.UUID;
 
 import blagodarie.rating.OperationType;
 import blagodarie.rating.R;
-import blagodarie.rating.auth.AccountGeneral;
+import blagodarie.rating.databinding.AnyTextFragmentBinding;
 import blagodarie.rating.databinding.EnterOperationCommentDialogBinding;
-import blagodarie.rating.databinding.ProfileFragmentBinding;
 import blagodarie.rating.databinding.ThanksUserItemBinding;
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
@@ -57,35 +50,32 @@ import blagodarie.rating.ui.AccountProvider;
 import blagodarie.rating.ui.user.DisplayThanksUser;
 import blagodarie.rating.ui.user.GridAutofitLayoutManager;
 import blagodarie.rating.ui.user.ThanksUserAdapter;
-import blagodarie.rating.ui.user.UserViewModel;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
-public final class ProfileFragment
+public final class AnyTextFragment
         extends Fragment
-        implements ProfileUserActionListener {
+        implements AnyTextUserActionListener {
 
     public interface FragmentCommunicator {
-        void toOperationsFromProfile ();
-
-        void toWishes ();
-
-        void toAbilities ();
+        void toOperationsFromAnyText (@NonNull final UUID anyTextId);
     }
 
-    private static final String TAG = ProfileFragment.class.getSimpleName();
+    private static final String TAG = AnyTextFragment.class.getSimpleName();
 
-    private ProfileViewModel mViewModel;
+    private AnyTextViewModel mViewModel;
 
-    private ProfileFragmentBinding mBinding;
+    private AnyTextFragmentBinding mBinding;
 
     private ThanksUserAdapter mThanksUserAdapter;
 
     private Account mAccount;
 
-    private UUID mUserId;
+    private String mAnyText;
+
+    private UUID mAnyTextId;
 
     @NonNull
     private CompositeDisposable mDisposables = new CompositeDisposable();
@@ -112,10 +102,10 @@ public final class ProfileFragment
         Log.d(TAG, "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
 
-        final ProfileFragmentArgs args = ProfileFragmentArgs.fromBundle(requireArguments());
+        final AnyTextFragmentArgs args = AnyTextFragmentArgs.fromBundle(requireArguments());
 
         mAccount = args.getAccount();
-        mUserId = args.getUserId();
+        mAnyText = args.getAnyText();
     }
 
     @Override
@@ -133,7 +123,7 @@ public final class ProfileFragment
         initViewModel();
         setupBinding();
 
-        refreshProfileData();
+        refreshAnyTextData();
     }
 
     @Override
@@ -149,7 +139,7 @@ public final class ProfileFragment
             @Nullable final ViewGroup container
     ) {
         Log.d(TAG, "initBinding");
-        mBinding = ProfileFragmentBinding.inflate(inflater, container, false);
+        mBinding = AnyTextFragmentBinding.inflate(inflater, container, false);
     }
 
     private void initThanksUserAdapter () {
@@ -157,11 +147,22 @@ public final class ProfileFragment
         mThanksUserAdapter = new ThanksUserAdapter(this::onThanksUserClick);
     }
 
+    private void onThanksUserClick (@NonNull final View view) {
+        Log.d(TAG, "onThanksUserClick");
+        final ThanksUserItemBinding thanksUserItemBinding = DataBindingUtil.findBinding(view);
+        if (thanksUserItemBinding != null) {
+            final String userId = thanksUserItemBinding.getThanksUser().getUserUUID();
+            final Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(getString(R.string.url_profile, userId)));
+            startActivity(i);
+        }
+    }
+
     private void initViewModel () {
         Log.d(TAG, "initViewModel");
-        mViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
+        mViewModel = new ViewModelProvider(requireActivity()).get(AnyTextViewModel.class);
+        mViewModel.getAnyText().set(mAnyText);
         mViewModel.isHaveAccount().set(mAccount != null);
-        mViewModel.isOwnProfile().set(mAccount != null && mAccount.name.equals(mUserId.toString()));
         mViewModel.getThanksUsers().observe(requireActivity(), mThanksUserAdapter::setData);
         mViewModel.getQrCode().set(createQrCodeBitmap());
     }
@@ -169,7 +170,7 @@ public final class ProfileFragment
     private void setupBinding () {
         Log.d(TAG, "setupBinding");
         mBinding.setUserActionListener(this);
-        mBinding.srlRefreshProfileInfo.setOnRefreshListener(this::refreshProfileData);
+        mBinding.srlRefreshProfileInfo.setOnRefreshListener(this::refreshAnyTextData);
         mBinding.rvThanksUsers.setLayoutManager(new GridAutofitLayoutManager(requireContext(), (int) ((getResources().getDimension(R.dimen.thanks_user_photo_width) + (getResources().getDimension(R.dimen.thanks_user_photo_margin) * 2)))));
         mBinding.rvThanksUsers.setAdapter(mThanksUserAdapter);
         mBinding.setViewModel(mViewModel);
@@ -187,7 +188,7 @@ public final class ProfileFragment
         hints.put(EncodeHintType.MARGIN, 0); // default = 4
         try {
             final BitMatrix bitMatrix = writer.encode(
-                    getString(R.string.url_profile, mUserId.toString()),
+                    mAnyText,
                     BarcodeFormat.QR_CODE,
                     width,
                     height,
@@ -204,38 +205,27 @@ public final class ProfileFragment
         return result;
     }
 
-    public final void refreshProfileData () {
-        Log.d(TAG, "refreshProfileData");
+    public final void refreshAnyTextData () {
+        Log.d(TAG, "refreshAnyTextData");
         if (mAccount != null) {
-            AccountProvider.getAuthToken(requireActivity(), mAccount, this::downloadProfileData);
+            AccountProvider.getAuthToken(requireActivity(), mAccount, this::downloadAnyTextData);
         } else {
-            downloadProfileData(null);
+            downloadAnyTextData(null);
         }
     }
 
-    private void onThanksUserClick (@NonNull final View view) {
-        Log.d(TAG, "onThanksUserClick");
-        final ThanksUserItemBinding thanksUserItemBinding = DataBindingUtil.findBinding(view);
-        if (thanksUserItemBinding != null) {
-            final String userId = thanksUserItemBinding.getThanksUser().getUserUUID();
-            final Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(getString(R.string.url_profile, userId)));
-            startActivity(i);
-        }
-    }
-
-    private void downloadProfileData (
+    private void downloadAnyTextData (
             @Nullable final String authToken
     ) {
-        Log.d(TAG, "downloadProfileData");
+        Log.d(TAG, "downloadAnyTextData");
         mViewModel.getDownloadInProgress().set(true);
         mDisposables.add(
                 Observable.
                         fromCallable(() -> {
                             if (authToken != null) {
-                                return ServerConnector.sendAuthRequestAndGetResponse("getprofileinfo?uuid=" + mUserId.toString(), authToken);
+                                return ServerConnector.sendAuthRequestAndGetResponse("gettextinfo?text=" + mAnyText, authToken);
                             } else {
-                                return ServerConnector.sendRequestAndGetResponse("getprofileinfo?uuid=" + mUserId.toString());
+                                return ServerConnector.sendRequestAndGetResponse("gettextinfo?text=" + mAnyText);
                             }
                         }).
                         subscribeOn(Schedulers.io()).
@@ -261,31 +251,12 @@ public final class ProfileFragment
                 try {
                     final JSONObject userJSON = new JSONObject(responseBody);
 
-                    final String photo = userJSON.getString("photo");
-                    mViewModel.getPhoto().set(photo);
-
-                    if (mViewModel.isOwnProfile().get()) {
-                        AccountManager.get(requireContext()).setUserData(mAccount, AccountGeneral.USER_DATA_PHOTO, photo);
-                        new ViewModelProvider(requireActivity()).get(UserViewModel.class).getOwnAccountPhotoUrl().setValue(photo);
-                    }
-
-                    final String lastName = userJSON.getString("last_name");
-                    mViewModel.getLastName().set(lastName);
-
-                    final String first_name = userJSON.getString("first_name");
-                    mViewModel.getFirstName().set(first_name);
-
-                    final String middleName = userJSON.getString("middle_name");
-                    mViewModel.getMiddleName().set(middleName);
-
+                    final String idString = userJSON.getString("uuid");
                     try {
-                        String cardNumber = userJSON.getString("credit_card");
-                        if (cardNumber.equals("null")) {
-                            cardNumber = "";
-                        }
-                        mViewModel.getCardNumber().set(cardNumber);
-                    } catch (JSONException e) {
-                        mViewModel.getCardNumber().set("");
+                        mAnyTextId = UUID.fromString(idString);
+                        mViewModel.getAnyTextId().set(mAnyTextId);
+                    } catch (IllegalArgumentException e) {
+                        //do nothing
                     }
 
                     final int fame = userJSON.getInt("fame");
@@ -346,131 +317,26 @@ public final class ProfileFragment
         }
     }
 
-    @BindingAdapter({"imageUrl"})
-    public static void loadImage (ImageView view, String url) {
-        if (url != null && !url.isEmpty()) {
-            Picasso.get().load(url).into(view);
-        }
-    }
-
-    @BindingAdapter({"imageBitmap"})
-    public static void loadImage (ImageView view, Bitmap bitmap) {
-        view.setImageBitmap(bitmap);
-    }
-
     @Override
-    public void onShareProfile () {
+    public void onShareAnyText () {
         final Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.url_profile, mUserId.toString()));
+        sendIntent.putExtra(Intent.EXTRA_TEXT, mAnyText);
         sendIntent.setType("text/plain");
         startActivity(Intent.createChooser(sendIntent, "Поделиться"));
     }
 
     @Override
-    public void onAddOperation (@NonNull final OperationType operationType) {
+    public void onAddOperation (@NonNull OperationType operationType) {
         Log.d(TAG, "onAddOperation");
         addOperationComment(operationType);
     }
 
     @Override
-    public void onCopyCardNumber () {
-        Log.d(TAG, "onCopyCardNumber");
-        final ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
-        final ClipData clip = ClipData.newPlainText(getText(R.string.txt_card_number), mBinding.etCardNumber.getText().toString());
-        if (clipboard != null) {
-            clipboard.setPrimaryClip(clip);
-            Toast.makeText(requireContext(), R.string.info_msg_copied_to_clipboard, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onEditCardNumber () {
-        Log.d(TAG, "onEditCardNumber");
-        mViewModel.setCurrentMode(ProfileViewModel.Mode.EDIT);
-    }
-
-    @Override
-    public void onSaveCardNumber () {
-        Log.d(TAG, "onSaveCardNumber");
-        mViewModel.setCurrentMode(ProfileViewModel.Mode.VIEW);
-
-        final String cardNumber = mBinding.etCardNumber.getText().toString();
-        if (cardNumber.isEmpty() || cardNumber.length() == 16) {
-            AccountProvider.getAuthToken(
-                    requireActivity(),
-                    mAccount,
-                    authToken -> {
-                        if (authToken != null) {
-                            updateCardNumber(authToken, cardNumber);
-                        }
-                    });
-        } else {
-            mViewModel.getCardNumber().notifyChange();
-            Toast.makeText(requireContext(), getString(blagodarie.rating.auth.R.string.err_msg_incorrect_card_number), Toast.LENGTH_LONG).show();
-        }
-    }
-
-    @Override
-    public void onCancelEditCardNumber () {
-        Log.d(TAG, "onCancelEditCardNumber");
-        mViewModel.getCardNumber().notifyChange();
-        mViewModel.setCurrentMode(ProfileViewModel.Mode.VIEW);
-    }
-
-    @Override
     public void onOperations () {
-        mFragmentCommunicator.toOperationsFromProfile();
+        mFragmentCommunicator.toOperationsFromAnyText(mAnyTextId);
     }
 
-    @Override
-    public void onWishes () {
-        mFragmentCommunicator.toWishes();
-    }
-
-    @Override
-    public void onAbilities () {
-        mFragmentCommunicator.toAbilities();
-    }
-
-    private void updateCardNumber (
-            @NonNull final String authToken,
-            @NonNull final String cardNumber
-    ) {
-        Log.d(TAG, "updateProfileData");
-
-        final String content = String.format("{\"credit_card\":\"%s\"}", cardNumber);
-
-        mDisposables.add(
-                Observable.
-                        fromCallable(() -> ServerConnector.sendAuthRequestAndGetResponse("updateprofileinfo", authToken, content)).
-                        subscribeOn(Schedulers.io()).
-                        observeOn(AndroidSchedulers.mainThread()).
-                        subscribe(
-                                serverApiResponse -> {
-                                    Log.d(TAG, serverApiResponse.toString());
-                                    onUpdateCardNumberComplete(serverApiResponse);
-                                },
-                                throwable -> {
-                                    Log.e(TAG, Log.getStackTraceString(throwable));
-                                    Toast.makeText(requireContext(), throwable.getMessage(), Toast.LENGTH_LONG).show();
-                                }
-                        )
-        );
-    }
-
-    private void onUpdateCardNumberComplete (
-            @NonNull final ServerApiResponse serverApiResponse
-    ) {
-        Log.d(TAG, "onUpdateCardNumberComplete serverApiResponse=" + serverApiResponse);
-        if (serverApiResponse.getCode() == 200) {
-            mViewModel.getCardNumber().set(mBinding.etCardNumber.getText().toString());
-            Toast.makeText(requireContext(), R.string.info_msg_update_data_complete, Toast.LENGTH_LONG).show();
-        } else {
-            mViewModel.getCardNumber().notifyChange();
-            Toast.makeText(requireContext(), R.string.err_msg_update_data_failed, Toast.LENGTH_LONG).show();
-        }
-    }
 
     private void addOperationComment (@NonNull final OperationType operationType) {
         Log.d(TAG, "addOperationComment");
@@ -499,14 +365,11 @@ public final class ProfileFragment
                                             if (account != null) {
                                                 mAccount = account;
                                                 mViewModel.isHaveAccount().set(true);
-                                                mViewModel.isOwnProfile().set(mAccount.name.equals(mUserId.toString()));
-                                                if (!mViewModel.isOwnProfile().get()) {
-                                                    AccountProvider.getAuthToken(requireActivity(), account, authToken -> {
-                                                        if (authToken != null) {
-                                                            addOperation(authToken, operationType, operationComment);
-                                                        }
-                                                    });
-                                                }
+                                                AccountProvider.getAuthToken(requireActivity(), account, authToken -> {
+                                                    if (authToken != null) {
+                                                        addOperation(authToken, operationType, operationComment);
+                                                    }
+                                                });
                                             }
                                         }
                                 );
@@ -525,11 +388,11 @@ public final class ProfileFragment
     ) {
         Log.d(TAG, "addOperation");
 
-        final String content = String.format(Locale.ENGLISH, "{\"user_id_to\":\"%s\",\"operation_type_id\":%d,\"timestamp\":%d,\"comment\":\"%s\"}", mUserId.toString(), operationType.getId(), System.currentTimeMillis(), operationComment);
+        final String content = String.format(Locale.ENGLISH, "{" + (mAnyTextId != null ? "\"text_id_to\":\"%s\"" : "\"text\":\"%s\"") + ",\"operation_type_id\":%d,\"timestamp\":%d,\"comment\":\"%s\"}", (mAnyTextId != null ? mAnyTextId.toString() : mAnyText), operationType.getId(), System.currentTimeMillis(), operationComment);
 
         mDisposables.add(
                 Observable.
-                        fromCallable(() -> ServerConnector.sendAuthRequestAndGetResponse("addoperation", authToken, content)).
+                        fromCallable(() -> ServerConnector.sendAuthRequestAndGetResponse("addtextoperation", authToken, content)).
                         subscribeOn(Schedulers.io()).
                         observeOn(AndroidSchedulers.mainThread()).
                         subscribe(
@@ -565,7 +428,7 @@ public final class ProfileFragment
                     break;
                 }
             }
-            refreshProfileData();
+            refreshAnyTextData();
         } else {
             Toast.makeText(requireContext(), R.string.err_msg_add_thanks_failed, Toast.LENGTH_LONG).show();
         }

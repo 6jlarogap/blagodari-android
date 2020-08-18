@@ -1,4 +1,4 @@
-package blagodarie.rating.ui.user.profile;
+package blagodarie.rating.ui.user;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,7 +11,7 @@ public final class DisplayThanksUser {
     @NonNull
     private final String mUserUUID;
 
-    DisplayThanksUser (
+    public DisplayThanksUser (
             @Nullable final String photo,
             @NonNull final String userUUID
     ) {
