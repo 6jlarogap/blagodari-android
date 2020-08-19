@@ -372,12 +372,16 @@ public final class ProfileFragment
     public void onAddOperation (@NonNull final OperationType operationType) {
         Log.d(TAG, "onAddOperation");
         if (mAccount != null) {
-            new OperationManager(this::refreshProfileData).
+            new OperationManager(
+                    OperationManager.Type.TO_USER,
+                    this::refreshProfileData
+            ).
                     createOperation(
                             requireActivity(),
                             mDisposables,
                             mAccount,
                             mUserId,
+                            null,
                             operationType
                     );
         } else {
@@ -389,12 +393,16 @@ public final class ProfileFragment
                             mViewModel.isHaveAccount().set(true);
                             mViewModel.isOwnProfile().set(mAccount.name.equals(mUserId.toString()));
                             if (!mViewModel.isOwnProfile().get()) {
-                                new OperationManager(this::refreshProfileData).
+                                new OperationManager(
+                                        OperationManager.Type.TO_USER,
+                                        this::refreshProfileData
+                                ).
                                         createOperation(
                                                 requireActivity(),
                                                 mDisposables,
                                                 mAccount,
                                                 mUserId,
+                                                null,
                                                 operationType
                                         );
                             }
