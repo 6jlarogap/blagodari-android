@@ -75,7 +75,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/tvFame"
-                            android:text="@{!ViewModel.isHaveAccount ? String.format(@string/txt_self_profile_thanks_count, ViewModel.sumThanksCount) : String.format(@string/txt_thanks_count, ViewModel.thanksCount, ViewModel.sumThanksCount)}" />
+                            android:text="@{!ViewModel.isHaveAccount || ViewModel.anyTextId == null ? String.format(@string/txt_self_profile_thanks_count, ViewModel.sumThanksCount) : String.format(@string/txt_thanks_count, ViewModel.thanksCount, ViewModel.sumThanksCount)}" />
 
                         <androidx.appcompat.widget.AppCompatImageButton
                             android:layout_width="wrap_content"
@@ -93,7 +93,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/tvThanksCount"
-                            android:text="@{!ViewModel.isHaveAccount ? String.format(@string/txt_self_profile_trust, ViewModel.trustlessCount) : String.format(@string/txt_trust, (ViewModel.isTrust ? @string/txt_yes : @string/txt_no), ViewModel.trustlessCount)}" />
+                            android:text="@{!ViewModel.isHaveAccount || ViewModel.anyTextId == null ? String.format(@string/txt_self_profile_trust, ViewModel.trustlessCount) : String.format(@string/txt_trust, (ViewModel.isTrust ? @string/txt_yes : @string/txt_no), ViewModel.trustlessCount)}" />
 
                     </RelativeLayout>
 

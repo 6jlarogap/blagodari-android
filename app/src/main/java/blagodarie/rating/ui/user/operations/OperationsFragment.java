@@ -149,14 +149,14 @@ public final class OperationsFragment
         Log.d(TAG, "onAddOperation");
         if (mAccount != null) {
             new OperationManager(
-                    OperationManager.Type.TO_USER,
-                    this::refreshOperations
+                    (mUserId != null ? OperationManager.Type.TO_USER : OperationManager.Type.TO_ANY_TEXT),
+                    textId -> refreshOperations()
             ).
                     createOperation(
                             requireActivity(),
                             mDisposables,
                             mAccount,
-                            mUserId,
+                            (mUserId != null ? mUserId : mAnyTextId),
                             null,
                             operationType
                     );
@@ -170,14 +170,14 @@ public final class OperationsFragment
                             mViewModel.isOwnProfile().set(mAccount.name.equals(mUserId.toString()));
                             if (!mViewModel.isOwnProfile().get()) {
                                 new OperationManager(
-                                        OperationManager.Type.TO_USER,
-                                        this::refreshOperations
+                                        (mUserId != null ? OperationManager.Type.TO_USER : OperationManager.Type.TO_ANY_TEXT),
+                                        textId -> refreshOperations()
                                 ).
                                         createOperation(
                                                 requireActivity(),
                                                 mDisposables,
                                                 mAccount,
-                                                mUserId,
+                                                (mUserId != null ? mUserId : mAnyTextId),
                                                 null,
                                                 operationType
                                         );

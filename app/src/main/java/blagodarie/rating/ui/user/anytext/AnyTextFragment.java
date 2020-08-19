@@ -297,7 +297,7 @@ public final class AnyTextFragment
                 }
             }
 
-        } else if (serverApiResponse.getCode() == 400) {
+        }/* else if (serverApiResponse.getCode() == 400) {
             if (serverApiResponse.getBody() != null) {
                 final String responseBody = serverApiResponse.getBody();
                 try {
@@ -310,7 +310,7 @@ public final class AnyTextFragment
                     Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
-        }
+        }*/
     }
 
     @Override
@@ -327,8 +327,12 @@ public final class AnyTextFragment
         Log.d(TAG, "onAddOperation");
         if (mAccount != null) {
             new OperationManager(
-                    OperationManager.Type.TO_USER,
-                    this::refreshAnyTextData
+                    OperationManager.Type.TO_ANY_TEXT,
+                    (textId) -> {
+                        mAnyTextId = UUID.fromString(textId);
+                        mViewModel.getAnyTextId().set(mAnyTextId);
+                        refreshAnyTextData();
+                    }
             ).
                     createOperation(
                             requireActivity(),
@@ -346,8 +350,12 @@ public final class AnyTextFragment
                             mAccount = account;
                             mViewModel.isHaveAccount().set(true);
                             new OperationManager(
-                                    OperationManager.Type.TO_USER,
-                                    this::refreshAnyTextData
+                                    OperationManager.Type.TO_ANY_TEXT,
+                                    (textId) -> {
+                                        mAnyTextId = UUID.fromString(textId);
+                                        mViewModel.getAnyTextId().set(mAnyTextId);
+                                        refreshAnyTextData();
+                                    }
                             ).
                                     createOperation(
                                             requireActivity(),
@@ -367,5 +375,5 @@ public final class AnyTextFragment
     public void onOperations () {
         mFragmentCommunicator.toOperationsFromAnyText(mAnyTextId);
     }
-    
+
 }

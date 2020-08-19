@@ -13,6 +13,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Locale;
 import java.util.UUID;
 
@@ -34,7 +37,7 @@ public final class OperationManager {
     }
 
     public interface OnAddOperationCompleteListener {
-        void onAddOperationComplete ();
+        void onAddOperationComplete (@Nullable final String textId);
     }
 
     @NonNull
@@ -149,7 +152,18 @@ public final class OperationManager {
                     break;
                 }
             }
-            mOnAddOperationCompleteListener.onAddOperationComplete();
+            String textId = null;
+            if (serverApiResponse.getBody() != null){
+
+                final String responseBody = serverApiResponse.getBody();
+                try {
+                    final JSONObject json = new JSONObject(responseBody);
+                    textId = json.getString("text_id_to");
+                } catch (JSONException e){
+                    //do nothing
+                }
+            }
+            mOnAddOperationCompleteListener.onAddOperationComplete(textId);
         } else {
             Toast.makeText(context, R.string.err_msg_add_thanks_failed, Toast.LENGTH_LONG).show();
         }

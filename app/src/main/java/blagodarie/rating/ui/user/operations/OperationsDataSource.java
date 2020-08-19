@@ -89,7 +89,7 @@ final class OperationsDataSource
     @Override
     public void loadRange (@NonNull LoadRangeParams params, @NonNull LoadRangeCallback<Operation> callback) {
         Log.d(TAG, "loadRange startPosition=" + params.startPosition + ", loadSize=" + params.loadSize);
-        final String content = String.format(Locale.ENGLISH, "{\"uuid\":\"%s\",\"from\":%d,\"count\":%d}", mUserId.toString(), params.startPosition, params.loadSize);
+        final String content = String.format(Locale.ENGLISH, "{\"uuid\":\"%s\",\"from\":%d,\"count\":%d}", (mUserId != null ? mUserId.toString() : (mAnyTextId != null ? mAnyTextId.toString() : null)), params.startPosition, params.loadSize);
         try {
             final ServerApiResponse serverApiResponse = ServerConnector.sendRequestAndGetResponse("/getuseroperations", content);
             if (serverApiResponse.getCode() == 200) {
