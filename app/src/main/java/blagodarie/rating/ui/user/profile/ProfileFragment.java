@@ -45,6 +45,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
+import blagodarie.rating.OperationManager;
 import blagodarie.rating.OperationType;
 import blagodarie.rating.R;
 import blagodarie.rating.auth.AccountGeneral;
@@ -370,7 +371,37 @@ public final class ProfileFragment
     @Override
     public void onAddOperation (@NonNull final OperationType operationType) {
         Log.d(TAG, "onAddOperation");
-        addOperationComment(operationType);
+        if (mAccount != null) {
+            new OperationManager(this::refreshProfileData).
+                    createOperation(
+                            requireActivity(),
+                            mDisposables,
+                            mAccount,
+                            mUserId,
+                            operationType
+                    );
+        } else {
+            AccountProvider.createAccount(
+                    requireActivity(),
+                    account -> {
+                        if (account != null) {
+                            mAccount = account;
+                            mViewModel.isHaveAccount().set(true);
+                            mViewModel.isOwnProfile().set(mAccount.name.equals(mUserId.toString()));
+                            if (!mViewModel.isOwnProfile().get()) {
+                                new OperationManager(this::refreshProfileData).
+                                        createOperation(
+                                                requireActivity(),
+                                                mDisposables,
+                                                mAccount,
+                                                mUserId,
+                                                operationType
+                                        );
+                            }
+                        }
+                    }
+            );
+        }
     }
 
     @Override

@@ -140,6 +140,7 @@ public final class ProfileViewModel
         return mDownloadInProgress;
     }
 
+    @NonNull
     public final ObservableBoolean isHaveAccount () {
         return mHaveAccount;
     }
