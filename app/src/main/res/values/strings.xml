@@ -13,6 +13,7 @@
     <string name="btn_ability">Возможности</string>
     <string name="btn_edit">Редактировать</string>
     <string name="btn_delete">Удалить</string>
+    <string name="btn_save">Сохранить</string>
 
     <string name="rqst_choose_account">Выберите аккаунт</string>
     <string name="rqst_scan_qr_code">Отсканируйте QR-код</string>

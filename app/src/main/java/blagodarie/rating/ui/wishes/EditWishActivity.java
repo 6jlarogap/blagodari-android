@@ -1,23 +1,20 @@
 package blagodarie.rating.ui.wishes;
 
 import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.accounts.AccountManagerFuture;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.Locale;
 
@@ -59,6 +56,7 @@ public final class EditWishActivity
             mWish = (Wish) getIntent().getSerializableExtra(EXTRA_WISH);
             if (mWish != null) {
                 initBinding();
+                setupToolbar();
             } else {
                 Toast.makeText(this, R.string.err_msg_missing_wish, Toast.LENGTH_SHORT).show();
                 setResult(RESULT_CANCELED);
@@ -85,16 +83,29 @@ public final class EditWishActivity
         mActivityBinding.setWish(mWish);
     }
 
-    public void onSaveWishClick (@NonNull final View view) {
-        Log.d(TAG, "onSaveWishClick");
-        mWish.setText(mActivityBinding.etWishText.getText().toString());
-        mWish.setTimestamp(new Date());
-        getAuthTokenAndAddOrUpdateWish();
-    }
-
     private void getAuthTokenAndAddOrUpdateWish () {
         Log.d(TAG, "getAuthTokenAndAddOrUpdateWish");
         AccountProvider.getAuthToken(this, mAccount, this::addOrUpdateWish);
+    }
+
+    private void setupToolbar () {
+        Log.d(TAG, "setupToolbar");
+        setSupportActionBar(findViewById(R.id.toolbar));
+        final ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu (
+            @NonNull final Menu menu
+    ) {
+        Log.d(TAG, "onCreateOptionsMenu");
+        getMenuInflater().inflate(R.menu.edit_wish_activity, menu);
+        return true;
     }
 
     private void addOrUpdateWish (
@@ -114,6 +125,22 @@ public final class EditWishActivity
                                 }
                         )
         );
+    }
+
+    @Override
+    public boolean onOptionsItemSelected (final MenuItem item) {
+        Log.d(TAG, "onOptionsItemSelected item=" + item);
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            case R.id.miSave:
+                mWish.setText(mActivityBinding.etWishText.getText().toString());
+                mWish.setTimestamp(new Date());
+                getAuthTokenAndAddOrUpdateWish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void extractDataFromServerApiResponse (
