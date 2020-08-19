@@ -48,25 +48,25 @@
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/ivPhoto"
+                        imageUrl="@{ViewModel.photo}"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:layout_margin="5dp"
                         android:adjustViewBounds="true"
                         android:maxWidth="200dp"
-                        android:scaleType="centerInside"
-                        imageUrl="@{ViewModel.photo}"/>
+                        android:scaleType="centerInside" />
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/ivQRCode"
+                        imageBitmap="@{ViewModel.qrCode}"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:layout_margin="5dp"
                         android:adjustViewBounds="true"
                         android:maxWidth="200dp"
-                        android:scaleType="centerInside"
-                        imageBitmap="@{ViewModel.qrCode}"/>
+                        android:scaleType="centerInside" />
 
                     <RelativeLayout
                         android:layout_width="wrap_content"
@@ -109,8 +109,7 @@
 
                     <RelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:visibility="@{ViewModel.isProfile() ? View.VISIBLE : View.GONE}">
+                        android:layout_height="wrap_content">
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/tilCardNumber"
@@ -182,15 +181,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:onClick="@{() -> UserActionListener.onWishes()}"
-                        android:text="@string/btn_wishes"
-                        android:visibility="@{ViewModel.isProfile() ? View.VISIBLE : View.GONE}" />
+                        android:text="@string/btn_wishes" />
 
                     <Button
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:onClick="@{() -> UserActionListener.onAbilities()}"
-                        android:text="@string/btn_ability"
-                        android:visibility="@{ViewModel.isProfile() ? View.VISIBLE : View.GONE}" />
+                        android:text="@string/btn_ability" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -212,7 +209,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
-                            android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISSTRUST)}"
+                            android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISTRUST)}"
                             android:text="@string/btn_trustless"
                             android:visibility="@{!ViewModel.isOwnProfile &amp;&amp; (ViewModel.isTrust == null || ViewModel.isTrust) ? View.VISIBLE : View.GONE}" />
 
@@ -221,7 +218,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
-                            android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISSTRUST_CANCEL)}"
+                            android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISTRUST_CANCEL)}"
                             android:text="@string/btn_cancel_trustless"
                             android:visibility="@{!ViewModel.isOwnProfile &amp;&amp; ViewModel.isTrust != null &amp;&amp; !ViewModel.isTrust ? View.VISIBLE : View.GONE}" />
 
@@ -251,8 +248,6 @@
     <data>
 
         <import type="android.view.View" />
-
-        <import type="blagodarie.rating.ui.user.profile.ProfileViewModel" />
 
         <import type="blagodarie.rating.ui.user.profile.ProfileViewModel.Mode" />
 

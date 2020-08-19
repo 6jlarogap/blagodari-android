@@ -11,7 +11,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,8 +25,6 @@ import androidx.databinding.BindingAdapter;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
@@ -48,6 +45,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
+import blagodarie.rating.OperationManager;
 import blagodarie.rating.OperationType;
 import blagodarie.rating.R;
 import blagodarie.rating.auth.AccountGeneral;
@@ -57,6 +55,9 @@ import blagodarie.rating.databinding.ThanksUserItemBinding;
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
 import blagodarie.rating.ui.AccountProvider;
+import blagodarie.rating.ui.user.DisplayThanksUser;
+import blagodarie.rating.ui.user.GridAutofitLayoutManager;
+import blagodarie.rating.ui.user.ThanksUserAdapter;
 import blagodarie.rating.ui.user.UserViewModel;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -68,74 +69,11 @@ public final class ProfileFragment
         implements ProfileUserActionListener {
 
     public interface FragmentCommunicator {
-        void toOperations ();
+        void toOperationsFromProfile ();
 
         void toWishes ();
 
         void toAbilities ();
-    }
-
-    private static class GridAutofitLayoutManager
-            extends GridLayoutManager {
-        private int columnWidth;
-        private boolean isColumnWidthChanged = true;
-        private int lastWidth;
-        private int lastHeight;
-
-        public GridAutofitLayoutManager (@NonNull final Context context, final int columnWidth) {
-            /* Initially set spanCount to 1, will be changed automatically later. */
-            super(context, 1);
-            setColumnWidth(checkedColumnWidth(context, columnWidth));
-        }
-
-        public GridAutofitLayoutManager (
-                @NonNull final Context context,
-                final int columnWidth,
-                final int orientation,
-                final boolean reverseLayout) {
-
-            /* Initially set spanCount to 1, will be changed automatically later. */
-            super(context, 1, orientation, reverseLayout);
-            setColumnWidth(checkedColumnWidth(context, columnWidth));
-        }
-
-        private int checkedColumnWidth (@NonNull final Context context, int columnWidth) {
-            if (columnWidth <= 0) {
-            /* Set default columnWidth value (48dp here). It is better to move this constant
-            to static constant on top, but we need context to convert it to dp, so can't really
-            do so. */
-                columnWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48,
-                        context.getResources().getDisplayMetrics());
-            }
-            return columnWidth;
-        }
-
-        public void setColumnWidth (final int newColumnWidth) {
-            if (newColumnWidth > 0 && newColumnWidth != columnWidth) {
-                columnWidth = newColumnWidth;
-                isColumnWidthChanged = true;
-            }
-        }
-
-        @Override
-        public void onLayoutChildren (@NonNull final RecyclerView.Recycler recycler, @NonNull final RecyclerView.State state) {
-            final int width = getWidth();
-            final int height = getHeight();
-            if (columnWidth > 0 && width > 0 && height > 0 && (isColumnWidthChanged || lastWidth != width || lastHeight != height)) {
-                final int totalSpace;
-                if (getOrientation() == VERTICAL) {
-                    totalSpace = width - getPaddingRight() - getPaddingLeft();
-                } else {
-                    totalSpace = height - getPaddingTop() - getPaddingBottom();
-                }
-                final int spanCount = Math.max(1, totalSpace / columnWidth);
-                setSpanCount(spanCount);
-                isColumnWidthChanged = false;
-            }
-            lastWidth = width;
-            lastHeight = height;
-            super.onLayoutChildren(recycler, state);
-        }
     }
 
     private static final String TAG = ProfileFragment.class.getSimpleName();
@@ -186,7 +124,7 @@ public final class ProfileFragment
         Log.d(TAG, "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
         try {
-            mFragmentCommunicator = (FragmentCommunicator) getActivity();
+            mFragmentCommunicator = (FragmentCommunicator) requireActivity();
         } catch (ClassCastException e) {
             Log.e(TAG, requireActivity().getClass().getName() + " must implement " + FragmentCommunicator.class.getName());
             throw new ClassCastException(requireActivity().getClass().getName() + " must implement " + FragmentCommunicator.class.getName());
@@ -223,7 +161,6 @@ public final class ProfileFragment
     private void initViewModel () {
         Log.d(TAG, "initViewModel");
         mViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
-        mViewModel.isProfile().set(true);
         mViewModel.isHaveAccount().set(mAccount != null);
         mViewModel.isOwnProfile().set(mAccount != null && mAccount.name.equals(mUserId.toString()));
         mViewModel.getThanksUsers().observe(requireActivity(), mThanksUserAdapter::setData);
@@ -394,6 +331,19 @@ public final class ProfileFragment
                 }
             }
 
+        } else if (serverApiResponse.getCode() == 400) {
+            if (serverApiResponse.getBody() != null) {
+                final String responseBody = serverApiResponse.getBody();
+                try {
+                    final JSONObject userJSON = new JSONObject(responseBody);
+                    final String message = userJSON.getString("message");
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
+                    requireActivity().finish();
+                } catch (JSONException e) {
+                    Log.e(TAG, Log.getStackTraceString(e));
+                    Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
         }
     }
 
@@ -421,7 +371,45 @@ public final class ProfileFragment
     @Override
     public void onAddOperation (@NonNull final OperationType operationType) {
         Log.d(TAG, "onAddOperation");
-        addOperationComment(operationType);
+        if (mAccount != null) {
+            new OperationManager(
+                    OperationManager.Type.TO_USER,
+                    textId -> refreshProfileData()
+            ).
+                    createOperation(
+                            requireActivity(),
+                            mDisposables,
+                            mAccount,
+                            mUserId,
+                            null,
+                            operationType
+                    );
+        } else {
+            AccountProvider.createAccount(
+                    requireActivity(),
+                    account -> {
+                        if (account != null) {
+                            mAccount = account;
+                            mViewModel.isHaveAccount().set(true);
+                            mViewModel.isOwnProfile().set(mAccount.name.equals(mUserId.toString()));
+                            if (!mViewModel.isOwnProfile().get()) {
+                                new OperationManager(
+                                        OperationManager.Type.TO_USER,
+                                        textId -> refreshProfileData()
+                                ).
+                                        createOperation(
+                                                requireActivity(),
+                                                mDisposables,
+                                                mAccount,
+                                                mUserId,
+                                                null,
+                                                operationType
+                                        );
+                            }
+                        }
+                    }
+            );
+        }
     }
 
     @Override
@@ -471,7 +459,7 @@ public final class ProfileFragment
 
     @Override
     public void onOperations () {
-        mFragmentCommunicator.toOperations();
+        mFragmentCommunicator.toOperationsFromProfile();
     }
 
     @Override
@@ -523,102 +511,4 @@ public final class ProfileFragment
         }
     }
 
-    private void addOperationComment (@NonNull final OperationType operationType) {
-        Log.d(TAG, "addOperationComment");
-        InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        final EnterOperationCommentDialogBinding binding = DataBindingUtil.inflate(LayoutInflater.from(requireContext()), R.layout.enter_operation_comment_dialog, null, false);
-        new AlertDialog.
-                Builder(requireContext()).
-                setCancelable(false).
-                setTitle(R.string.txt_comment).
-                setView(binding.getRoot()).
-                setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> imm.hideSoftInputFromWindow(binding.etOperationComment.getWindowToken(), 0)).
-                setPositiveButton(android.R.string.ok,
-                        (dialogInterface, i) -> {
-                            imm.hideSoftInputFromWindow(binding.etOperationComment.getWindowToken(), 0);
-                            final String operationComment = binding.etOperationComment.getText().toString();
-                            if (mAccount != null) {
-                                AccountProvider.getAuthToken(requireActivity(), mAccount, authToken -> {
-                                    if (authToken != null) {
-                                        addOperation(authToken, operationType, operationComment);
-                                    }
-                                });
-                            } else {
-                                AccountProvider.createAccount(
-                                        requireActivity(),
-                                        account -> {
-                                            if (account != null) {
-                                                mAccount = account;
-                                                mViewModel.isHaveAccount().set(true);
-                                                mViewModel.isOwnProfile().set(mAccount.name.equals(mUserId.toString()));
-                                                if (!mViewModel.isOwnProfile().get()) {
-                                                    AccountProvider.getAuthToken(requireActivity(), account, authToken -> {
-                                                        if (authToken != null) {
-                                                            addOperation(authToken, operationType, operationComment);
-                                                        }
-                                                    });
-                                                }
-                                            }
-                                        }
-                                );
-                            }
-                        }).
-                create().
-                show();
-        binding.etOperationComment.requestFocus();
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
-    }
-
-    private void addOperation (
-            @NonNull final String authToken,
-            @NonNull final OperationType operationType,
-            final String operationComment
-    ) {
-        Log.d(TAG, "addOperation");
-
-        final String content = String.format(Locale.ENGLISH, "{\"user_id_to\":\"%s\",\"operation_type_id\":%d,\"timestamp\":%d,\"comment\":\"%s\"}", mUserId.toString(), operationType.getId(), System.currentTimeMillis(), operationComment);
-
-        mDisposables.add(
-                Observable.
-                        fromCallable(() -> ServerConnector.sendAuthRequestAndGetResponse("addoperation", authToken, content)).
-                        subscribeOn(Schedulers.io()).
-                        observeOn(AndroidSchedulers.mainThread()).
-                        subscribe(
-                                serverApiResponse -> {
-                                    Log.d(TAG, serverApiResponse.toString());
-                                    onAddOperationComplete(serverApiResponse, operationType);
-                                },
-                                throwable -> {
-                                    Log.e(TAG, Log.getStackTraceString(throwable));
-                                    Toast.makeText(requireContext(), throwable.getMessage(), Toast.LENGTH_LONG).show();
-                                }
-                        )
-        );
-    }
-
-    private void onAddOperationComplete (
-            @NonNull final ServerApiResponse serverApiResponse,
-            @NonNull final OperationType operationType
-    ) {
-        Log.d(TAG, "onAddOperationComplete serverApiResponse=" + serverApiResponse);
-        if (serverApiResponse.getCode() == 200) {
-            switch (operationType) {
-                case THANKS: {
-                    Toast.makeText(requireContext(), R.string.info_msg_add_thanks_complete, Toast.LENGTH_LONG).show();
-                    break;
-                }
-                case MISSTRUST: {
-                    Toast.makeText(requireContext(), R.string.info_msg_trust_is_lost, Toast.LENGTH_LONG).show();
-                    break;
-                }
-                case MISSTRUST_CANCEL: {
-                    Toast.makeText(requireContext(), R.string.info_msg_trust_restored, Toast.LENGTH_LONG).show();
-                    break;
-                }
-            }
-            refreshProfileData();
-        } else {
-            Toast.makeText(requireContext(), R.string.err_msg_add_thanks_failed, Toast.LENGTH_LONG).show();
-        }
-    }
 }

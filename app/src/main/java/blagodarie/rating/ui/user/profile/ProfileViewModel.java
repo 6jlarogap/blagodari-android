@@ -11,6 +11,8 @@ import androidx.lifecycle.ViewModel;
 
 import java.util.List;
 
+import blagodarie.rating.ui.user.DisplayThanksUser;
+
 public final class ProfileViewModel
         extends ViewModel {
 
@@ -56,9 +58,6 @@ public final class ProfileViewModel
 
     @NonNull
     private final ObservableBoolean mDownloadInProgress = new ObservableBoolean(false);
-
-    @NonNull
-    private final ObservableBoolean mIsProfile = new ObservableBoolean(false);
 
     @NonNull
     private final ObservableBoolean mHaveAccount = new ObservableBoolean(false);
@@ -141,17 +140,13 @@ public final class ProfileViewModel
         return mDownloadInProgress;
     }
 
+    @NonNull
     public final ObservableBoolean isHaveAccount () {
         return mHaveAccount;
     }
 
     public final ObservableBoolean isOwnProfile () {
         return mOwnProfile;
-    }
-
-    @NonNull
-    public ObservableBoolean isProfile () {
-        return mIsProfile;
     }
 
     @NonNull

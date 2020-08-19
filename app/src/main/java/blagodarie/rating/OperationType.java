@@ -5,8 +5,8 @@ import androidx.annotation.Nullable;
 public enum OperationType {
 
     THANKS(1, R.string.operation_type_name_thanks),
-    MISSTRUST(2, R.string.operation_type_name_trustless),
-    MISSTRUST_CANCEL(3, R.string.operation_type_name_trustless_cancel);
+    MISTRUST(2, R.string.operation_type_name_trustless),
+    MISTRUST_CANCEL(3, R.string.operation_type_name_trustless_cancel);
 
     final int mId;
 
@@ -36,10 +36,10 @@ public enum OperationType {
                 operationType = THANKS;
                 break;
             case 2:
-                operationType = MISSTRUST;
+                operationType = MISTRUST;
                 break;
             case 3:
-                operationType = MISSTRUST_CANCEL;
+                operationType = MISTRUST_CANCEL;
                 break;
             default:
                 operationType = null;

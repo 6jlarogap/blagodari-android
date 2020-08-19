@@ -1,8 +1,10 @@
 <resources>
     <string name="app_name">БлагоДари!</string>
 
+    <string name="host">blagodarie.org</string>
     <string name="url_profile">https://blagodarie.org/profile?id=%s</string>
     <string name="url_wish">https://blagodarie.org/wish?id=%s</string>
+    <string name="url_any_text">https://blagodarie.org/anytext?text=%s</string>
 
     <string name="btn_thanks">Благодарить</string>
     <string name="btn_trustless">Утрата доверия</string>
@@ -11,6 +13,7 @@
     <string name="btn_ability">Возможности</string>
     <string name="btn_edit">Редактировать</string>
     <string name="btn_delete">Удалить</string>
+    <string name="btn_save">Сохранить</string>
 
     <string name="rqst_choose_account">Выберите аккаунт</string>
     <string name="rqst_scan_qr_code">Отсканируйте QR-код</string>
@@ -22,6 +25,7 @@
 
     <string name="err_msg_account_not_created">Аккаунт не был создан</string>
     <string name="err_msg_authentication_error">Ошибка аутентификации</string>
+    <string name="err_msg_missing_data">Осутствуют данные</string>
     <string name="err_msg_missing_user_id">Не указан идентификатор пользователя</string>
     <string name="err_msg_missing_wish">Не указано желание</string>
     <string name="err_msg_missing_account">Не указан аккаунт</string>

@@ -5,7 +5,7 @@ import androidx.databinding.ObservableBoolean;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class UserViewModel
+public final class UserViewModel
         extends ViewModel {
 
     @NonNull

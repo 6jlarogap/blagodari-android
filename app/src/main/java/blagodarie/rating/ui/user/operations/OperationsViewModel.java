@@ -12,6 +12,9 @@ public final class OperationsViewModel
     private LiveData<PagedList<Operation>> mOperations;
 
     @NonNull
+    private final ObservableBoolean mHaveAccount = new ObservableBoolean(false);
+
+    @NonNull
     private final ObservableBoolean mOwnProfile = new ObservableBoolean(false);
 
     @NonNull
@@ -24,6 +27,11 @@ public final class OperationsViewModel
 
     public void setOperations (@NonNull final LiveData<PagedList<Operation>> operations) {
         mOperations = operations;
+    }
+
+    @NonNull
+    public final ObservableBoolean isHaveAccount () {
+        return mHaveAccount;
     }
 
     @NonNull
