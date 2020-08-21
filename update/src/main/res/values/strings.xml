@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="txt_new_version_download">Идет загрузка новой версии приложения: %s</string>
+    <string name="update_progress_percent">%d %%</string>
+    <string name="downloaded_mb">Загружено %.2f mb</string>
+    <string name="total_mb">%.2f mb</string>
+</resources>

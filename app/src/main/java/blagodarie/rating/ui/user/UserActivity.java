@@ -32,6 +32,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.UUID;
 
+import blagodarie.rating.BuildConfig;
 import blagodarie.rating.R;
 import blagodarie.rating.auth.AccountGeneral;
 import blagodarie.rating.databinding.NavHeaderLayoutBinding;
@@ -42,11 +43,15 @@ import blagodarie.rating.ui.user.anytext.AnyTextFragment;
 import blagodarie.rating.ui.user.anytext.AnyTextFragmentDirections;
 import blagodarie.rating.ui.user.profile.ProfileFragment;
 import blagodarie.rating.ui.user.profile.ProfileFragmentDirections;
+import blagodarie.rating.update.NewVersionInfo;
+import blagodarie.rating.update.UpdateManager;
+import io.reactivex.disposables.CompositeDisposable;
 
 public final class UserActivity
         extends AppCompatActivity
         implements ProfileFragment.FragmentCommunicator,
-        AnyTextFragment.FragmentCommunicator {
+        AnyTextFragment.FragmentCommunicator,
+        UpdateManager.OnCheckUpdateListener {
 
     private static final String TAG = UserActivity.class.getSimpleName();
 
@@ -69,6 +74,8 @@ public final class UserActivity
     private NavController mNavController;
 
     private AppCompatImageView ivOwnAccountPhoto;
+
+    private CompositeDisposable mDisposables = new CompositeDisposable();
 
     @Override
     protected void onCreate (@Nullable final Bundle savedInstanceState) {
@@ -101,10 +108,39 @@ public final class UserActivity
                     this,
                     this::onAccountSelected
             );
+            mDisposables.add(
+                    UpdateManager.checkUpdate(
+                            BuildConfig.VERSION_CODE,
+                            this,
+                            throwable -> Toast.makeText(this, throwable.getLocalizedMessage(), Toast.LENGTH_LONG).show()
+                    )
+            );
         } else {
             Toast.makeText(this, R.string.err_msg_missing_data, Toast.LENGTH_LONG).show();
             finish();
         }
+    }
+
+    @Override
+    public void onHaveUpdate (@NonNull final NewVersionInfo newVersionInfo) {
+        Log.d(TAG, "onHaveUpdate");
+        Toast.makeText(this, "Доступна новая версия " + newVersionInfo.getVersionName(), Toast.LENGTH_LONG).show();
+        UpdateManager.startUpdate(
+                this,
+                getString(R.string.file_provider_authorities),
+                newVersionInfo
+        );
+    }
+
+    @Override
+    public void onNothingUpdate () {
+        Log.d(TAG, "onNothingUpdate");
+        Toast.makeText(this, R.string.info_msg_you_use_latest_version, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onUpdateFromMarket () {
+        Log.d(TAG, "onUpdateFromMarket");
     }
 
     @Override
@@ -343,6 +379,7 @@ public final class UserActivity
     protected void onDestroy () {
         Log.d(TAG, "onDestroy");
         super.onDestroy();
+        mDisposables.clear();
     }
 
     @Override

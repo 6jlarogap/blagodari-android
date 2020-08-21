@@ -12,9 +12,9 @@ android {
         versionCode 12
         versionName "0.0.12"
 
-        project.ext.set("archivesBaseName", "rating-" + defaultConfig.versionName);
+        project.ext.set("archivesBaseName", "rating-" + defaultConfig.versionName)
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        multiDexEnabled false
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -23,17 +23,21 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
-            manifestPlaceholders = [hostName:"blagodarie.org"]
+            manifestPlaceholders = [hostName: "blagodarie.org"]
+
+            resValue "string", "file_provider_authorities", "blagodarie.rating.files"
         }
         debug {
             debuggable true
             applicationIdSuffix ".dbg"
 
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
-            manifestPlaceholders = [hostName:"dev.blagodarie.org"]
+            manifestPlaceholders = [hostName: "dev.blagodarie.org"]
+
+            resValue "string", "file_provider_authorities", "blagodarie.rating.files"
         }
     }
 
@@ -61,6 +65,7 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation project(path: ':auth')
+    implementation project(path: ':update')
     implementation project(path: ':server')
     implementation "android.arch.paging:runtime:1.0.1"
     implementation 'androidx.appcompat:appcompat:1.2.0'
@@ -80,6 +85,7 @@ dependencies {
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
     implementation 'com.yandex.money.api:yandex-money-sdk-java:7.2.23'
+    implementation project(path: ':update')
 
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'

@@ -21,6 +21,7 @@
     <string name="rqst_enter_your_comment">Напишите ваш комментарий</string>
 
     <string name="info_msg_copied_to_clipboard">Скопировано в буффер обмена</string>
+    <string name="info_msg_you_use_latest_version">Вы используете последнюю версию</string>
     <string name="info_msg_function_in_developing">Функция в разработке</string>
 
     <string name="err_msg_account_not_created">Аккаунт не был создан</string>
