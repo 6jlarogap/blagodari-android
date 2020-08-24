@@ -5,6 +5,7 @@ import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -50,13 +51,12 @@ public final class SplashActivity
     }
 
     @Override
-    public void onNoAccount () {
-        addNewAccount(getString(R.string.account_type));
-    }
-
-    @Override
-    public void onAccountSelected (@NonNull final Account account) {
-        toProfile(account);
+    public void onAccountSelected (@Nullable final Account account) {
+        if (account != null) {
+            toProfile(account);
+        } else {
+            addNewAccount(getString(R.string.account_type));
+        }
     }
 
     private void addNewAccount (
@@ -106,5 +106,12 @@ public final class SplashActivity
         i.setData(Uri.parse(getString(R.string.url_profile, userId)));
         startActivity(i);
         finish();
+    }
+
+    public static Intent createSelfIntent (
+            @NonNull final Context context
+    ) {
+        Log.d(TAG, "createSelfIntent");
+        return new Intent(context, SplashActivity.class);
     }
 }

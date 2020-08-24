@@ -54,7 +54,6 @@ public final class SignUpFragment
         return view;
     }
 
-
     @Override
     public void onActivityCreated (@Nullable final Bundle savedInstanceState) {
         Log.d(TAG, "onActivityCreated");
@@ -133,8 +132,9 @@ public final class SignUpFragment
                     final String first_name = userJSON.getString("first_name");
                     final String middleName = userJSON.getString("middle_name");
                     final String lastName = userJSON.getString("last_name");
+                    final String photo = userJSON.getString("photo");
                     final String authToken = userJSON.getString("token");
-                    createAccount(userId, first_name, middleName, lastName, authToken);
+                    createAccount(userId, first_name, middleName, lastName, photo, authToken);
                 } catch (JSONException e) {
                     Log.e(TAG, Log.getStackTraceString(e));
                     Toast.makeText(requireActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
@@ -151,6 +151,7 @@ public final class SignUpFragment
             @NonNull final String firstName,
             @NonNull final String middleName,
             @NonNull final String lastName,
+            @NonNull final String photo,
             @NonNull final String authToken
     ) {
         Log.d(TAG, "createAccount");
@@ -162,6 +163,7 @@ public final class SignUpFragment
         userData.putString(AccountGeneral.USER_DATA_FIRST_NAME, firstName);
         userData.putString(AccountGeneral.USER_DATA_MIDDLE_NAME, middleName);
         userData.putString(AccountGeneral.USER_DATA_LAST_NAME, lastName);
+        userData.putString(AccountGeneral.USER_DATA_PHOTO, photo);
         accountManager.addAccountExplicitly(account, "", userData);
         accountManager.setAuthToken(account, getString(R.string.token_type), authToken);
 

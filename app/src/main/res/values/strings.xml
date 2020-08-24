@@ -1,33 +1,54 @@
 <resources>
     <string name="app_name">БлагоДари!</string>
 
+    <string name="host">blagodarie.org</string>
     <string name="url_profile">https://blagodarie.org/profile?id=%s</string>
+    <string name="url_wish">https://blagodarie.org/wish?id=%s</string>
+    <string name="url_any_text">https://blagodarie.org/anytext?text=%s</string>
 
     <string name="btn_thanks">Благодарить</string>
     <string name="btn_trustless">Утрата доверия</string>
     <string name="btn_cancel_trustless">Восстановить доверие</string>
+    <string name="btn_wishes">Желания</string>
+    <string name="btn_ability">Возможности</string>
+    <string name="btn_edit">Редактировать</string>
+    <string name="btn_delete">Удалить</string>
+    <string name="btn_save">Сохранить</string>
 
     <string name="rqst_choose_account">Выберите аккаунт</string>
     <string name="rqst_scan_qr_code">Отсканируйте QR-код</string>
+    <string name="rqst_enter_your_wish">Напишите ваше желание</string>
+    <string name="rqst_enter_your_comment">Напишите ваш комментарий</string>
 
     <string name="info_msg_copied_to_clipboard">Скопировано в буффер обмена</string>
+    <string name="info_msg_function_in_developing">Функция в разработке</string>
 
     <string name="err_msg_account_not_created">Аккаунт не был создан</string>
     <string name="err_msg_authentication_error">Ошибка аутентификации</string>
-    <string name="err_msg_missing_profile_user_id">Не указан идентификатор пользователя</string>
+    <string name="err_msg_missing_data">Осутствуют данные</string>
+    <string name="err_msg_missing_user_id">Не указан идентификатор пользователя</string>
+    <string name="err_msg_missing_wish">Не указано желание</string>
+    <string name="err_msg_missing_account">Не указан аккаунт</string>
     <string name="err_msg_incorrect_link">Неверная ссылка</string>
 
     <string name="txt_fame">Известность: %d</string>
-    <string name="txt_sum_thanks_count">Всего благодарностей: %d</string>
-    <string name="txt_trustless_count">Утраты доверия: %d</string>
-    <string name="txt_thanks_count">Мои благодарности: %d</string>
-    <string name="txt_is_trust">Доверие: %s</string>
+    <string name="txt_self_profile_thanks_count">Всего благодарностей: %d</string>
+    <string name="txt_thanks_count">Моих/всего благодарностей: %d/%d</string>
+    <string name="txt_self_profile_trust">Утраты доверия: %d</string>
+    <string name="txt_trust">Доверие/утраты: %s/%d</string>
     <string name="txt_yes">Да</string>
     <string name="txt_no">Нет</string>
     <string name="txt_card_number">Номер карты</string>
     <string name="txt_thanks_users">Поблагодарившие и отблагодаренные</string>
     <string name="txt_version">Версия: %s</string>
     <string name="txt_share">Потелиться</string>
+    <string name="txt_my_account">Мой профиль</string>
+    <string name="txt_logout">Выйти из аккаунта</string>
     <string name="txt_qr_code_scan">Сканировать QR-код</string>
+    <string name="txt_comment">Комментарий</string>
+
+    <string name="operation_type_name_thanks">Благодарность</string>
+    <string name="operation_type_name_trustless">Утрата доверия</string>
+    <string name="operation_type_name_trustless_cancel">Восстановление доверия</string>
 
 </resources>

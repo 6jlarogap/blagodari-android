@@ -2,15 +2,15 @@
 <layout>
 
     <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp">
+        android:layout_width="@dimen/thanks_user_photo_width"
+        android:layout_height="@dimen/thanks_user_photo_height"
+        android:layout_margin="@dimen/thanks_user_photo_margin">
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivPhoto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:scaleType="center" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerInside" />
 
     </androidx.cardview.widget.CardView>
 
@@ -18,7 +18,7 @@
 
         <variable
             name="ThanksUser"
-            type="blagodarie.rating.ui.profile.DisplayThanksUser" />
+            type="blagodarie.rating.ui.user.DisplayThanksUser" />
 
     </data>
 

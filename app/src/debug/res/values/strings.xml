@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">БлагоДари!-dbg</string>
 
+    <string name="host">dev.blagodarie.org</string>
     <string name="url_profile">https://dev.blagodarie.org/profile?id=%s</string>
+    <string name="url_wish">https://dev.blagodarie.org/wish?id=%s</string>
+    <string name="url_any_text">https://dev.blagodarie.org/anytext?text=%s</string>
 </resources>

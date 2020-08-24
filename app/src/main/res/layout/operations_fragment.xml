@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingHorizontal="@dimen/activity_horizontal_margin"
+        android:paddingVertical="@dimen/activity_vertical_margin">
+
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/srlRefreshProfileInfo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:refreshing="@{ViewModel.downloadInProgress}">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvOperations"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            android:onClick="@{() -> UserActionsListener.onAddOperation(OperationType.THANKS)}"
+            android:src="@drawable/heart"
+            android:visibility="@{!ViewModel.isOwnProfile() ? View.VISIBLE : View.GONE}"
+            app:backgroundTint="@android:color/white"
+            app:borderWidth="0dp"
+            app:elevation="2dp"
+            app:fabSize="normal"
+            app:maxImageSize="40dp"
+            app:pressedTranslationZ="12dp" />
+
+    </FrameLayout>
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <import type="blagodarie.rating.OperationType" />
+
+        <variable
+            name="UserActionsListener"
+            type="blagodarie.rating.ui.user.operations.OperationsUserActionListener" />
+
+        <variable
+            name="ViewModel"
+            type="blagodarie.rating.ui.user.operations.OperationsViewModel" />
+
+    </data>
+</layout>

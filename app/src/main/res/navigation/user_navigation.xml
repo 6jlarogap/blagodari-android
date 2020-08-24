@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/user_navigation"
+    app:startDestination="@id/startFragment2">
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="blagodarie.rating.ui.user.profile.ProfileFragment"
+        android:label="ProfileFragment" >
+        <argument
+            android:name="user_id"
+            app:argType="java.util.UUID" />
+        <argument
+            android:name="account"
+            app:argType="android.accounts.Account"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_profileFragment_to_operationsFragment"
+            app:destination="@id/operationsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_profileFragment_to_wishesFragment"
+            app:destination="@id/wishesFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/startFragment2"
+        android:name="blagodarie.rating.ui.user.StartFragment"
+        android:label="StartFragment" >
+        <action
+            android:id="@+id/action_startFragment2_to_profileFragment"
+            app:destination="@id/profileFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_startFragment2_to_anyTextFragment"
+            app:destination="@id/anyTextFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/operationsFragment"
+        android:name="blagodarie.rating.ui.user.operations.OperationsFragment"
+        android:label="OperationsFragment" >
+        <argument
+            android:name="user_id"
+            app:argType="java.util.UUID"
+            app:nullable="true" />
+        <argument
+            android:name="any_text_id"
+            app:argType="java.util.UUID"
+            app:nullable="true" />
+        <argument
+            android:name="account"
+            app:argType="android.accounts.Account"
+            app:nullable="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/wishesFragment"
+        android:name="blagodarie.rating.ui.user.wishes.WishesFragment"
+        android:label="WishesFragment" >
+        <argument
+            android:name="user_id"
+            app:argType="java.util.UUID" />
+        <argument
+            android:name="account"
+            app:argType="android.accounts.Account"
+            app:nullable="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/anyTextFragment"
+        android:name="blagodarie.rating.ui.user.anytext.AnyTextFragment"
+        android:label="AnyTextFragment" >
+        <action
+            android:id="@+id/action_anyTextFragment_to_operationsFragment"
+            app:destination="@id/operationsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <argument
+            android:name="any_text"
+            app:argType="string" />
+        <argument android:name="account"
+            app:argType="android.accounts.Account"
+            app:nullable="true" />
+    </fragment>
+</navigation>
