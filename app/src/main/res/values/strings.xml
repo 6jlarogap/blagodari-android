@@ -7,13 +7,14 @@
     <string name="url_any_text">https://blagodarie.org/anytext?text=%s</string>
 
     <string name="btn_thanks">Благодарить</string>
-    <string name="btn_trustless">Утрата доверия</string>
-    <string name="btn_cancel_trustless">Восстановить доверие</string>
+    <string name="btn_mistrust">Утрата доверия</string>
+    <string name="btn_cancel_mistrust">Восстановить доверие</string>
     <string name="btn_wishes">Желания</string>
     <string name="btn_ability">Возможности</string>
     <string name="btn_edit">Редактировать</string>
     <string name="btn_delete">Удалить</string>
     <string name="btn_save">Сохранить</string>
+    <string name="btn_update">Обновить</string>
 
     <string name="rqst_choose_account">Выберите аккаунт</string>
     <string name="rqst_scan_qr_code">Отсканируйте QR-код</string>
@@ -23,6 +24,9 @@
     <string name="info_msg_copied_to_clipboard">Скопировано в буффер обмена</string>
     <string name="info_msg_you_use_latest_version">Вы используете последнюю версию</string>
     <string name="info_msg_function_in_developing">Функция в разработке</string>
+    <string name="info_msg_update_available">Доступна новая версия</string>
+
+    <string name="qstn_want_load_new_version">Желаете загрузить новую версию %s?</string>
 
     <string name="err_msg_account_not_created">Аккаунт не был создан</string>
     <string name="err_msg_authentication_error">Ошибка аутентификации</string>
