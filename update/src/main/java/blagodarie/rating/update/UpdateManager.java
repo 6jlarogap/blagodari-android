@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import blagodarie.rating.server.ServerApiResponse;
+import blagodarie.rating.server.ServerConnector;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -36,10 +37,7 @@ public final class UpdateManager {
             @NonNull final OnErrorListener onErrorListener
     ) {
         return Observable.
-                fromCallable(() -> {
-                    //ServerConnector.sendRequestAndGetResponse("getratinglatestversion");
-                    return new ServerApiResponse(200, "{\"is_server_update\":true,\"version_code\":14,\"version_name\":\"0.0.14\",\"path\":\"https://github.com/6jlarogap/blagodari/raw/master/app/release/rating-0.0.3-release.apk\"}");
-                }).
+                fromCallable(() -> ServerConnector.sendRequestAndGetResponse("getratinglatestversion")).
                 subscribeOn(Schedulers.io()).
                 observeOn(AndroidSchedulers.mainThread()).
                 subscribe(
@@ -60,8 +58,8 @@ public final class UpdateManager {
                 case 200:
                     try {
                         final JSONObject json = new JSONObject(responseBody);
-                        final boolean isServerUpdate = json.getBoolean("is_server_update");
-                        if (isServerUpdate) {
+                        final boolean ratingGooglePlayUpdate = json.getBoolean("rating_google_play_update");
+                        if (!ratingGooglePlayUpdate) {
                             final int versionCode = json.getInt("version_code");
                             if (versionCode > currentCodeVersion) {
                                 final String versionName = json.getString("version_name");
