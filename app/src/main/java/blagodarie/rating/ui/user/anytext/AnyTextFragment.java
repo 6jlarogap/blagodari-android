@@ -261,8 +261,8 @@ public final class AnyTextFragment
                     final int sumThanksCount = userJSON.getInt("sum_thanks_count");
                     mViewModel.getSumThanksCount().set(sumThanksCount);
 
-                    final int trustlessCount = userJSON.getInt("trustless_count");
-                    mViewModel.getTrustlessCount().set(trustlessCount);
+                    final int mistrustCount = userJSON.getInt("trustless_count");
+                    mViewModel.getTrustlessCount().set(mistrustCount);
 
                     try {
                         final int thanksCount = userJSON.getInt("thanks_count");

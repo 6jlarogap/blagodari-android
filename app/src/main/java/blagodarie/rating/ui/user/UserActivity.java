@@ -3,6 +3,7 @@ package blagodarie.rating.ui.user;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.core.view.GravityCompat;
@@ -32,6 +34,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.UUID;
 
+import blagodarie.rating.BuildConfig;
 import blagodarie.rating.R;
 import blagodarie.rating.auth.AccountGeneral;
 import blagodarie.rating.databinding.NavHeaderLayoutBinding;
@@ -42,15 +45,21 @@ import blagodarie.rating.ui.user.anytext.AnyTextFragment;
 import blagodarie.rating.ui.user.anytext.AnyTextFragmentDirections;
 import blagodarie.rating.ui.user.profile.ProfileFragment;
 import blagodarie.rating.ui.user.profile.ProfileFragmentDirections;
+import blagodarie.rating.update.NewVersionInfo;
+import blagodarie.rating.update.UpdateManager;
+import io.reactivex.disposables.CompositeDisposable;
 
 public final class UserActivity
         extends AppCompatActivity
         implements ProfileFragment.FragmentCommunicator,
-        AnyTextFragment.FragmentCommunicator {
+        AnyTextFragment.FragmentCommunicator,
+        UpdateManager.OnCheckUpdateListener {
 
     private static final String TAG = UserActivity.class.getSimpleName();
 
     private static final String EXTRA_ANY_TEXT = "blagodarie.rating.ui.user.UserActivity.ANY_TEXT";
+
+    private static final String NEW_VERSION_NOTIFICATION_PREFERENCE = "blagodarie.rating.ui.user.UserActivity.newVersionNotification";
 
     private AccountManager mAccountManager;
 
@@ -69,6 +78,8 @@ public final class UserActivity
     private NavController mNavController;
 
     private AppCompatImageView ivOwnAccountPhoto;
+
+    private CompositeDisposable mDisposables = new CompositeDisposable();
 
     @Override
     protected void onCreate (@Nullable final Bundle savedInstanceState) {
@@ -101,10 +112,54 @@ public final class UserActivity
                     this,
                     this::onAccountSelected
             );
+            mDisposables.add(
+                    UpdateManager.checkUpdate(
+                            BuildConfig.VERSION_CODE,
+                            this,
+                            throwable -> Toast.makeText(this, throwable.getLocalizedMessage(), Toast.LENGTH_LONG).show()
+                    )
+            );
         } else {
             Toast.makeText(this, R.string.err_msg_missing_data, Toast.LENGTH_LONG).show();
             finish();
         }
+    }
+
+    @Override
+    public void onHaveUpdate (@NonNull final NewVersionInfo newVersionInfo) {
+        Log.d(TAG, "onHaveUpdate");
+
+        if (!getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).contains(newVersionInfo.getVersionName())) {
+            new AlertDialog.
+                    Builder(this).
+                    setTitle(R.string.info_msg_update_available).
+                    setMessage(String.format(getString(R.string.qstn_want_load_new_version), newVersionInfo.getVersionName())).
+                    setPositiveButton(
+                            R.string.btn_update,
+                            (dialogInterface, i) -> UpdateManager.startUpdate(
+                                    this,
+                                    getString(R.string.file_provider_authorities),
+                                    newVersionInfo)).
+                    setNegativeButton(android.R.string.cancel, null).
+                    create().
+                    show();
+            getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).
+                    edit().
+                    putInt(newVersionInfo.getVersionName(), newVersionInfo.getVersionCode()).
+                    apply();
+        }
+    }
+
+    @Override
+    public void onNothingUpdate () {
+        Log.d(TAG, "onNothingUpdate");
+        //do nothing
+    }
+
+    @Override
+    public void onUpdateFromMarket () {
+        Log.d(TAG, "onUpdateFromMarket");
+        //do nothing
     }
 
     @Override
@@ -343,6 +398,7 @@ public final class UserActivity
     protected void onDestroy () {
         Log.d(TAG, "onDestroy");
         super.onDestroy();
+        mDisposables.clear();
     }
 
     @Override

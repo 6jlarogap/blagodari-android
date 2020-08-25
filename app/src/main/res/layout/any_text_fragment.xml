@@ -117,7 +117,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
                             android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISTRUST)}"
-                            android:text="@string/btn_trustless"
+                            android:text="@string/btn_mistrust"
                             android:visibility="@{(ViewModel.isTrust == null || ViewModel.isTrust) ? View.VISIBLE : View.GONE}" />
 
                         <Button
@@ -126,7 +126,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
                             android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISTRUST_CANCEL)}"
-                            android:text="@string/btn_cancel_trustless"
+                            android:text="@string/btn_cancel_mistrust"
                             android:visibility="@{ViewModel.isTrust != null &amp;&amp; !ViewModel.isTrust ? View.VISIBLE : View.GONE}" />
 
                     </LinearLayout>

@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class GridAutofitLayoutManager
+public final class GridAutofitLayoutManager
         extends GridLayoutManager {
     private int columnWidth;
     private boolean isColumnWidthChanged = true;
