@@ -44,6 +44,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:gravity="center_horizontal"
+                        android:onClick="@{() -> UserActionListener.onKeys()}"
                         android:text='@{ViewModel.lastName + " " + ViewModel.firstName + (ViewModel.middleName.equals("") ? "" : " " + ViewModel.middleName)}' />
 
                     <androidx.appcompat.widget.AppCompatImageView

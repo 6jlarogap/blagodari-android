@@ -28,6 +28,13 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_profileFragment_to_keysFragment"
+            app:destination="@id/keysFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/startFragment2"
@@ -94,5 +101,34 @@
         <argument android:name="account"
             app:argType="android.accounts.Account"
             app:nullable="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/keysFragment"
+        android:name="blagodarie.rating.ui.user.keys.KeysFragment"
+        android:label="KeysFragment" >
+        <argument android:name="user_id"
+            app:argType="java.util.UUID" />
+        <argument
+            android:name="account"
+            app:argType="android.accounts.Account"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_keysFragment_to_addKeyFragment"
+            app:destination="@id/addKeyFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/addKeyFragment"
+        android:name="blagodarie.rating.ui.user.keys.AddKeyFragment"
+        android:label="AddKeyFragment" >
+        <argument
+            android:name="account"
+            app:argType="android.accounts.Account" />
+        <action
+            android:id="@+id/action_addKeyFragment_to_keysFragment"
+            app:destination="@id/keysFragment" />
     </fragment>
 </navigation>

@@ -19,13 +19,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.UUID;
 
-import blagodarie.rating.server.ServerApiResponse;
-import blagodarie.rating.server.ServerConnector;
+import blagodarie.rating.server.ServerApiClient;
+import blagodarie.rating.server.SignUpRequest;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -104,46 +101,18 @@ public final class SignUpFragment
             @NonNull final String googleTokenId
     ) {
         Log.d(TAG, "startSignUp");
-        final String content = String.format("{\"oauth\":{\"provider\":\"google\",\"token\":\"%s\"}}", googleTokenId);
-        Log.d(TAG, "content=" + content);
-
+        final ServerApiClient apiClient = new ServerApiClient();
+        final SignUpRequest signUpRequest = new SignUpRequest(googleTokenId);
         mDisposables.add(
                 Observable.
-                        fromCallable(() -> ServerConnector.sendRequestAndGetResponse("auth/signup", content)).
+                        fromCallable(() -> apiClient.execute(signUpRequest)).
                         subscribeOn(Schedulers.io()).
                         observeOn(AndroidSchedulers.mainThread()).
                         subscribe(
-                                this::extractDataFromServerApiResponse,
+                                signUpResponse -> createAccount(signUpResponse.getUserId(), signUpResponse.getFirstName(), signUpResponse.getMiddleName(), signUpResponse.getLastName(), signUpResponse.getPhoto(), signUpResponse.getAuthToken()),
                                 throwable -> Toast.makeText(requireActivity(), throwable.getMessage(), Toast.LENGTH_LONG).show()
                         )
         );
-    }
-
-    private void extractDataFromServerApiResponse (
-            @NonNull final ServerApiResponse serverApiResponse
-    ) {
-        if (serverApiResponse.getCode() == 200) {
-            if (serverApiResponse.getBody() != null) {
-                final String responseBody = serverApiResponse.getBody();
-                try {
-                    final JSONObject userJSON = new JSONObject(responseBody);
-                    final String userIdString = userJSON.getString("user_uuid");
-                    final UUID userId = UUID.fromString(userIdString);
-                    final String first_name = userJSON.getString("first_name");
-                    final String middleName = userJSON.getString("middle_name");
-                    final String lastName = userJSON.getString("last_name");
-                    final String photo = userJSON.getString("photo");
-                    final String authToken = userJSON.getString("token");
-                    createAccount(userId, first_name, middleName, lastName, photo, authToken);
-                } catch (JSONException e) {
-                    Log.e(TAG, Log.getStackTraceString(e));
-                    Toast.makeText(requireActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
-                } catch (IllegalArgumentException e) {
-                    Log.e(TAG, Log.getStackTraceString(e));
-                    Toast.makeText(requireActivity(), getString(R.string.err_msg_incorrect_user_id), Toast.LENGTH_LONG).show();
-                }
-            }
-        }
     }
 
     private void createAccount (

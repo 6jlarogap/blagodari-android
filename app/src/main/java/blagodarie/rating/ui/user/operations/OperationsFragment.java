@@ -98,6 +98,10 @@ public final class OperationsFragment
         mBinding = null;
     }
 
+    private void initOperationsAdapter () {
+        mOperationsAdapter = new OperationsAdapter();
+    }
+
     private void initBinding (
             @NonNull final LayoutInflater inflater,
             @Nullable final ViewGroup container
@@ -110,6 +114,18 @@ public final class OperationsFragment
         mViewModel = new ViewModelProvider(requireActivity()).get(OperationsViewModel.class);
         mViewModel.isHaveAccount().set(mAccount != null);
         mViewModel.isOwnProfile().set(mAccount != null && mUserId != null && mAccount.name.equals(mUserId.toString()));
+    }
+
+    private void setupBinding () {
+        mBinding.setViewModel(mViewModel);
+        mBinding.setUserActionsListener(this);
+        mBinding.rvOperations.setLayoutManager(new LinearLayoutManager(requireContext()));
+        mBinding.rvOperations.setAdapter(mOperationsAdapter);
+        mBinding.srlRefreshProfileInfo.setOnRefreshListener(() -> {
+            mViewModel.getDownloadInProgress().set(true);
+            refreshOperations();
+            mViewModel.getDownloadInProgress().set(false);
+        });
     }
 
     private void refreshOperations () {
@@ -126,22 +142,6 @@ public final class OperationsFragment
                         build()
         );
         mViewModel.getOperations().observe(requireActivity(), mOperationsAdapter::submitList);
-    }
-
-    private void setupBinding () {
-        mBinding.setViewModel(mViewModel);
-        mBinding.setUserActionsListener(this);
-        mBinding.rvOperations.setLayoutManager(new LinearLayoutManager(requireContext()));
-        mBinding.rvOperations.setAdapter(mOperationsAdapter);
-        mBinding.srlRefreshProfileInfo.setOnRefreshListener(() -> {
-            mViewModel.getDownloadInProgress().set(true);
-            refreshOperations();
-            mViewModel.getDownloadInProgress().set(false);
-        });
-    }
-
-    private void initOperationsAdapter () {
-        mOperationsAdapter = new OperationsAdapter();
     }
 
     @Override
