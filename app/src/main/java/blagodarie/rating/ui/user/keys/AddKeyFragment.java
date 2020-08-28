@@ -13,6 +13,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Locale;
 
@@ -20,6 +22,7 @@ import blagodarie.rating.R;
 import blagodarie.rating.databinding.AddKeyFragmentBinding;
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
+import blagodarie.rating.server.ServerException;
 import blagodarie.rating.ui.AccountProvider;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -138,10 +141,17 @@ public final class AddKeyFragment
             @NonNull final ServerApiResponse serverApiResponse) {
         Log.d(TAG, "extractDataFromServerApiResponse");
         if (serverApiResponse.getCode() == 200) {
-            Toast.makeText(requireContext(), R.string.info_msg_wish_saved, Toast.LENGTH_LONG).show();
+            Toast.makeText(requireContext(), R.string.info_msg_key_saved, Toast.LENGTH_LONG).show();
             mFragmentCommunicator.onKeyAdded();
         } else {
-            Toast.makeText(requireContext(), R.string.err_msg_save_wish_failed, Toast.LENGTH_LONG).show();
+            if (serverApiResponse.getBody() != null) {
+                try {
+                    final JSONObject jsonObject = new JSONObject(serverApiResponse.getBody());
+                    String errorMessage = jsonObject.getString("message");
+                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show();
+                } catch (JSONException e) {
+                }
+            }
         }
     }
 }

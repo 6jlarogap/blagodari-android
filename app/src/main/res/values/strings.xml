@@ -9,6 +9,7 @@
     <string name="btn_thanks">Благодарить</string>
     <string name="btn_mistrust">Утрата доверия</string>
     <string name="btn_cancel_mistrust">Восстановить доверие</string>
+    <string name="btn_keys">Ключи</string>
     <string name="btn_wishes">Желания</string>
     <string name="btn_ability">Возможности</string>
     <string name="btn_edit">Редактировать</string>
