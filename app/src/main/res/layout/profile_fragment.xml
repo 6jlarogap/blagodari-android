@@ -180,6 +180,12 @@
                     <Button
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:onClick="@{() -> UserActionListener.onKeys()}"
+                        android:text="@string/btn_keys" />
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:onClick="@{() -> UserActionListener.onWishes()}"
                         android:text="@string/btn_wishes" />
 

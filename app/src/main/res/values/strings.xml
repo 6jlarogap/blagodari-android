@@ -9,6 +9,7 @@
     <string name="btn_thanks">Благодарить</string>
     <string name="btn_mistrust">Утрата доверия</string>
     <string name="btn_cancel_mistrust">Восстановить доверие</string>
+    <string name="btn_keys">Ключи</string>
     <string name="btn_wishes">Желания</string>
     <string name="btn_ability">Возможности</string>
     <string name="btn_edit">Редактировать</string>
@@ -51,9 +52,15 @@
     <string name="txt_logout">Выйти из аккаунта</string>
     <string name="txt_qr_code_scan">Сканировать QR-код</string>
     <string name="txt_comment">Комментарий</string>
+    <string name="txt_key">%s: %s</string>
 
     <string name="operation_type_name_thanks">Благодарность</string>
     <string name="operation_type_name_trustless">Утрата доверия</string>
     <string name="operation_type_name_trustless_cancel">Восстановление доверия</string>
+
+    <string name="key_type_phone">Телефон</string>
+    <string name="key_type_email">Емэйл</string>
+    <string name="key_type_credit_card">Номер карты</string>
+    <string name="key_type_link">Ссылка</string>
 
 </resources>

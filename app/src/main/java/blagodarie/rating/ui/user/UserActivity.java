@@ -43,6 +43,8 @@ import blagodarie.rating.ui.AccountProvider;
 import blagodarie.rating.ui.splash.SplashActivity;
 import blagodarie.rating.ui.user.anytext.AnyTextFragment;
 import blagodarie.rating.ui.user.anytext.AnyTextFragmentDirections;
+import blagodarie.rating.ui.user.keys.KeysFragment;
+import blagodarie.rating.ui.user.keys.KeysFragmentDirections;
 import blagodarie.rating.ui.user.profile.ProfileFragment;
 import blagodarie.rating.ui.user.profile.ProfileFragmentDirections;
 import blagodarie.rating.update.NewVersionInfo;
@@ -53,7 +55,8 @@ public final class UserActivity
         extends AppCompatActivity
         implements ProfileFragment.FragmentCommunicator,
         AnyTextFragment.FragmentCommunicator,
-        UpdateManager.OnCheckUpdateListener {
+        UpdateManager.OnCheckUpdateListener,
+        KeysFragment.FragmentCommunicator {
 
     private static final String TAG = UserActivity.class.getSimpleName();
 
@@ -427,4 +430,17 @@ public final class UserActivity
         Toast.makeText(this, getString(R.string.info_msg_function_in_developing), Toast.LENGTH_LONG).show();
     }
 
+    @Override
+    public void toKeysFromProfile () {
+        Log.d(TAG, "toKeysFromProfile");
+        final NavDirections action = ProfileFragmentDirections.actionProfileFragmentToKeysFragment(mUserId, mAccount);
+        mNavController.navigate(action);
+    }
+
+    @Override
+    public void toAddKey () {
+        Log.d(TAG, "toAddKey");
+        final NavDirections action = KeysFragmentDirections.actionKeysFragmentToAddKeyFragment(mAccount);
+        mNavController.navigate(action);
+    }
 }

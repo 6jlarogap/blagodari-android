@@ -14,13 +14,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.BindingAdapter;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
@@ -41,7 +39,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -49,7 +46,6 @@ import blagodarie.rating.OperationManager;
 import blagodarie.rating.OperationType;
 import blagodarie.rating.R;
 import blagodarie.rating.auth.AccountGeneral;
-import blagodarie.rating.databinding.EnterOperationCommentDialogBinding;
 import blagodarie.rating.databinding.ProfileFragmentBinding;
 import blagodarie.rating.databinding.ThanksUserItemBinding;
 import blagodarie.rating.server.ServerApiResponse;
@@ -74,6 +70,8 @@ public final class ProfileFragment
         void toWishes ();
 
         void toAbilities ();
+
+        void toKeysFromProfile ();
     }
 
     private static final String TAG = ProfileFragment.class.getSimpleName();
@@ -470,6 +468,11 @@ public final class ProfileFragment
     @Override
     public void onAbilities () {
         mFragmentCommunicator.toAbilities();
+    }
+
+    @Override
+    public void onKeys () {
+        mFragmentCommunicator.toKeysFromProfile();
     }
 
     private void updateCardNumber (
