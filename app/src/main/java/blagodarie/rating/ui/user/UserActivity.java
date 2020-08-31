@@ -43,8 +43,6 @@ import blagodarie.rating.ui.AccountProvider;
 import blagodarie.rating.ui.splash.SplashActivity;
 import blagodarie.rating.ui.user.anytext.AnyTextFragment;
 import blagodarie.rating.ui.user.anytext.AnyTextFragmentDirections;
-import blagodarie.rating.ui.user.keys.AddKeyFragment;
-import blagodarie.rating.ui.user.keys.AddKeyFragmentDirections;
 import blagodarie.rating.ui.user.keys.KeysFragment;
 import blagodarie.rating.ui.user.keys.KeysFragmentDirections;
 import blagodarie.rating.ui.user.profile.ProfileFragment;
@@ -58,8 +56,7 @@ public final class UserActivity
         implements ProfileFragment.FragmentCommunicator,
         AnyTextFragment.FragmentCommunicator,
         UpdateManager.OnCheckUpdateListener,
-        KeysFragment.FragmentCommunicator,
-        AddKeyFragment.FragmentCommunicator {
+        KeysFragment.FragmentCommunicator {
 
     private static final String TAG = UserActivity.class.getSimpleName();
 
@@ -437,13 +434,6 @@ public final class UserActivity
     public void toKeysFromProfile () {
         Log.d(TAG, "toKeysFromProfile");
         final NavDirections action = ProfileFragmentDirections.actionProfileFragmentToKeysFragment(mUserId, mAccount);
-        mNavController.navigate(action);
-    }
-
-    @Override
-    public void onKeyAdded () {
-        Log.d(TAG, "onKeyAdded");
-        final NavDirections action = AddKeyFragmentDirections.actionAddKeyFragmentToKeysFragment(mUserId, mAccount);
         mNavController.navigate(action);
     }
 

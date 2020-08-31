@@ -127,8 +127,5 @@
         <argument
             android:name="account"
             app:argType="android.accounts.Account" />
-        <action
-            android:id="@+id/action_addKeyFragment_to_keysFragment"
-            app:destination="@id/keysFragment" />
     </fragment>
 </navigation>

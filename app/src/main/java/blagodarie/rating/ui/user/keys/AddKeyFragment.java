@@ -22,7 +22,6 @@ import blagodarie.rating.R;
 import blagodarie.rating.databinding.AddKeyFragmentBinding;
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
-import blagodarie.rating.server.ServerException;
 import blagodarie.rating.ui.AccountProvider;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -32,10 +31,6 @@ import io.reactivex.schedulers.Schedulers;
 public final class AddKeyFragment
         extends Fragment {
 
-    public interface FragmentCommunicator {
-        void onKeyAdded ();
-    }
-
     private static final String TAG = AddKeyFragment.class.getSimpleName();
 
     private AddKeyFragmentBinding mBinding;
@@ -44,8 +39,6 @@ public final class AddKeyFragment
 
     @NonNull
     private CompositeDisposable mDisposables = new CompositeDisposable();
-
-    private FragmentCommunicator mFragmentCommunicator;
 
     @NotNull
     @Override
@@ -75,12 +68,6 @@ public final class AddKeyFragment
     @Override
     public void onActivityCreated (@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        try {
-            mFragmentCommunicator = (FragmentCommunicator) requireActivity();
-        } catch (ClassCastException e) {
-            Log.e(TAG, requireActivity().getClass().getName() + " must implement " + FragmentCommunicator.class.getName());
-            throw new ClassCastException(requireActivity().getClass().getName() + " must implement " + FragmentCommunicator.class.getName());
-        }
 
         setupBinding();
     }
@@ -142,7 +129,7 @@ public final class AddKeyFragment
         Log.d(TAG, "extractDataFromServerApiResponse");
         if (serverApiResponse.getCode() == 200) {
             Toast.makeText(requireContext(), R.string.info_msg_key_saved, Toast.LENGTH_LONG).show();
-            mFragmentCommunicator.onKeyAdded();
+            requireActivity().onBackPressed();
         } else {
             if (serverApiResponse.getBody() != null) {
                 try {

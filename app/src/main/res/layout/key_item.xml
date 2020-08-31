@@ -11,7 +11,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{Key.value}" />
+            android:singleLine="true"
+            android:text='@{KeyName}' />
 
     </androidx.cardview.widget.CardView>
 
@@ -20,5 +21,11 @@
         <variable
             name="Key"
             type="blagodarie.rating.ui.user.keys.Key" />
+
+        <variable
+            name="KeyName"
+            type="String" />
+
     </data>
+
 </layout>

@@ -63,6 +63,13 @@ public final class KeysAdapter
         ) {
             itemView.setOnClickListener(onKeyClickListener);
             mBinding.setKey(key);
+            mBinding.setKeyName(
+                    String.format(
+                            mBinding.getRoot().getContext().getString(R.string.txt_key),
+                            mBinding.getRoot().getContext().getString(key.getKeyType().getNameResId()),
+                            key.getValue()
+                    )
+            );
         }
     }
 
