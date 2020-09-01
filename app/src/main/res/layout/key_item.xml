@@ -11,7 +11,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:singleLine="true"
+            android:layout_margin="5dp"
             android:text='@{KeyName}' />
 
     </androidx.cardview.widget.CardView>

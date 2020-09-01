@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -36,6 +37,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -473,6 +476,13 @@ public final class ProfileFragment
     @Override
     public void onKeys () {
         mFragmentCommunicator.toKeysFromProfile();
+    }
+
+    @Override
+    public void onSocialGraph () {
+        final Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(String.format(getString(R.string.url_social_graph), mAccount.name, mUserId)));
+        startActivity(i);
     }
 
     private void updateCardNumber (

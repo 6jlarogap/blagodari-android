@@ -25,4 +25,6 @@ public interface ProfileUserActionListener {
     void onAbilities ();
 
     void onKeys ();
+
+    void onSocialGraph ();
 }

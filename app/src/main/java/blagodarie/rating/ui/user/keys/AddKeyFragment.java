@@ -96,7 +96,13 @@ public final class AddKeyFragment
 
     private void setupBinding () {
         Log.d(TAG, "setupBinding");
-        mBinding.btnSave.setOnClickListener(view -> AccountProvider.getAuthToken(requireActivity(), mAccount, this::addKey));
+        mBinding.btnSave.setOnClickListener(view -> {
+            if (!mBinding.etValue.getText().toString().isEmpty()) {
+                AccountProvider.getAuthToken(requireActivity(), mAccount, this::addKey);
+            } else {
+                mBinding.etValue.setError(getString(R.string.err_msg_required_to_fill));
+            }
+        });
     }
 
     private void addKey (
