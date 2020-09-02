@@ -55,7 +55,8 @@
                         android:layout_margin="5dp"
                         android:adjustViewBounds="true"
                         android:maxWidth="200dp"
-                        android:scaleType="centerInside" />
+                        android:scaleType="centerInside"
+                        android:src="@drawable/account_200dp" />
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/ivQRCode"
