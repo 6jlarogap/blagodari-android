@@ -191,7 +191,7 @@ public final class KeysFragment
                             subscribeOn(Schedulers.io()).
                             observeOn(AndroidSchedulers.mainThread()).
                             subscribe(
-                                    this::extractDataFromServerApiResponse,
+                                    this::onUpdateKeyComplete,
                                     throwable -> Toast.makeText(requireContext(), throwable.getMessage(), Toast.LENGTH_LONG).show()
                             )
             );
@@ -206,18 +206,39 @@ public final class KeysFragment
                             subscribeOn(Schedulers.io()).
                             observeOn(AndroidSchedulers.mainThread()).
                             subscribe(
-                                    this::extractDataFromServerApiResponse,
+                                    this::onDeleteKeyComplete,
                                     throwable -> Toast.makeText(requireContext(), throwable.getMessage(), Toast.LENGTH_LONG).show()
                             )
             );
         }
     }
 
-    private void extractDataFromServerApiResponse (
-            @NonNull final ServerApiResponse serverApiResponse) {
+    private void onUpdateKeyComplete (
+            @NonNull final ServerApiResponse serverApiResponse
+    ) {
         Log.d(TAG, "extractDataFromServerApiResponse");
         if (serverApiResponse.getCode() == 200) {
             Toast.makeText(requireContext(), R.string.info_msg_key_saved, Toast.LENGTH_LONG).show();
+            refreshKeys();
+        } else {
+            if (serverApiResponse.getBody() != null) {
+                try {
+                    final JSONObject jsonObject = new JSONObject(serverApiResponse.getBody());
+                    String errorMessage = jsonObject.getString("message");
+                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show();
+                } catch (JSONException e) {
+                    Toast.makeText(requireContext(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    }
+
+    private void onDeleteKeyComplete (
+            @NonNull final ServerApiResponse serverApiResponse
+    ) {
+        Log.d(TAG, "extractDataFromServerApiResponse");
+        if (serverApiResponse.getCode() == 200) {
+            Toast.makeText(requireContext(), R.string.info_msg_key_deleted, Toast.LENGTH_LONG).show();
             refreshKeys();
         } else {
             if (serverApiResponse.getBody() != null) {

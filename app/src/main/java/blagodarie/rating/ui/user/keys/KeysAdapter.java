@@ -3,8 +3,11 @@ package blagodarie.rating.ui.user.keys;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -105,22 +108,29 @@ public final class KeysAdapter
                 @Override
                 public void onEditClick () {
                     final Context context = mBinding.getRoot().getContext();
+                    final InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
                     final EditText etKeyValue = new EditText(context);
                     etKeyValue.setText(key.getValue());
-                    new AlertDialog.
+                    final AlertDialog dialog = new AlertDialog.
                             Builder(context).
                             setTitle(R.string.rqst_enter_key).
                             setView(etKeyValue).
-                            setPositiveButton(R.string.btn_update, (dialogInterface, i) -> {
-                                if (!etKeyValue.getText().toString().isEmpty()) {
-                                    adapterCommunicator.onEditKey(new Key(key.getId(), key.getOwnerId(), etKeyValue.getText().toString(), key.getKeyType()));
-                                } else {
-                                    etKeyValue.setError(context.getString(R.string.err_msg_required_to_fill));
-                                }
-                            }).
-                            setNegativeButton(R.string.btn_cancel, null).
-                            create().
-                            show();
+                            setPositiveButton(R.string.btn_update, null).
+                            setNegativeButton(R.string.btn_cancel, (dialogInterface, i) -> imm.hideSoftInputFromWindow(etKeyValue.getWindowToken(), 0)).
+                            create();
+                    dialog.show();
+
+                    dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
+                        if (!etKeyValue.getText().toString().isEmpty()) {
+                            imm.hideSoftInputFromWindow(etKeyValue.getWindowToken(), 0);
+                            dialog.dismiss();
+                            adapterCommunicator.onEditKey(new Key(key.getId(), key.getOwnerId(), etKeyValue.getText().toString(), key.getKeyType()));
+                        } else {
+                            etKeyValue.setError(context.getString(R.string.err_msg_required_to_fill));
+                        }
+                    });
+                    etKeyValue.requestFocus();
+                    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
                 }
 
                 @Override
