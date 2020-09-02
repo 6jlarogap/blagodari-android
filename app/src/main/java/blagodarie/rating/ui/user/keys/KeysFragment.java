@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,17 +17,27 @@ import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 
+import blagodarie.rating.R;
 import blagodarie.rating.databinding.KeysFragmentBinding;
+import blagodarie.rating.server.ServerApiResponse;
+import blagodarie.rating.server.ServerConnector;
+import blagodarie.rating.ui.AccountProvider;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 public final class KeysFragment
         extends Fragment
         implements KeysUserActionListener,
-        OnKeyClickListener {
+        KeysAdapter.AdapterCommunicator {
 
     public interface FragmentCommunicator {
         void toAddKey ();
@@ -107,7 +118,7 @@ public final class KeysFragment
 
     private void initKeysAdapter () {
         Log.d(TAG, "initKeysAdapter");
-        mKeysAdapter = new KeysAdapter(this);
+        mKeysAdapter = new KeysAdapter((mAccount != null && mAccount.name.equals(mUserId.toString())), this);
     }
 
     private void initBinding (
@@ -160,8 +171,85 @@ public final class KeysFragment
         mFragmentCommunicator.toAddKey();
     }
 
-    @Override
-    public void onClick (@NonNull final Key key) {
 
+    @Override
+    public void onEditKey (@NonNull final Key key) {
+        AccountProvider.getAuthToken(requireActivity(), mAccount, authToken -> editKey(authToken, key));
+    }
+
+    @Override
+    public void onDeleteKey (@NonNull final Key key) {
+        AccountProvider.getAuthToken(requireActivity(), mAccount, authToken -> deleteKey(authToken, key));
+    }
+
+    public void editKey (@Nullable final String authToken, @NonNull final Key key) {
+        if (authToken != null) {
+            final String content = String.format(Locale.ENGLISH, "{\"id\":%d,\"value\":\"%s\",\"type_id\":%d}", key.getId(), key.getValue(), key.getKeyType().getId());
+            mDisposables.add(
+                    Observable.
+                            fromCallable(() -> ServerConnector.sendAuthRequestAndGetResponse("updatekey", authToken, content)).
+                            subscribeOn(Schedulers.io()).
+                            observeOn(AndroidSchedulers.mainThread()).
+                            subscribe(
+                                    this::onUpdateKeyComplete,
+                                    throwable -> Toast.makeText(requireContext(), throwable.getMessage(), Toast.LENGTH_LONG).show()
+                            )
+            );
+        }
+    }
+
+    public void deleteKey (@Nullable final String authToken, @NonNull final Key key) {
+        if (authToken != null) {
+            mDisposables.add(
+                    Observable.
+                            fromCallable(() -> ServerConnector.sendAuthRequestAndGetResponse(String.format(Locale.ENGLISH, "deletekey?id=%d", key.getId()), authToken)).
+                            subscribeOn(Schedulers.io()).
+                            observeOn(AndroidSchedulers.mainThread()).
+                            subscribe(
+                                    this::onDeleteKeyComplete,
+                                    throwable -> Toast.makeText(requireContext(), throwable.getMessage(), Toast.LENGTH_LONG).show()
+                            )
+            );
+        }
+    }
+
+    private void onUpdateKeyComplete (
+            @NonNull final ServerApiResponse serverApiResponse
+    ) {
+        Log.d(TAG, "extractDataFromServerApiResponse");
+        if (serverApiResponse.getCode() == 200) {
+            Toast.makeText(requireContext(), R.string.info_msg_key_saved, Toast.LENGTH_LONG).show();
+            refreshKeys();
+        } else {
+            if (serverApiResponse.getBody() != null) {
+                try {
+                    final JSONObject jsonObject = new JSONObject(serverApiResponse.getBody());
+                    String errorMessage = jsonObject.getString("message");
+                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show();
+                } catch (JSONException e) {
+                    Toast.makeText(requireContext(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    }
+
+    private void onDeleteKeyComplete (
+            @NonNull final ServerApiResponse serverApiResponse
+    ) {
+        Log.d(TAG, "extractDataFromServerApiResponse");
+        if (serverApiResponse.getCode() == 200) {
+            Toast.makeText(requireContext(), R.string.info_msg_key_deleted, Toast.LENGTH_LONG).show();
+            refreshKeys();
+        } else {
+            if (serverApiResponse.getBody() != null) {
+                try {
+                    final JSONObject jsonObject = new JSONObject(serverApiResponse.getBody());
+                    String errorMessage = jsonObject.getString("message");
+                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show();
+                } catch (JSONException e) {
+                    Toast.makeText(requireContext(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        }
     }
 }
