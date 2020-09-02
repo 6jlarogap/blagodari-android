@@ -11,10 +11,10 @@
       "type": "SINGLE",
       "filters": [],
       "properties": [],
-      "versionCode": 15,
-      "versionName": "0.0.15",
+      "versionCode": 16,
+      "versionName": "0.0.16",
       "enabled": true,
-      "outputFile": "rating-0.0.15-release.apk"
+      "outputFile": "rating-0.0.16-release.apk"
     }
   ]
 }
