@@ -303,7 +303,7 @@ public final class ProfileFragment
                         final int thanksCount = userJSON.getInt("thanks_count");
                         mViewModel.getThanksCount().set(thanksCount);
                     } catch (JSONException e) {
-                        mViewModel.getThanksCount().set(null);
+                        mViewModel.getThanksCount().set(0);
                     }
 
                     try {
