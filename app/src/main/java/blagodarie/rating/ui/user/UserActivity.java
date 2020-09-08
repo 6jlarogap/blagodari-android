@@ -28,6 +28,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.squareup.picasso.Picasso;
@@ -128,6 +129,28 @@ public final class UserActivity
         }
     }
 
+    private static void subscribeOnFirebaseNotifications (@NonNull final String userId) {
+        FirebaseMessaging.getInstance().subscribeToTopic("user_" + userId)
+                .addOnCompleteListener(task -> {
+                    String msg = "subscribed";
+                    if (!task.isSuccessful()) {
+                        msg = "subscribe failed";
+                    }
+                    Log.d(TAG, msg);
+                });
+    }
+
+    private static void unSubscribeOnFirebaseNotifications (@NonNull final String userId) {
+        FirebaseMessaging.getInstance().unsubscribeFromTopic("user_" + userId)
+                .addOnCompleteListener(task -> {
+                    String msg = "unsubscribed";
+                    if (!task.isSuccessful()) {
+                        msg = "unsubscribe failed";
+                    }
+                    Log.d(TAG, msg);
+                });
+    }
+
     @Override
     public void onHaveUpdate (@NonNull final NewVersionInfo newVersionInfo) {
         Log.d(TAG, "onHaveUpdate");
@@ -182,6 +205,7 @@ public final class UserActivity
         Log.d(TAG, "onAccountSelected account=" + (account != null ? account.toString() : "null"));
         if (account != null) {
             mAccount = account;
+            subscribeOnFirebaseNotifications(mAccount.name);
             mViewModel.getOwnAccountPhotoUrl().setValue(mAccountManager.getUserData(mAccount, AccountGeneral.USER_DATA_PHOTO));
         }
         mActivityBinding.nvNavigation.getMenu().findItem(R.id.miLogout).setEnabled(mAccount != null);
@@ -280,6 +304,7 @@ public final class UserActivity
     }
 
     private void logout () {
+        unSubscribeOnFirebaseNotifications(mAccount.name);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
             mAccountManager.removeAccount(
                     mAccount,

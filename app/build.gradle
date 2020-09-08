@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'androidx.navigation.safeargs'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 30
@@ -9,12 +10,12 @@ android {
         applicationId "blagodarie.rating"
         minSdkVersion 19
         targetSdkVersion 30
-        versionCode 18
-        versionName "0.0.18"
+        versionCode 19
+        versionName "0.0.19"
 
         project.ext.set("archivesBaseName", "rating-" + defaultConfig.versionName)
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        multiDexEnabled false
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -31,8 +32,8 @@ android {
             debuggable true
             applicationIdSuffix ".dbg"
 
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
             manifestPlaceholders = [hostName: "dev.blagodarie.org"]
@@ -86,6 +87,9 @@ dependencies {
 
     implementation 'com.yandex.money.api:yandex-money-sdk-java:7.2.23'
     implementation project(path: ':update')
+
+    implementation 'com.google.firebase:firebase-messaging:20.2.4'
+    implementation 'com.google.firebase:firebase-analytics:17.5.0'
 
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
