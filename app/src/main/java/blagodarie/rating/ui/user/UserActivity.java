@@ -236,7 +236,11 @@ public final class UserActivity
             final MenuItem miMyAccount = menu.findItem(R.id.miOwnAccount);
             miMyAccount.setVisible(true);
             ivOwnAccountPhoto = miMyAccount.getActionView().findViewById(R.id.ivOwnAccountPhoto);
-            mViewModel.getOwnAccountPhotoUrl().observe(this, s -> Picasso.get().load(s).into(ivOwnAccountPhoto));
+            mViewModel.getOwnAccountPhotoUrl().observe(this, s -> {
+                if (s != null && !s.isEmpty()) {
+                    Picasso.get().load(s).into(ivOwnAccountPhoto);
+                }
+            });
             ivOwnAccountPhoto.setOnClickListener(view -> {
                 if (mViewModel.isOwnProfile().get()) {
                     if (mNavController.getCurrentDestination() != null) {
