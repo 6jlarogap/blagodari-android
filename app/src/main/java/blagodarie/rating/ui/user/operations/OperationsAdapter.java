@@ -11,14 +11,25 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.UUID;
+
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.OperationItemBinding;
 
 final class OperationsAdapter
         extends PagedListAdapter<Operation, OperationsAdapter.OperationViewHolder> {
 
-    protected OperationsAdapter () {
+    interface OnItemClickListener {
+        void onClick (@NonNull final UUID userId);
+    }
+
+    private final OnItemClickListener mOnItemClickListener;
+
+    protected OperationsAdapter (
+            @NonNull final OnItemClickListener onItemClickListener
+    ) {
         super(DIFF_CALLBACK);
+        mOnItemClickListener = onItemClickListener;
     }
 
     @NonNull
@@ -39,7 +50,7 @@ final class OperationsAdapter
     ) {
         final Operation operation = getItem(position);
         if (operation != null) {
-            holder.bind(operation);
+            holder.bind(operation, mOnItemClickListener);
         }
     }
 
@@ -55,10 +66,12 @@ final class OperationsAdapter
         }
 
         void bind (
-                @NonNull final Operation operation
+                @NonNull final Operation operation,
+                @NonNull final OnItemClickListener onItemClickListener
         ) {
             mBinding.setOperation(operation);
             mBinding.setOperationName(mBinding.getRoot().getContext().getString(operation.getOperationType().getNameResId()));
+            mBinding.ivPhoto.setOnClickListener(view -> onItemClickListener.onClick(operation.getUserIdFrom()));
             Picasso.get().load(operation.getPhoto()).into(mBinding.ivPhoto);
         }
     }

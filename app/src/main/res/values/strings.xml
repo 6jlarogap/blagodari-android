@@ -59,8 +59,8 @@
     <string name="err_msg_required_to_fill">Обязательно для заполнения</string>
 
     <string name="txt_fame">Известность: %d</string>
-    <string name="txt_self_profile_thanks_count">Всего благодарностей: %d</string>
-    <string name="txt_thanks_count">Моих/всего благодарностей: %d/%d</string>
+    <string name="txt_self_profile_thanks_count">Благодарности: %d</string>
+    <string name="txt_thanks_count">Благодарности/мои: %d/%d</string>
     <string name="txt_self_profile_trust">Утраты доверия: %d</string>
     <string name="txt_trust">Доверие/утраты: %s/%d</string>
     <string name="txt_yes">Да</string>
