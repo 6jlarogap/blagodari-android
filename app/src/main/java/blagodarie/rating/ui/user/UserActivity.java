@@ -62,6 +62,7 @@ public final class UserActivity
     private static final String TAG = UserActivity.class.getSimpleName();
 
     private static final String EXTRA_ANY_TEXT = "blagodarie.rating.ui.user.UserActivity.ANY_TEXT";
+    public static final String EXTRA_TO_OPERATIONS = "blagodarie.rating.ui.user.UserActivity.TO_OPERATIONS";
 
     private static final String NEW_VERSION_NOTIFICATION_PREFERENCE = "blagodarie.rating.ui.user.UserActivity.newVersionNotification";
 
@@ -212,6 +213,9 @@ public final class UserActivity
         mViewModel.isOwnProfile().set(mAccount != null && mUserId != null && mAccount.name.equals(mUserId.toString()));
         if (mUserId != null) {
             toProfile();
+            if (getIntent().getBooleanExtra(EXTRA_TO_OPERATIONS, false)) {
+                toOperationsFromProfile();
+            }
         } else if (mAnyText != null) {
             toAnyText();
         }

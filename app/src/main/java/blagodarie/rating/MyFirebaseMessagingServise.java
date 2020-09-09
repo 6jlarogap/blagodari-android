@@ -2,8 +2,12 @@ package blagodarie.rating;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -12,11 +16,14 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+
+import blagodarie.rating.ui.user.UserActivity;
 
 public class MyFirebaseMessagingServise
         extends FirebaseMessagingService {
@@ -87,11 +94,32 @@ public class MyFirebaseMessagingServise
                 }
             }
 
+
+            // Create an explicit intent for an Activity in your app
+            final Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(getString(R.string.url_profile, remoteMessage.getFrom().replace("/topics/user_", ""))));
+            i.putExtra(UserActivity.EXTRA_TO_OPERATIONS, true);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_launcher);
+            Bitmap bitmap = Bitmap.createBitmap(
+                    drawable.getIntrinsicWidth(),
+                    drawable.getIntrinsicHeight(),
+                    Bitmap.Config.ARGB_8888
+            );
+
+            Canvas canvas = new Canvas(bitmap);
+            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            drawable.draw(canvas);
+
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
                     .setSmallIcon(R.drawable.ic_launcher)
+                    .setColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary))
                     .setContentTitle(title)
                     .setContentText(comment)
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                    .setContentIntent(pendingIntent)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setAutoCancel(true);
 
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

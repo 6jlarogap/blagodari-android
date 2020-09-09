@@ -1,6 +1,8 @@
 package blagodarie.rating.ui.user.operations;
 
 import android.accounts.Account;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,6 +24,7 @@ import java.util.concurrent.Executors;
 
 import blagodarie.rating.OperationManager;
 import blagodarie.rating.OperationType;
+import blagodarie.rating.R;
 import blagodarie.rating.databinding.OperationsFragmentBinding;
 import blagodarie.rating.ui.AccountProvider;
 import io.reactivex.disposables.CompositeDisposable;
@@ -99,7 +102,11 @@ public final class OperationsFragment
     }
 
     private void initOperationsAdapter () {
-        mOperationsAdapter = new OperationsAdapter();
+        mOperationsAdapter = new OperationsAdapter(userId -> {
+            final Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(getString(R.string.url_profile, userId.toString())));
+            startActivity(i);
+        });
     }
 
     private void initBinding (
