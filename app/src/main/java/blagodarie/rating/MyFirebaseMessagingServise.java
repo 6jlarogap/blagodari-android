@@ -101,17 +101,6 @@ public class MyFirebaseMessagingServise
             i.putExtra(UserActivity.EXTRA_TO_OPERATIONS, true);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
 
-            Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_launcher);
-            Bitmap bitmap = Bitmap.createBitmap(
-                    drawable.getIntrinsicWidth(),
-                    drawable.getIntrinsicHeight(),
-                    Bitmap.Config.ARGB_8888
-            );
-
-            Canvas canvas = new Canvas(bitmap);
-            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-            drawable.draw(canvas);
-
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
                     .setSmallIcon(R.drawable.ic_launcher)
                     .setColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary))
