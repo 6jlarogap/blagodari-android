@@ -20,7 +20,7 @@
         android:label="SignInFragment" >
         <argument
             android:name="user_id"
-            app:argType="long" />
+            app:argType="java.util.UUID" />
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"

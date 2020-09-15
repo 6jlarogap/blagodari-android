@@ -18,19 +18,15 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.UUID;
 
-import java.util.Locale;
-
-import blagodarie.rating.server.ServerApiResponse;
-import blagodarie.rating.server.ServerConnector;
+import blagodarie.rating.server.ServerApiClient;
+import blagodarie.rating.server.SignInRequest;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
-import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
 public final class SignInFragment
@@ -38,9 +34,7 @@ public final class SignInFragment
 
     private static final String TAG = SignInFragment.class.getSimpleName();
 
-    static final Long DEFAULT_USER_ID = Long.MIN_VALUE;
-
-    private Long mUserId;
+    private UUID mUserId;
 
     private CompositeDisposable mDisposables = new CompositeDisposable();
 
@@ -63,18 +57,9 @@ public final class SignInFragment
     ) {
         Log.d(TAG, "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
-        if (getArguments() != null) {
-            mUserId = SignInFragmentArgs.fromBundle(getArguments()).getUserId();
-            if (mUserId.equals(DEFAULT_USER_ID)) {
-                Toast.makeText(requireActivity(), getString(R.string.err_msg_no_user_id), Toast.LENGTH_LONG).show();
-                requireActivity().setResult(RESULT_CANCELED);
-                requireActivity().finish();
-            }
-        } else {
-            Toast.makeText(requireActivity(), getString(R.string.err_msg_no_user_id), Toast.LENGTH_LONG).show();
-            requireActivity().setResult(RESULT_CANCELED);
-            requireActivity().finish();
-        }
+        final SignInFragmentArgs args = SignInFragmentArgs.fromBundle(requireArguments());
+
+        mUserId = args.getUserId();
     }
 
     @Override
@@ -129,37 +114,18 @@ public final class SignInFragment
             @NonNull final String googleTokenId
     ) {
         Log.d(TAG, "startSignIn");
-        final String content = String.format(Locale.ENGLISH, "{\"oauth\":{\"provider\":\"google\",\"token\":\"%s\"},\"user_id\":%d}", googleTokenId, mUserId);
-        Log.d(TAG, "content=" + content);
-
+        final ServerApiClient apiClient = new ServerApiClient();
+        final SignInRequest signInRequest = new SignInRequest(googleTokenId, mUserId.toString());
         mDisposables.add(
                 Observable.
-                        fromCallable(() -> ServerConnector.sendRequestAndGetResponse("auth/signin", content)).
+                        fromCallable(() -> apiClient.execute(signInRequest)).
                         subscribeOn(Schedulers.io()).
                         observeOn(AndroidSchedulers.mainThread()).
                         subscribe(
-                                this::extractDataFromServerApiResponse,
+                                signInResponse -> finishSignIn(signInResponse.getAuthToken()),
                                 throwable -> Toast.makeText(requireActivity(), throwable.getMessage(), Toast.LENGTH_LONG).show()
                         )
         );
-    }
-
-    private void extractDataFromServerApiResponse (
-            @NonNull final ServerApiResponse serverApiResponse
-    ) {
-        if (serverApiResponse.getCode() == 200) {
-            if (serverApiResponse.getBody() != null) {
-                final String responseBody = serverApiResponse.getBody();
-                try {
-                    final JSONObject userJSON = new JSONObject(responseBody);
-                    final String authToken = userJSON.getString("token");
-                    finishSignIn(authToken);
-                } catch (JSONException e) {
-                    Log.e(TAG, Log.getStackTraceString(e));
-                    Toast.makeText(requireActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            }
-        }
     }
 
     private void finishSignIn (

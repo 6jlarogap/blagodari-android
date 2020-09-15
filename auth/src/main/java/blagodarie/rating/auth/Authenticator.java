@@ -11,6 +11,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import java.util.UUID;
+
 public final class Authenticator
         extends AbstractAccountAuthenticator {
 
@@ -72,7 +74,7 @@ public final class Authenticator
         if (options != null) {
             bundle.putAll(options);
         }
-        final Long userId = Long.valueOf(AccountManager.get(mContext).getUserData(account, AccountGeneral.USER_DATA_USER_ID));
+        final UUID userId = UUID.fromString(AccountManager.get(mContext).getUserData(account, AccountGeneral.USER_DATA_USER_ID));
         final Intent intent = AuthenticationActivity.createSelfIntent(mContext, account.type, userId, response);
         bundle.putParcelable(AccountManager.KEY_INTENT, intent);
         return bundle;
