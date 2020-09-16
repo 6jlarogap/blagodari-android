@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import blagodarie.rating.OperationManager;
+import blagodarie.rating.OperationToAnyTextManager;
 import blagodarie.rating.OperationType;
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.AnyTextFragmentBinding;
@@ -44,7 +44,6 @@ import blagodarie.rating.server.GetProfileInfoResponse;
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
 import blagodarie.rating.ui.AccountProvider;
-import blagodarie.rating.ui.user.DisplayThanksUser;
 import blagodarie.rating.ui.user.GridAutofitLayoutManager;
 import blagodarie.rating.ui.user.ThanksUserAdapter;
 import io.reactivex.Observable;
@@ -327,21 +326,19 @@ public final class AnyTextFragment
     public void onAddOperation (@NonNull final OperationType operationType) {
         Log.d(TAG, "onAddOperation");
         if (mAccount != null) {
-            new OperationManager(
-                    OperationManager.Type.TO_ANY_TEXT,
-                    (textId) -> {
-                        mAnyTextId = UUID.fromString(textId);
-                        mViewModel.getAnyTextId().set(mAnyTextId);
-                        refreshAnyTextData();
-                    }
-            ).
-                    createOperation(
+            new OperationToAnyTextManager().
+                    createOperationToAnyText(
                             requireActivity(),
                             mDisposables,
                             mAccount,
                             mAnyTextId,
                             mAnyText,
-                            operationType
+                            operationType,
+                            (textId) -> {
+                                mAnyTextId = textId;
+                                mViewModel.getAnyTextId().set(mAnyTextId);
+                                refreshAnyTextData();
+                            }
                     );
         } else {
             AccountProvider.createAccount(
@@ -350,21 +347,19 @@ public final class AnyTextFragment
                         if (account != null) {
                             mAccount = account;
                             mViewModel.isHaveAccount().set(true);
-                            new OperationManager(
-                                    OperationManager.Type.TO_ANY_TEXT,
-                                    (textId) -> {
-                                        mAnyTextId = UUID.fromString(textId);
-                                        mViewModel.getAnyTextId().set(mAnyTextId);
-                                        refreshAnyTextData();
-                                    }
-                            ).
-                                    createOperation(
+                            new OperationToAnyTextManager().
+                                    createOperationToAnyText(
                                             requireActivity(),
                                             mDisposables,
                                             mAccount,
                                             mAnyTextId,
                                             mAnyText,
-                                            operationType
+                                            operationType,
+                                            (textId) -> {
+                                                mAnyTextId = textId;
+                                                mViewModel.getAnyTextId().set(mAnyTextId);
+                                                refreshAnyTextData();
+                                            }
                                     );
                         }
                     }

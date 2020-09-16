@@ -37,7 +37,7 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.UUID;
 
-import blagodarie.rating.OperationManager;
+import blagodarie.rating.OperationToUserManager;
 import blagodarie.rating.OperationType;
 import blagodarie.rating.R;
 import blagodarie.rating.auth.AccountGeneral;
@@ -295,17 +295,14 @@ public final class ProfileFragment
     public void onAddOperation (@NonNull final OperationType operationType) {
         Log.d(TAG, "onAddOperation");
         if (mAccount != null) {
-            new OperationManager(
-                    OperationManager.Type.TO_USER,
-                    textId -> refreshProfileData()
-            ).
-                    createOperation(
+            new OperationToUserManager().
+                    createOperationToUser(
                             requireActivity(),
                             mDisposables,
                             mAccount,
                             mUserId,
-                            null,
-                            operationType
+                            operationType,
+                            this::refreshProfileData
                     );
         } else {
             AccountProvider.createAccount(
@@ -316,17 +313,14 @@ public final class ProfileFragment
                             mViewModel.isHaveAccount().set(true);
                             mViewModel.isOwnProfile().set(mAccount.name.equals(mUserId.toString()));
                             if (!mViewModel.isOwnProfile().get()) {
-                                new OperationManager(
-                                        OperationManager.Type.TO_USER,
-                                        textId -> refreshProfileData()
-                                ).
-                                        createOperation(
+                                new OperationToUserManager().
+                                        createOperationToUser(
                                                 requireActivity(),
                                                 mDisposables,
                                                 mAccount,
                                                 mUserId,
-                                                null,
-                                                operationType
+                                                operationType,
+                                                this::refreshProfileData
                                         );
                             }
                         }

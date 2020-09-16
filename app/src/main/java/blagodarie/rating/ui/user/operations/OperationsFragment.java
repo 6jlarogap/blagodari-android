@@ -22,7 +22,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 
-import blagodarie.rating.OperationManager;
+import blagodarie.rating.OperationToAnyTextManager;
+import blagodarie.rating.OperationToUserManager;
 import blagodarie.rating.OperationType;
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.OperationsFragmentBinding;
@@ -155,18 +156,28 @@ public final class OperationsFragment
     public void onAddOperation (@NonNull final OperationType operationType) {
         Log.d(TAG, "onAddOperation");
         if (mAccount != null) {
-            new OperationManager(
-                    (mUserId != null ? OperationManager.Type.TO_USER : OperationManager.Type.TO_ANY_TEXT),
-                    textId -> refreshOperations()
-            ).
-                    createOperation(
-                            requireActivity(),
-                            mDisposables,
-                            mAccount,
-                            (mUserId != null ? mUserId : mAnyTextId),
-                            null,
-                            operationType
-                    );
+            if (mUserId != null){
+                new OperationToUserManager().
+                        createOperationToUser(
+                                requireActivity(),
+                                mDisposables,
+                                mAccount,
+                                mUserId,
+                                operationType,
+                                this::refreshOperations
+                        );
+            } else {
+                new OperationToAnyTextManager().
+                        createOperationToAnyText(
+                                requireActivity(),
+                                mDisposables,
+                                mAccount,
+                                mAnyTextId,
+                                "",
+                                operationType,
+                                (textId) -> refreshOperations()
+                        );
+            }
         } else {
             AccountProvider.createAccount(
                     requireActivity(),
@@ -176,18 +187,28 @@ public final class OperationsFragment
                             mViewModel.isHaveAccount().set(true);
                             mViewModel.isOwnProfile().set(mAccount.name.equals(mUserId.toString()));
                             if (!mViewModel.isOwnProfile().get()) {
-                                new OperationManager(
-                                        (mUserId != null ? OperationManager.Type.TO_USER : OperationManager.Type.TO_ANY_TEXT),
-                                        textId -> refreshOperations()
-                                ).
-                                        createOperation(
-                                                requireActivity(),
-                                                mDisposables,
-                                                mAccount,
-                                                (mUserId != null ? mUserId : mAnyTextId),
-                                                null,
-                                                operationType
-                                        );
+                                if (mUserId != null){
+                                    new OperationToUserManager().
+                                            createOperationToUser(
+                                                    requireActivity(),
+                                                    mDisposables,
+                                                    mAccount,
+                                                    mUserId,
+                                                    operationType,
+                                                    this::refreshOperations
+                                            );
+                                } else {
+                                    new OperationToAnyTextManager().
+                                            createOperationToAnyText(
+                                                    requireActivity(),
+                                                    mDisposables,
+                                                    mAccount,
+                                                    mAnyTextId,
+                                                    "",
+                                                    operationType,
+                                                    (textId) -> refreshOperations()
+                                            );
+                                }
                             }
                         }
                     }

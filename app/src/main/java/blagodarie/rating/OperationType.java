@@ -8,9 +8,9 @@ public enum OperationType {
     MISTRUST(2, R.string.operation_type_name_trustless),
     MISTRUST_CANCEL(3, R.string.operation_type_name_trustless_cancel);
 
-    final int mId;
+    private final int mId;
 
-    final int mNameResId;
+    private final int mNameResId;
 
     OperationType (
             final int id,
