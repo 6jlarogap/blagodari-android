@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModel;
 import java.util.List;
 import java.util.UUID;
 
-import blagodarie.rating.ui.user.DisplayThanksUser;
+import blagodarie.rating.server.GetProfileInfoResponse;
 
 public final class AnyTextViewModel
         extends ViewModel {
@@ -63,7 +63,7 @@ public final class AnyTextViewModel
     }
 
     @NonNull
-    private final MutableLiveData<List<DisplayThanksUser>> mThanksUsers = new MutableLiveData<>();
+    private final MutableLiveData<List<GetProfileInfoResponse.ThanksUser>> mThanksUsers = new MutableLiveData<>();
 
     @NonNull
     public final ObservableInt getSumThanksCount () {
@@ -100,7 +100,7 @@ public final class AnyTextViewModel
     }
 
     @NonNull
-    public MutableLiveData<List<DisplayThanksUser>> getThanksUsers () {
+    public MutableLiveData<List<GetProfileInfoResponse.ThanksUser>> getThanksUsers () {
         return mThanksUsers;
     }
 }

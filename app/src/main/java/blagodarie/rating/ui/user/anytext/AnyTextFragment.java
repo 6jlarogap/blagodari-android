@@ -40,6 +40,7 @@ import blagodarie.rating.OperationType;
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.AnyTextFragmentBinding;
 import blagodarie.rating.databinding.ThanksUserItemBinding;
+import blagodarie.rating.server.GetProfileInfoResponse;
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
 import blagodarie.rating.ui.AccountProvider;
@@ -147,7 +148,7 @@ public final class AnyTextFragment
         Log.d(TAG, "onThanksUserClick");
         final ThanksUserItemBinding thanksUserItemBinding = DataBindingUtil.findBinding(view);
         if (thanksUserItemBinding != null) {
-            final String userId = thanksUserItemBinding.getThanksUser().getUserUUID();
+            final String userId = thanksUserItemBinding.getThanksUser().getUserId().toString();
             final Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(getString(R.string.url_profile, userId)));
             startActivity(i);
@@ -278,13 +279,13 @@ public final class AnyTextFragment
                         mViewModel.getIsTrust().set(null);
                     }
 
-                    final List<DisplayThanksUser> thanksUsers = new ArrayList<>();
+                    final List<GetProfileInfoResponse.ThanksUser> thanksUsers = new ArrayList<>();
                     final JSONArray thanksUsersJSONArray = userJSON.getJSONArray("thanks_users");
                     for (int i = 0; i < thanksUsersJSONArray.length(); i++) {
                         final JSONObject thanksUserJSONObject = thanksUsersJSONArray.getJSONObject(i);
                         final String thanksUserPhoto = thanksUserJSONObject.getString("photo");
                         final String thanksUserUUID = thanksUserJSONObject.getString("user_uuid");
-                        thanksUsers.add(new DisplayThanksUser(thanksUserPhoto, thanksUserUUID));
+                        thanksUsers.add(new GetProfileInfoResponse.ThanksUser(UUID.fromString(thanksUserUUID), thanksUserPhoto));
                     }
                     mViewModel.getThanksUsers().setValue(thanksUsers);
 

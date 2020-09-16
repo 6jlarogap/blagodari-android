@@ -35,6 +35,13 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_profileFragment_to_graphFragment"
+            app:destination="@id/graphFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/startFragment2"
@@ -127,5 +134,13 @@
         <argument
             android:name="account"
             app:argType="android.accounts.Account" />
+    </fragment>
+    <fragment
+        android:id="@+id/graphFragment"
+        android:name="blagodarie.rating.ui.user.graph.GraphFragment"
+        android:label="GraphFragment" >
+        <argument
+            android:name="user_id"
+            app:argType="java.util.UUID" />
     </fragment>
 </navigation>

@@ -6,6 +6,7 @@
     <string name="url_wish">https://blagodarie.org/wish?id=%s</string>
     <string name="url_any_text">https://blagodarie.org/anytext?text=%s</string>
     <string name="url_social_graph">https://blagodarie.org/socialgraph?from=%s&amp;to=%s</string>
+    <string name="url_prof">https://blagodarie.org/prof?id=%s</string>
 
     <string name="notification_chanel_id_thanks" translatable="false">thanks_notification_chanel</string>
     <string name="notification_chanel_name_thanks">Благодарности</string>

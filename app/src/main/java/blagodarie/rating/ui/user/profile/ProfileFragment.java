@@ -14,7 +14,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -33,15 +32,8 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -51,10 +43,12 @@ import blagodarie.rating.R;
 import blagodarie.rating.auth.AccountGeneral;
 import blagodarie.rating.databinding.ProfileFragmentBinding;
 import blagodarie.rating.databinding.ThanksUserItemBinding;
+import blagodarie.rating.server.GetProfileInfoRequest;
+import blagodarie.rating.server.GetProfileInfoResponse;
+import blagodarie.rating.server.ServerApiClient;
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
 import blagodarie.rating.ui.AccountProvider;
-import blagodarie.rating.ui.user.DisplayThanksUser;
 import blagodarie.rating.ui.user.GridAutofitLayoutManager;
 import blagodarie.rating.ui.user.ThanksUserAdapter;
 import blagodarie.rating.ui.user.UserViewModel;
@@ -75,6 +69,8 @@ public final class ProfileFragment
         void toAbilities ();
 
         void toKeysFromProfile ();
+
+        void toGraph ();
     }
 
     private static final String TAG = ProfileFragment.class.getSimpleName();
@@ -219,7 +215,7 @@ public final class ProfileFragment
         Log.d(TAG, "onThanksUserClick");
         final ThanksUserItemBinding thanksUserItemBinding = DataBindingUtil.findBinding(view);
         if (thanksUserItemBinding != null) {
-            final String userId = thanksUserItemBinding.getThanksUser().getUserUUID();
+            final String userId = thanksUserItemBinding.getThanksUser().getUserId().toString();
             final Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(getString(R.string.url_profile, userId)));
             startActivity(i);
@@ -231,121 +227,47 @@ public final class ProfileFragment
     ) {
         Log.d(TAG, "downloadProfileData");
         mViewModel.getDownloadInProgress().set(true);
+
+        final ServerApiClient apiClient = new ServerApiClient();
+        apiClient.setAuthToken(authToken);
+        final GetProfileInfoRequest getProfileInfoRequest = new GetProfileInfoRequest(mUserId.toString());
         mDisposables.add(
                 Observable.
-                        fromCallable(() -> {
-                            if (authToken != null) {
-                                return ServerConnector.sendAuthRequestAndGetResponse("getprofileinfo?uuid=" + mUserId.toString(), authToken);
-                            } else {
-                                return ServerConnector.sendRequestAndGetResponse("getprofileinfo?uuid=" + mUserId.toString());
-                            }
-                        }).
+                        fromCallable(() -> apiClient.execute(getProfileInfoRequest)).
                         subscribeOn(Schedulers.io()).
                         observeOn(AndroidSchedulers.mainThread()).
                         subscribe(
-                                serverApiResponse -> {
+                                getProfileInfoResponse -> {
                                     mViewModel.getDownloadInProgress().set(false);
-                                    extractDataFromServerApiResponse(serverApiResponse);
+                                    handleGetProfileInfoResponse(getProfileInfoResponse);
                                 },
                                 throwable -> {
                                     mViewModel.getDownloadInProgress().set(false);
-                                    Toast.makeText(requireContext(), throwable.getMessage(), Toast.LENGTH_LONG).show();
+                                    Toast.makeText(requireActivity(), throwable.getMessage(), Toast.LENGTH_LONG).show();
                                 }
                         )
         );
     }
 
-    private void extractDataFromServerApiResponse (ServerApiResponse serverApiResponse) {
-        Log.d(TAG, "extractDataFromServerApiResponse");
-        if (serverApiResponse.getCode() == 200) {
-            if (serverApiResponse.getBody() != null) {
-                final String responseBody = serverApiResponse.getBody();
-                try {
-                    final JSONObject userJSON = new JSONObject(responseBody);
-
-                    final String photo = userJSON.getString("photo");
-                    mViewModel.getPhoto().set(photo);
-
-                    if (mViewModel.isOwnProfile().get()) {
-                        AccountManager.get(requireContext()).setUserData(mAccount, AccountGeneral.USER_DATA_PHOTO, photo);
-                        new ViewModelProvider(requireActivity()).get(UserViewModel.class).getOwnAccountPhotoUrl().setValue(photo);
-                    }
-
-                    final String lastName = userJSON.getString("last_name");
-                    mViewModel.getLastName().set(lastName);
-
-                    final String first_name = userJSON.getString("first_name");
-                    mViewModel.getFirstName().set(first_name);
-
-                    final String middleName = userJSON.getString("middle_name");
-                    mViewModel.getMiddleName().set(middleName);
-
-                    try {
-                        String cardNumber = userJSON.getString("credit_card");
-                        if (cardNumber.equals("null")) {
-                            cardNumber = "";
-                        }
-                        mViewModel.getCardNumber().set(cardNumber);
-                    } catch (JSONException e) {
-                        mViewModel.getCardNumber().set("");
-                    }
-
-                    final int fame = userJSON.getInt("fame");
-                    mViewModel.getFame().set(fame);
-
-                    final int sumThanksCount = userJSON.getInt("sum_thanks_count");
-                    mViewModel.getSumThanksCount().set(sumThanksCount);
-
-                    final int trustlessCount = userJSON.getInt("trustless_count");
-                    mViewModel.getTrustlessCount().set(trustlessCount);
-
-                    try {
-                        final int thanksCount = userJSON.getInt("thanks_count");
-                        mViewModel.getThanksCount().set(thanksCount);
-                    } catch (JSONException e) {
-                        mViewModel.getThanksCount().set(0);
-                    }
-
-                    try {
-                        final boolean isTrust = userJSON.getBoolean("is_trust");
-                        mViewModel.getIsTrust().set(isTrust);
-                    } catch (JSONException e) {
-                        mViewModel.getIsTrust().set(null);
-                    }
-
-                    final List<DisplayThanksUser> thanksUsers = new ArrayList<>();
-                    final JSONArray thanksUsersJSONArray = userJSON.getJSONArray("thanks_users");
-                    for (int i = 0; i < thanksUsersJSONArray.length(); i++) {
-                        final JSONObject thanksUserJSONObject = thanksUsersJSONArray.getJSONObject(i);
-                        final String thanksUserPhoto = thanksUserJSONObject.getString("photo");
-                        final String thanksUserUUID = thanksUserJSONObject.getString("user_uuid");
-                        thanksUsers.add(new DisplayThanksUser(thanksUserPhoto, thanksUserUUID));
-                    }
-                    mViewModel.getThanksUsers().setValue(thanksUsers);
-
-                } catch (JSONException e) {
-                    Log.e(TAG, Log.getStackTraceString(e));
-                    Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-                } catch (IllegalArgumentException e) {
-                    Log.e(TAG, Log.getStackTraceString(e));
-                    Toast.makeText(requireContext(), getString(blagodarie.rating.auth.R.string.err_msg_incorrect_user_id), Toast.LENGTH_LONG).show();
-                }
-            }
-
-        } else if (serverApiResponse.getCode() == 400) {
-            if (serverApiResponse.getBody() != null) {
-                final String responseBody = serverApiResponse.getBody();
-                try {
-                    final JSONObject userJSON = new JSONObject(responseBody);
-                    final String message = userJSON.getString("message");
-                    Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
-                    requireActivity().finish();
-                } catch (JSONException e) {
-                    Log.e(TAG, Log.getStackTraceString(e));
-                    Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            }
+    private void handleGetProfileInfoResponse (
+            @NonNull final GetProfileInfoResponse getProfileInfoResponse
+    ) {
+        Log.d(TAG, "handleGetProfileInfoResponse");
+        mViewModel.getPhoto().set(getProfileInfoResponse.getPhoto());
+        if (mViewModel.isOwnProfile().get()) {
+            AccountManager.get(requireContext()).setUserData(mAccount, AccountGeneral.USER_DATA_PHOTO, getProfileInfoResponse.getPhoto());
+            new ViewModelProvider(requireActivity()).get(UserViewModel.class).getOwnAccountPhotoUrl().setValue(getProfileInfoResponse.getPhoto());
         }
+        mViewModel.getFirstName().set(getProfileInfoResponse.getFirstName());
+        mViewModel.getMiddleName().set(getProfileInfoResponse.getMiddleName());
+        mViewModel.getLastName().set(getProfileInfoResponse.getLastName());
+        mViewModel.getCardNumber().set(getProfileInfoResponse.getCardNumber());
+        mViewModel.getFame().set(getProfileInfoResponse.getFame());
+        mViewModel.getSumThanksCount().set(getProfileInfoResponse.getSumThanksCount());
+        mViewModel.getTrustlessCount().set(getProfileInfoResponse.getMistrustCount());
+        mViewModel.getThanksCount().set((getProfileInfoResponse.getThanksCount() != null ? getProfileInfoResponse.getThanksCount() : 0));
+        mViewModel.getIsTrust().set(getProfileInfoResponse.getIsTrust());
+        mViewModel.getThanksUsers().setValue(getProfileInfoResponse.getThanksUsers());
     }
 
     @BindingAdapter({"imageUrl"})
@@ -480,9 +402,12 @@ public final class ProfileFragment
 
     @Override
     public void onSocialGraph () {
+        mFragmentCommunicator.toGraph();
+        /*
         final Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(String.format(getString(R.string.url_social_graph), mAccount.name, mUserId)));
         startActivity(i);
+        */
     }
 
     private void updateCardNumber (

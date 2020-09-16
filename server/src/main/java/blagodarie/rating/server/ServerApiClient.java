@@ -32,7 +32,7 @@ public final class ServerApiClient {
     }
 
     public void setAuthToken (
-            final String mAuthToken
+            @Nullable final String mAuthToken
     ) {
         this.mAuthToken = mAuthToken;
     }
