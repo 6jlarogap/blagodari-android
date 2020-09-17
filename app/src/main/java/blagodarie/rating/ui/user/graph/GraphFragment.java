@@ -24,7 +24,7 @@ import blagodarie.rating.ui.user.operations.OperationsFragment;
 import blagodarie.rating.ui.user.operations.OperationsFragmentArgs;
 
 public class GraphFragment
-extends Fragment {
+        extends Fragment {
 
     private static final String TAG = GraphFragment.class.getSimpleName();
 
@@ -62,7 +62,7 @@ extends Fragment {
         mBinding.wbGraph.getSettings().setUseWideViewPort(true);
         mBinding.wbGraph.getSettings().setBuiltInZoomControls(true);
         mBinding.wbGraph.getSettings().setSupportZoom(true);
-        mBinding.wbGraph.loadUrl(String.format(getString(R.string.url_prof), "01b8788f-1a84-4257-9a59-9c22488bdea6"));
+        mBinding.wbGraph.loadUrl(String.format(getString(R.string.url_profile), mUserId.toString()) + "&from_app=1");
     }
 
     private void initBinding (
