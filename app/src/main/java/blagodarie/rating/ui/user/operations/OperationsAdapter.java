@@ -69,9 +69,9 @@ final class OperationsAdapter
                 @NonNull final Operation operation,
                 @NonNull final OnItemClickListener onItemClickListener
         ) {
+            itemView.setOnClickListener(view -> onItemClickListener.onClick(operation.getUserIdFrom()));
             mBinding.setOperation(operation);
             mBinding.setOperationName(mBinding.getRoot().getContext().getString(operation.getOperationType().getNameResId()));
-            mBinding.ivPhoto.setOnClickListener(view -> onItemClickListener.onClick(operation.getUserIdFrom()));
             Picasso.get().load(operation.getPhoto()).into(mBinding.ivPhoto);
         }
     }
