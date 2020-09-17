@@ -34,14 +34,14 @@ public final class SignUpRequest
     protected SignUpResponse parseOkResponse (
             @NonNull final String responseBody
     ) throws JSONException {
-        final JSONObject userJSON = new JSONObject(responseBody);
-        final String userIdString = userJSON.getString("user_uuid");
+        final JSONObject json = new JSONObject(responseBody);
+        final String userIdString = json.getString("user_uuid");
         final UUID userId = UUID.fromString(userIdString);
-        final String firstName = userJSON.getString("first_name");
-        final String middleName = userJSON.getString("middle_name");
-        final String lastName = userJSON.getString("last_name");
-        final String photo = userJSON.getString("photo");
-        final String authToken = userJSON.getString("token");
+        final String firstName = json.getString("first_name");
+        final String middleName = json.getString("middle_name");
+        final String lastName = json.getString("last_name");
+        final String photo = json.getString("photo");
+        final String authToken = json.getString("token");
         return new SignUpResponse(
                 userId,
                 firstName,
@@ -51,7 +51,6 @@ public final class SignUpRequest
                 authToken
         );
     }
-
 
     private String createContent () {
         return String.format("{\"oauth\":{\"provider\":\"google\",\"token\":\"%s\"}}", mGoogleToken);

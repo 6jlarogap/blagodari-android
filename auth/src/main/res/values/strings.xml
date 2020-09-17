@@ -14,6 +14,7 @@
     <string name="info_msg_trust_is_lost">Доверие утрачено</string>
     <string name="info_msg_trust_restored">Доверие восстановлено</string>
     <string name="info_msg_in_developing">Функция в разработке</string>
+    <string name="info_msg_saved">Сохранено</string>
 
     <string name="err_msg_no_user_id">Отсутствует идентификатор пользователя</string>
     <string name="err_msg_incorrect_user_id">Некорректный идентификатор пользователя</string>

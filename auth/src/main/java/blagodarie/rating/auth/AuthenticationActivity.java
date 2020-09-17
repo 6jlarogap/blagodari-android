@@ -23,6 +23,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 
 public final class AuthenticationActivity
@@ -56,7 +57,14 @@ public final class AuthenticationActivity
         mNavController = Navigation.findNavController(this, R.id.nav_host_fragment);
 
         if (getIntent().hasExtra(EXTRA_USER_ID)) {
-            toSignIn();
+            final UUID userId = (UUID) getIntent().getSerializableExtra(EXTRA_USER_ID);
+            if (userId != null) {
+                toSignIn(userId);
+            } else {
+                Toast.makeText(this, getString(R.string.err_msg_no_user_id), Toast.LENGTH_LONG).show();
+                setResult(RESULT_CANCELED);
+                finish();
+            }
         } else {
             final Account[] accounts = AccountManager.get(this).getAccountsByType(getString(R.string.account_type));
             Log.d(TAG, "existing accounts=" + Arrays.toString(accounts));
@@ -110,18 +118,13 @@ public final class AuthenticationActivity
     public static Intent createSelfIntent (
             @NonNull final Context context,
             @NonNull final String accountType,
-            @NonNull final Long userId,
+            @NonNull final UUID userId,
             final AccountAuthenticatorResponse response
     ) {
         Log.d(TAG, "createSelfIntent");
         final Intent intent = createSelfIntent(context, accountType, response);
         intent.putExtra(EXTRA_USER_ID, userId);
         return intent;
-    }
-
-    public void toSignUp () {
-        Log.d(TAG, "toSignUp");
-        mNavController.navigate(R.id.action_startFragment_to_signUpFragment);
     }
 
     @Override
@@ -143,9 +146,14 @@ public final class AuthenticationActivity
         mResultBundle = result;
     }
 
-    void toSignIn () {
+    public void toSignUp () {
+        Log.d(TAG, "toSignUp");
+        final NavDirections action = StartFragmentDirections.actionStartFragmentToSignUpFragment();
+        mNavController.navigate(action);
+    }
+
+    void toSignIn (@NonNull final UUID userId) {
         Log.d(TAG, "toSignIn");
-        final long userId = getIntent().getLongExtra(EXTRA_USER_ID, SignInFragment.DEFAULT_USER_ID);
         final NavDirections action = StartFragmentDirections.actionStartFragmentToSignInFragment(userId);
         mNavController.navigate(action);
     }

@@ -35,15 +35,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import blagodarie.rating.OperationManager;
+import blagodarie.rating.OperationToAnyTextManager;
 import blagodarie.rating.OperationType;
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.AnyTextFragmentBinding;
 import blagodarie.rating.databinding.ThanksUserItemBinding;
+import blagodarie.rating.server.GetProfileInfoResponse;
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
 import blagodarie.rating.ui.AccountProvider;
-import blagodarie.rating.ui.user.DisplayThanksUser;
 import blagodarie.rating.ui.user.GridAutofitLayoutManager;
 import blagodarie.rating.ui.user.ThanksUserAdapter;
 import io.reactivex.Observable;
@@ -147,7 +147,7 @@ public final class AnyTextFragment
         Log.d(TAG, "onThanksUserClick");
         final ThanksUserItemBinding thanksUserItemBinding = DataBindingUtil.findBinding(view);
         if (thanksUserItemBinding != null) {
-            final String userId = thanksUserItemBinding.getThanksUser().getUserUUID();
+            final String userId = thanksUserItemBinding.getThanksUser().getUserId().toString();
             final Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(getString(R.string.url_profile, userId)));
             startActivity(i);
@@ -278,13 +278,13 @@ public final class AnyTextFragment
                         mViewModel.getIsTrust().set(null);
                     }
 
-                    final List<DisplayThanksUser> thanksUsers = new ArrayList<>();
+                    final List<GetProfileInfoResponse.ThanksUser> thanksUsers = new ArrayList<>();
                     final JSONArray thanksUsersJSONArray = userJSON.getJSONArray("thanks_users");
                     for (int i = 0; i < thanksUsersJSONArray.length(); i++) {
                         final JSONObject thanksUserJSONObject = thanksUsersJSONArray.getJSONObject(i);
                         final String thanksUserPhoto = thanksUserJSONObject.getString("photo");
                         final String thanksUserUUID = thanksUserJSONObject.getString("user_uuid");
-                        thanksUsers.add(new DisplayThanksUser(thanksUserPhoto, thanksUserUUID));
+                        thanksUsers.add(new GetProfileInfoResponse.ThanksUser(UUID.fromString(thanksUserUUID), thanksUserPhoto));
                     }
                     mViewModel.getThanksUsers().setValue(thanksUsers);
 
@@ -326,21 +326,19 @@ public final class AnyTextFragment
     public void onAddOperation (@NonNull final OperationType operationType) {
         Log.d(TAG, "onAddOperation");
         if (mAccount != null) {
-            new OperationManager(
-                    OperationManager.Type.TO_ANY_TEXT,
-                    (textId) -> {
-                        mAnyTextId = UUID.fromString(textId);
-                        mViewModel.getAnyTextId().set(mAnyTextId);
-                        refreshAnyTextData();
-                    }
-            ).
-                    createOperation(
+            new OperationToAnyTextManager().
+                    createOperationToAnyText(
                             requireActivity(),
                             mDisposables,
                             mAccount,
                             mAnyTextId,
                             mAnyText,
-                            operationType
+                            operationType,
+                            (textId) -> {
+                                mAnyTextId = textId;
+                                mViewModel.getAnyTextId().set(mAnyTextId);
+                                refreshAnyTextData();
+                            }
                     );
         } else {
             AccountProvider.createAccount(
@@ -349,21 +347,19 @@ public final class AnyTextFragment
                         if (account != null) {
                             mAccount = account;
                             mViewModel.isHaveAccount().set(true);
-                            new OperationManager(
-                                    OperationManager.Type.TO_ANY_TEXT,
-                                    (textId) -> {
-                                        mAnyTextId = UUID.fromString(textId);
-                                        mViewModel.getAnyTextId().set(mAnyTextId);
-                                        refreshAnyTextData();
-                                    }
-                            ).
-                                    createOperation(
+                            new OperationToAnyTextManager().
+                                    createOperationToAnyText(
                                             requireActivity(),
                                             mDisposables,
                                             mAccount,
                                             mAnyTextId,
                                             mAnyText,
-                                            operationType
+                                            operationType,
+                                            (textId) -> {
+                                                mAnyTextId = textId;
+                                                mViewModel.getAnyTextId().set(mAnyTextId);
+                                                refreshAnyTextData();
+                                            }
                                     );
                         }
                     }

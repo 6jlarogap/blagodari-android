@@ -18,7 +18,7 @@
 
         <variable
             name="ThanksUser"
-            type="blagodarie.rating.ui.user.DisplayThanksUser" />
+            type="blagodarie.rating.server.GetProfileInfoResponse.ThanksUser" />
 
     </data>
 

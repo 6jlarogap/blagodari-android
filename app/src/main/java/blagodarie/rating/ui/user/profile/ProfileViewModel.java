@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModel;
 
 import java.util.List;
 
+import blagodarie.rating.server.GetProfileInfoResponse;
 import blagodarie.rating.ui.user.DisplayThanksUser;
 
 public final class ProfileViewModel
@@ -66,7 +67,7 @@ public final class ProfileViewModel
     private final ObservableBoolean mOwnProfile = new ObservableBoolean(false);
 
     @NonNull
-    private final MutableLiveData<List<DisplayThanksUser>> mThanksUsers = new MutableLiveData<>();
+    private final MutableLiveData<List<GetProfileInfoResponse.ThanksUser>> mThanksUsers = new MutableLiveData<>();
 
     public ProfileViewModel () {
     }
@@ -150,7 +151,7 @@ public final class ProfileViewModel
     }
 
     @NonNull
-    public MutableLiveData<List<DisplayThanksUser>> getThanksUsers () {
+    public MutableLiveData<List<GetProfileInfoResponse.ThanksUser>> getThanksUsers () {
         return mThanksUsers;
     }
 

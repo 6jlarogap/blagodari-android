@@ -471,6 +471,13 @@ public final class UserActivity
     }
 
     @Override
+    public void toGraph () {
+        Log.d(TAG, "toGraph");
+        final NavDirections action = ProfileFragmentDirections.actionProfileFragmentToGraphFragment(mUserId);
+        mNavController.navigate(action);
+    }
+
+    @Override
     public void toAddKey () {
         Log.d(TAG, "toAddKey");
         final NavDirections action = KeysFragmentDirections.actionKeysFragmentToAddKeyFragment(mAccount);

@@ -39,7 +39,9 @@ public abstract class ServerApiRequest<ApiResponseType extends _ServerApiRespons
     abstract Request.Builder getRequestBuilder ();
 
     @NonNull
-    ApiResponseType parseResponse (@NonNull final Response response) throws ServerException, JSONException, IOException, EmptyBodyException {
+    ApiResponseType parseResponse (
+            @NonNull final Response response
+    ) throws ServerException, JSONException, IOException, EmptyBodyException {
         if (response.code() == 200) {
             if (response.body() != null) {
                 return parseOkResponse(response.body().string());
