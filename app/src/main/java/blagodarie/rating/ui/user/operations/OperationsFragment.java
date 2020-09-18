@@ -32,7 +32,8 @@ import io.reactivex.disposables.CompositeDisposable;
 
 public final class OperationsFragment
         extends Fragment
-        implements OperationsUserActionListener {
+        implements OperationsUserActionListener,
+        OperationsAdapter.OnItemClickListener {
 
     private static final String TAG = OperationsFragment.class.getSimpleName();
 
@@ -82,8 +83,8 @@ public final class OperationsFragment
     public void onActivityCreated (@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        initOperationsAdapter();
         initViewModel();
+        initOperationsAdapter();
         setupBinding();
     }
 
@@ -103,11 +104,7 @@ public final class OperationsFragment
     }
 
     private void initOperationsAdapter () {
-        mOperationsAdapter = new OperationsAdapter(userId -> {
-            final Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(getString(R.string.url_profile, userId.toString())));
-            startActivity(i);
-        });
+        mOperationsAdapter = new OperationsAdapter(this, mViewModel);
     }
 
     private void initBinding (
@@ -156,7 +153,7 @@ public final class OperationsFragment
     public void onAddOperation (@NonNull final OperationType operationType) {
         Log.d(TAG, "onAddOperation");
         if (mAccount != null) {
-            if (mUserId != null){
+            if (mUserId != null) {
                 new OperationToUserManager().
                         createOperationToUser(
                                 requireActivity(),
@@ -187,7 +184,7 @@ public final class OperationsFragment
                             mViewModel.isHaveAccount().set(true);
                             mViewModel.isOwnProfile().set(mAccount.name.equals(mUserId.toString()));
                             if (!mViewModel.isOwnProfile().get()) {
-                                if (mUserId != null){
+                                if (mUserId != null) {
                                     new OperationToUserManager().
                                             createOperationToUser(
                                                     requireActivity(),
@@ -216,4 +213,55 @@ public final class OperationsFragment
         }
     }
 
+
+    @Override
+    public void onOperationClick (
+            @NonNull final UUID userId
+    ) {
+        final Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(getString(R.string.url_profile, userId.toString())));
+        startActivity(i);
+    }
+
+    @Override
+    public void onThanksClick (
+            @NonNull final UUID userIdTo
+    ) {
+        Log.d(TAG, "onThanksClick");
+        if (mAccount != null) {
+            new OperationToUserManager().
+                    createOperationToUser(
+                            requireActivity(),
+                            mDisposables,
+                            mAccount,
+                            userIdTo,
+                            OperationType.THANKS,
+                            () -> {
+                            }
+                    );
+        } else {
+            AccountProvider.createAccount(
+                    requireActivity(),
+                    account -> {
+                        if (account != null) {
+                            mAccount = account;
+                            mViewModel.isHaveAccount().set(true);
+                            mViewModel.isOwnProfile().set(mAccount.name.equals(mUserId.toString()));
+                            if (!mViewModel.isOwnProfile().get()) {
+                                new OperationToUserManager().
+                                        createOperationToUser(
+                                                requireActivity(),
+                                                mDisposables,
+                                                mAccount,
+                                                userIdTo,
+                                                OperationType.THANKS,
+                                                () -> {
+                                                }
+                                        );
+                            }
+                        }
+                    }
+            );
+        }
+    }
 }
