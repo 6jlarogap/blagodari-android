@@ -20,16 +20,24 @@ final class OperationsAdapter
         extends PagedListAdapter<Operation, OperationsAdapter.OperationViewHolder> {
 
     interface OnItemClickListener {
-        void onClick (@NonNull final UUID userId);
+        void onOperationClick (@NonNull final UUID userId);
+
+        void onThanksClick (@NonNull final UUID userIdTo);
     }
 
+    @NonNull
     private final OnItemClickListener mOnItemClickListener;
 
+    @NonNull
+    private final OperationsViewModel mOperationsViewModel;
+
     protected OperationsAdapter (
-            @NonNull final OnItemClickListener onItemClickListener
+            @NonNull final OnItemClickListener onItemClickListener,
+            @NonNull final OperationsViewModel operationsViewModel
     ) {
         super(DIFF_CALLBACK);
         mOnItemClickListener = onItemClickListener;
+        mOperationsViewModel = operationsViewModel;
     }
 
     @NonNull
@@ -50,7 +58,7 @@ final class OperationsAdapter
     ) {
         final Operation operation = getItem(position);
         if (operation != null) {
-            holder.bind(operation, mOnItemClickListener);
+            holder.bind(operation, mOnItemClickListener, mOperationsViewModel);
         }
     }
 
@@ -67,11 +75,14 @@ final class OperationsAdapter
 
         void bind (
                 @NonNull final Operation operation,
-                @NonNull final OnItemClickListener onItemClickListener
+                @NonNull final OnItemClickListener onItemClickListener,
+                @NonNull final OperationsViewModel viewModel
         ) {
-            itemView.setOnClickListener(view -> onItemClickListener.onClick(operation.getUserIdFrom()));
+            itemView.setOnClickListener(view -> onItemClickListener.onOperationClick(operation.getUserIdFrom()));
+            mBinding.setViewModel(viewModel);
             mBinding.setOperation(operation);
             mBinding.setOperationName(mBinding.getRoot().getContext().getString(operation.getOperationType().getNameResId()));
+            mBinding.fabThanks.setOnClickListener(view -> onItemClickListener.onThanksClick(operation.getUserIdFrom()));
             Picasso.get().load(operation.getPhoto()).into(mBinding.ivPhoto);
         }
     }
