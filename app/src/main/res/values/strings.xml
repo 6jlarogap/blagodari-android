@@ -7,6 +7,7 @@
     <string name="url_any_text">https://blagodarie.org/anytext?text=%s</string>
     <string name="url_social_graph">https://blagodarie.org/socialgraph?from=%s&amp;to=%s</string>
     <string name="url_prof">https://blagodarie.org/prof?id=%s</string>
+    <string name="url_play_market">https://play.google.com/store/apps/details?id=blagodarie.rating</string>
 
     <string name="notification_chanel_id_thanks" translatable="false">thanks_notification_chanel</string>
     <string name="notification_chanel_name_thanks">Благодарности</string>
@@ -47,7 +48,7 @@
     <string name="info_msg_function_in_developing">Функция в разработке</string>
     <string name="info_msg_update_available">Доступна новая версия</string>
 
-    <string name="qstn_want_load_new_version">Желаете загрузить новую версию %s?</string>
+    <string name="qstn_want_load_new_version">Желаете загрузить новую версию %d?</string>
     <string name="qstn_delete_key">Удалить ключ?</string>
 
     <string name="err_msg_account_not_created">Аккаунт не был создан</string>

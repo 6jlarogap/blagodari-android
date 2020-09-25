@@ -1,5 +1,5 @@
 package blagodarie.rating.server;
 
-public class EmptyBodyException
+public final class EmptyBodyException
         extends Exception {
 }

@@ -5,7 +5,7 @@ import androidx.annotation.Nullable;
 
 import java.util.UUID;
 
-public abstract class Operation {
+abstract class Operation {
 
     @Nullable
     private final UUID mIdTo;

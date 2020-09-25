@@ -28,6 +28,10 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
+import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.tasks.Task;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -156,11 +160,11 @@ public final class UserActivity
     public void onHaveUpdate (@NonNull final NewVersionInfo newVersionInfo) {
         Log.d(TAG, "onHaveUpdate");
 
-        if (!getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).contains(newVersionInfo.getVersionName())) {
+        if (!getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).contains(String.valueOf(newVersionInfo.getVersionCode()))) {
             new AlertDialog.
                     Builder(this).
                     setTitle(R.string.info_msg_update_available).
-                    setMessage(String.format(getString(R.string.qstn_want_load_new_version), newVersionInfo.getVersionName())).
+                    setMessage(getString(R.string.qstn_want_load_new_version, newVersionInfo.getVersionCode())).
                     setPositiveButton(
                             R.string.btn_update,
                             (dialogInterface, i) -> UpdateManager.startUpdate(
@@ -172,7 +176,7 @@ public final class UserActivity
                     show();
             getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).
                     edit().
-                    putInt(newVersionInfo.getVersionName(), newVersionInfo.getVersionCode()).
+                    putInt(String.valueOf(newVersionInfo.getVersionCode()), newVersionInfo.getVersionCode()).
                     apply();
         }
     }
@@ -186,7 +190,35 @@ public final class UserActivity
     @Override
     public void onUpdateFromMarket () {
         Log.d(TAG, "onUpdateFromMarket");
-        //do nothing
+        final AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(this);
+
+        final Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
+
+        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+            if (appUpdateInfo.availableVersionCode() > BuildConfig.VERSION_CODE) {
+                if (!getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).contains(String.valueOf(appUpdateInfo.availableVersionCode()))) {
+                    new AlertDialog.
+                            Builder(this).
+                            setTitle(R.string.info_msg_update_available).
+                            setMessage(getString(R.string.qstn_want_load_new_version, appUpdateInfo.availableVersionCode())).
+                            setPositiveButton(
+                                    R.string.btn_update,
+                                    (dialogInterface, i) -> {
+                                        final Intent intent = new Intent(Intent.ACTION_VIEW);
+                                        intent.setData(Uri.parse(getString(R.string.url_play_market)));
+                                        startActivity(intent);
+                                    }).
+                            setNegativeButton(android.R.string.cancel, null).
+                            create().
+                            show();
+                    getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).
+                            edit().
+                            putInt(String.valueOf(appUpdateInfo.availableVersionCode()), appUpdateInfo.availableVersionCode()).
+                            apply();
+
+                }
+            }
+        });
     }
 
     @Override

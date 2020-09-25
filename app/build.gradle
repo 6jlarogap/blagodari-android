@@ -10,8 +10,8 @@ android {
         applicationId "blagodarie.rating"
         minSdkVersion 19
         targetSdkVersion 30
-        versionCode 22
-        versionName "0.0.22"
+        versionCode 23
+        versionName "0.0.23"
 
         project.ext.set("archivesBaseName", "rating-" + defaultConfig.versionName)
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -68,31 +68,24 @@ dependencies {
     implementation project(path: ':auth')
     implementation project(path: ':update')
     implementation project(path: ':server')
+    implementation project(path: ':update')
     implementation "android.arch.paging:runtime:1.0.1"
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.navigation:navigation-fragment:2.3.0'
     implementation 'androidx.navigation:navigation-ui:2.3.0'
-
-    implementation 'com.google.android.material:material:1.3.0-alpha02'
-
-    implementation 'com.journeyapps:zxing-android-embedded:3.0.2@aar'
-    implementation 'com.google.zxing:core:3.4.0'
-
-    implementation "io.reactivex.rxjava2:rxjava:2.2.9"
-    implementation "io.reactivex.rxjava2:rxandroid:2.1.0"
-
-    implementation "com.squareup.picasso:picasso:2.71828"
-    implementation 'org.jetbrains:annotations:15.0'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
-
-    implementation 'com.yandex.money.api:yandex-money-sdk-java:7.2.23'
-    implementation project(path: ':update')
-
+    implementation 'com.google.android.material:material:1.3.0-alpha02'
     implementation 'com.google.firebase:firebase-messaging:20.2.4'
     implementation 'com.google.firebase:firebase-analytics:17.5.0'
-
+    implementation 'com.google.zxing:core:3.4.0'
+    implementation 'com.journeyapps:zxing-android-embedded:3.0.2@aar'
+    implementation "com.squareup.picasso:picasso:2.71828"
+    implementation 'com.yandex.money.api:yandex-money-sdk-java:7.2.23'
+    implementation "io.reactivex.rxjava2:rxjava:2.2.9"
+    implementation "io.reactivex.rxjava2:rxandroid:2.1.0"
+    implementation 'org.jetbrains:annotations:15.0'
+    implementation 'com.google.android.play:core:1.6.4'
     testImplementation 'junit:junit:4.13'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 }

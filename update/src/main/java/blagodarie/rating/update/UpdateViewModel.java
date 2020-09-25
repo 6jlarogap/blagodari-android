@@ -1,5 +1,7 @@
 package blagodarie.rating.update;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.databinding.ObservableFloat;
 import androidx.databinding.ObservableInt;
@@ -68,6 +70,8 @@ public final class UpdateViewModel
     static final class Factory
             implements ViewModelProvider.Factory {
 
+        private static final String TAG = Factory.class.getSimpleName();
+
         @NonNull
         private final String mVersionName;
 
@@ -84,7 +88,7 @@ public final class UpdateViewModel
                 try {
                     return modelClass.getConstructor(String.class).newInstance(mVersionName);
                 } catch (IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
-                    e.printStackTrace();
+                    Log.e(TAG, Log.getStackTraceString(e));
                 }
             }
             throw new IllegalArgumentException("Unknown ViewModel class");
