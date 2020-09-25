@@ -6,11 +6,9 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import blagodarie.rating.server.ServerApiResponse;
-import blagodarie.rating.server.ServerConnector;
+import blagodarie.rating.server.GetRatingLatestVersionRequest;
+import blagodarie.rating.server.GetRatingLatestVersionResponse;
+import blagodarie.rating.server.ServerApiClient;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -36,58 +34,31 @@ public final class UpdateManager {
             @NonNull final OnCheckUpdateListener onCheckUpdateListener,
             @NonNull final OnErrorListener onErrorListener
     ) {
+        final ServerApiClient client = new ServerApiClient();
+        final GetRatingLatestVersionRequest request = new GetRatingLatestVersionRequest();
         return Observable.
-                fromCallable(() -> ServerConnector.sendRequestAndGetResponse("getratinglatestversion")).
+                fromCallable(() -> client.execute(request)).
                 subscribeOn(Schedulers.io()).
                 observeOn(AndroidSchedulers.mainThread()).
                 subscribe(
-                        serverApiResponse -> handleCheckUpdateResponse(currentCodeVersion, serverApiResponse, onCheckUpdateListener, onErrorListener),
+                        response -> handleCheckUpdateResponse(currentCodeVersion, response, onCheckUpdateListener),
                         onErrorListener::onError
                 );
     }
 
     private static void handleCheckUpdateResponse (
             final int currentCodeVersion,
-            @NonNull final ServerApiResponse serverApiResponse,
-            @NonNull final OnCheckUpdateListener onCheckUpdateListener,
-            @NonNull final OnErrorListener onErrorListener
+            @NonNull final GetRatingLatestVersionResponse response,
+            @NonNull final OnCheckUpdateListener onCheckUpdateListener
     ) {
-        if (serverApiResponse.getBody() != null) {
-            final String responseBody = serverApiResponse.getBody();
-            switch (serverApiResponse.getCode()) {
-                case 200:
-                    try {
-                        final JSONObject json = new JSONObject(responseBody);
-                        final boolean ratingGooglePlayUpdate = json.getBoolean("rating_google_play_update");
-                        if (!ratingGooglePlayUpdate) {
-                            final int versionCode = json.getInt("version_code");
-                            if (versionCode > currentCodeVersion) {
-                                final String versionName = json.getString("version_name");
-                                final String path = json.getString("path");
-                                onCheckUpdateListener.onHaveUpdate(new NewVersionInfo(versionCode, versionName, Uri.parse(path)));
-                            } else {
-                                onCheckUpdateListener.onNothingUpdate();
-                            }
-                        } else {
-                            onCheckUpdateListener.onUpdateFromMarket();
-                        }
-                    } catch (JSONException e) {
-                        onErrorListener.onError(e);
-                    }
-                    break;
-                case 400:
-                    try {
-                        final JSONObject json = new JSONObject(responseBody);
-                        final String message = json.getString("message");
-                        onErrorListener.onError(new Exception(message));
-                    } catch (JSONException e) {
-                        onErrorListener.onError(e);
-                    }
-                    break;
+        if (!response.isRatingGooglePlayUpdate()) {
+            if (response.getVersionCode() > currentCodeVersion) {
+                onCheckUpdateListener.onHaveUpdate(new NewVersionInfo(response.getVersionCode(), response.getVersionName(), Uri.parse(response.getPath())));
+            } else {
+                onCheckUpdateListener.onNothingUpdate();
             }
-
         } else {
-            onErrorListener.onError(new IllegalArgumentException("Response body is null"));
+            onCheckUpdateListener.onUpdateFromMarket();
         }
     }
 
