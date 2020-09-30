@@ -12,7 +12,7 @@
             android:hint="@string/rqst_enter_your_comment"
             android:importantForAutofill="no"
             android:gravity="start"
-            android:inputType="textMultiLine"
+            android:inputType="textMultiLine|textCapSentences"
             android:maxLength="2000"
             android:singleLine="false" />
 
