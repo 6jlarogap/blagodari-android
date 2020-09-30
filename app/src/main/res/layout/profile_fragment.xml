@@ -151,36 +151,6 @@
 
                     </RelativeLayout>
 
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:onClick="@{() -> UserActionListener.onOperations()}"
-                        android:text="@{ViewModel.isOwnProfile || !ViewModel.isHaveAccount ? String.format(@string/txt_self_profile_thanks_count, ViewModel.sumThanksCount) : String.format(@string/txt_thanks_count, ViewModel.sumThanksCount, ViewModel.thanksCount)}" />
-
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:onClick="@{() -> UserActionListener.onKeys()}"
-                        android:text="@string/btn_keys" />
-
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:onClick="@{() -> UserActionListener.onWishes()}"
-                        android:text="@string/btn_wishes" />
-
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:onClick="@{() -> UserActionListener.onAbilities()}"
-                        android:text="@string/btn_ability" />
-
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:onClick="@{() -> UserActionListener.onSocialGraph()}"
-                        android:text="@string/btn_social_graph" />
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -215,6 +185,36 @@
                             android:visibility="@{!ViewModel.isOwnProfile &amp;&amp; ViewModel.isTrust != null &amp;&amp; !ViewModel.isTrust ? View.VISIBLE : View.GONE}" />
 
                     </LinearLayout>
+                    
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:onClick="@{() -> UserActionListener.onOperations()}"
+                        android:text="@{ViewModel.isOwnProfile || !ViewModel.isHaveAccount ? String.format(@string/txt_self_profile_thanks_count, ViewModel.sumThanksCount) : String.format(@string/txt_thanks_count, ViewModel.sumThanksCount, ViewModel.thanksCount)}" />
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:onClick="@{() -> UserActionListener.onKeys()}"
+                        android:text="@string/btn_keys" />
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:onClick="@{() -> UserActionListener.onWishes()}"
+                        android:text="@string/btn_wishes" />
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:onClick="@{() -> UserActionListener.onAbilities()}"
+                        android:text="@string/btn_ability" />
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:onClick="@{() -> UserActionListener.onSocialGraph()}"
+                        android:text="@string/btn_social_graph" />
 
                     <TextView
                         android:layout_width="wrap_content"
