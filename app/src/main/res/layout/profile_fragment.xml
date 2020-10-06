@@ -171,9 +171,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
+                            android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISTRUST_CANCEL)}"
+                            android:text="@string/btn_set_trust"
+                            android:visibility="@{!ViewModel.isOwnProfile &amp;&amp; ViewModel.isTrust == null ? View.VISIBLE : View.GONE}" />
+
+                        <Button
+                            style="?android:attr/buttonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
                             android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISTRUST)}"
                             android:text="@string/btn_mistrust"
-                            android:visibility="@{!ViewModel.isOwnProfile &amp;&amp; (ViewModel.isTrust == null || ViewModel.isTrust) ? View.VISIBLE : View.GONE}" />
+                            android:visibility="@{!ViewModel.isOwnProfile &amp;&amp; ViewModel.isTrust != null &amp;&amp; ViewModel.isTrust ? View.VISIBLE : View.GONE}" />
 
                         <Button
                             style="?android:attr/buttonStyle"
