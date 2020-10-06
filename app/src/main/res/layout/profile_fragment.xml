@@ -19,6 +19,21 @@
             app:elevation="6dp"
             app:fabSize="mini" />
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.THANKS)}"
+            android:src="@drawable/heart"
+            android:visibility="@{!ViewModel.isOwnProfile() ? View.VISIBLE : View.GONE}"
+            app:backgroundTint="@android:color/white"
+            app:borderWidth="0dp"
+            app:elevation="2dp"
+            app:fabSize="normal"
+            app:maxImageSize="40dp"
+            app:pressedTranslationZ="12dp" />
+
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/srlRefreshProfileInfo"
             android:layout_width="match_parent"
@@ -159,42 +174,28 @@
 
                         <Button
                             style="?android:attr/buttonStyle"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
-                            android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.THANKS)}"
-                            android:text="@string/btn_thanks"
+                            android:layout_weight="1"
+                            android:enabled="@{ViewModel.isTrust == null || ViewModel.isTrust}"
+                            android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISTRUST)}"
+                            android:text="@string/btn_mistrust"
                             android:visibility="@{!ViewModel.isOwnProfile ? View.VISIBLE : View.GONE}" />
 
                         <Button
                             style="?android:attr/buttonStyle"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:layout_gravity="center_horizontal"
+                            android:enabled="@{ViewModel.isTrust == null || !ViewModel.isTrust}"
                             android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISTRUST_CANCEL)}"
-                            android:text="@string/btn_set_trust"
-                            android:visibility="@{!ViewModel.isOwnProfile &amp;&amp; ViewModel.isTrust == null ? View.VISIBLE : View.GONE}" />
-
-                        <Button
-                            style="?android:attr/buttonStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISTRUST)}"
-                            android:text="@string/btn_mistrust"
-                            android:visibility="@{!ViewModel.isOwnProfile &amp;&amp; ViewModel.isTrust != null &amp;&amp; ViewModel.isTrust ? View.VISIBLE : View.GONE}" />
-
-                        <Button
-                            style="?android:attr/buttonStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISTRUST_CANCEL)}"
-                            android:text="@string/btn_cancel_mistrust"
-                            android:visibility="@{!ViewModel.isOwnProfile &amp;&amp; ViewModel.isTrust != null &amp;&amp; !ViewModel.isTrust ? View.VISIBLE : View.GONE}" />
+                            android:text="@{ViewModel.isTrust == null ? @string/btn_set_trust : @string/btn_cancel_mistrust}"
+                            android:visibility="@{!ViewModel.isOwnProfile ? View.VISIBLE : View.GONE}" />
 
                     </LinearLayout>
-                    
+
                     <Button
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
