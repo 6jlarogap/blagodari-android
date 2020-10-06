@@ -190,35 +190,37 @@ public final class UserActivity
     @Override
     public void onUpdateFromMarket () {
         Log.d(TAG, "onUpdateFromMarket");
-        final AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(this);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            final AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(this);
 
-        final Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
+            final Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
 
-        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
-            if (appUpdateInfo.availableVersionCode() > BuildConfig.VERSION_CODE) {
-                if (!getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).contains(String.valueOf(appUpdateInfo.availableVersionCode()))) {
-                    new AlertDialog.
-                            Builder(this).
-                            setTitle(R.string.info_msg_update_available).
-                            setMessage(getString(R.string.qstn_want_load_new_version, appUpdateInfo.availableVersionCode())).
-                            setPositiveButton(
-                                    R.string.btn_update,
-                                    (dialogInterface, i) -> {
-                                        final Intent intent = new Intent(Intent.ACTION_VIEW);
-                                        intent.setData(Uri.parse(getString(R.string.url_play_market)));
-                                        startActivity(intent);
-                                    }).
-                            setNegativeButton(android.R.string.cancel, null).
-                            create().
-                            show();
-                    getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).
-                            edit().
-                            putInt(String.valueOf(appUpdateInfo.availableVersionCode()), appUpdateInfo.availableVersionCode()).
-                            apply();
+            appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+                if (appUpdateInfo.availableVersionCode() > BuildConfig.VERSION_CODE) {
+                    if (!getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).contains(String.valueOf(appUpdateInfo.availableVersionCode()))) {
+                        new AlertDialog.
+                                Builder(this).
+                                setTitle(R.string.info_msg_update_available).
+                                setMessage(getString(R.string.qstn_want_load_new_version, appUpdateInfo.availableVersionCode())).
+                                setPositiveButton(
+                                        R.string.btn_update,
+                                        (dialogInterface, i) -> {
+                                            final Intent intent = new Intent(Intent.ACTION_VIEW);
+                                            intent.setData(Uri.parse(getString(R.string.url_play_market)));
+                                            startActivity(intent);
+                                        }).
+                                setNegativeButton(android.R.string.cancel, null).
+                                create().
+                                show();
+                        getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).
+                                edit().
+                                putInt(String.valueOf(appUpdateInfo.availableVersionCode()), appUpdateInfo.availableVersionCode()).
+                                apply();
 
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     @Override
@@ -244,7 +246,9 @@ public final class UserActivity
         mActivityBinding.nvNavigation.getMenu().findItem(R.id.miLogout).setEnabled(mAccount != null);
         mViewModel.isOwnProfile().set(mAccount != null && mUserId != null && mAccount.name.equals(mUserId.toString()));
         if (mUserId != null) {
-            toProfile();
+            if (mNavController.getCurrentDestination() != null && mNavController.getCurrentDestination().getId() != R.id.profileFragment) {
+                toProfile();
+            }
             if (getIntent().getBooleanExtra(EXTRA_TO_OPERATIONS, false)) {
                 toOperationsFromProfile();
             }
