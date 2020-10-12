@@ -25,6 +25,7 @@
     <string name="btn_thanks">Благодарить</string>
     <string name="btn_mistrust">Утрата доверия</string>
     <string name="btn_set_trust">Установить доверие</string>
+    <string name="btn_trust">Доверие</string>
     <string name="btn_cancel_mistrust">Восстановить доверие</string>
     <string name="btn_keys">Ключи</string>
     <string name="btn_wishes">Желания</string>
@@ -65,7 +66,7 @@
     <string name="txt_self_profile_thanks_count">Благодарности: %d</string>
     <string name="txt_thanks_count">Благодарности/мои: %d/%d</string>
     <string name="txt_self_profile_trust">Утраты доверия: %d</string>
-    <string name="txt_trust">Доверие/утраты: %s/%d</string>
+    <string name="txt_trust">Доверие/утраты: %d/%d</string>
     <string name="txt_yes">Да</string>
     <string name="txt_no">Нет</string>
     <string name="txt_card_number">Номер карты</string>

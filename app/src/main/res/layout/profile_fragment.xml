@@ -94,7 +94,7 @@
                         style="@style/TextAppearance.AppCompat.Body1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@{ViewModel.isOwnProfile || !ViewModel.isHaveAccount ? String.format(@string/txt_self_profile_trust, ViewModel.trustlessCount) : String.format(@string/txt_trust, (ViewModel.isTrust ? @string/txt_yes : @string/txt_no), ViewModel.trustlessCount)}" />
+                        android:text="@{ViewModel.isOwnProfile || !ViewModel.isHaveAccount ? String.format(@string/txt_self_profile_trust, ViewModel.mistrustCount) : String.format(@string/txt_trust, ViewModel.trustCount, ViewModel.mistrustCount)}" />
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -176,22 +176,24 @@
                             style="?android:attr/buttonStyle"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
                             android:layout_weight="1"
-                            android:enabled="@{ViewModel.isTrust == null || ViewModel.isTrust}"
-                            android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISTRUST)}"
-                            android:text="@string/btn_mistrust"
+                            android:layout_gravity="center_horizontal"
+                            android:backgroundTint="@{ViewModel.isTrust != null &amp;&amp; !ViewModel.isTrust ? @android:color/holo_green_dark : @color/light_gray}"
+                            android:enabled="@{ViewModel.isTrust == null || !ViewModel.isTrust}"
+                            android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISTRUST_CANCEL)}"
+                            android:text="@string/btn_trust"
                             android:visibility="@{!ViewModel.isOwnProfile ? View.VISIBLE : View.GONE}" />
 
                         <Button
                             style="?android:attr/buttonStyle"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:layout_gravity="center_horizontal"
-                            android:enabled="@{ViewModel.isTrust == null || !ViewModel.isTrust}"
-                            android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISTRUST_CANCEL)}"
-                            android:text="@{ViewModel.isTrust == null ? @string/btn_set_trust : @string/btn_cancel_mistrust}"
+                            android:layout_weight="1"
+                            android:backgroundTint="@{ViewModel.isTrust != null &amp;&amp; ViewModel.isTrust ? @android:color/holo_red_dark : @color/light_gray}"
+                            android:enabled="@{ViewModel.isTrust == null || ViewModel.isTrust}"
+                            android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISTRUST)}"
+                            android:text="@string/btn_mistrust"
                             android:visibility="@{!ViewModel.isOwnProfile ? View.VISIBLE : View.GONE}" />
 
                     </LinearLayout>
