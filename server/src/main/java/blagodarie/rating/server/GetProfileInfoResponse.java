@@ -57,6 +57,8 @@ public final class GetProfileInfoResponse
 
     private final int mSumThanksCount;
 
+    private final int mTrustCount;
+
     private final int mMistrustCount;
 
     @Nullable
@@ -76,6 +78,7 @@ public final class GetProfileInfoResponse
             @NonNull final String cardNumber,
             final int fame,
             final int sumThanksCount,
+            final int trustCount,
             final int mistrustCount,
             @Nullable final Integer thanksCount,
             @Nullable final Boolean isTrust,
@@ -88,6 +91,7 @@ public final class GetProfileInfoResponse
         mCardNumber = cardNumber;
         mFame = fame;
         mSumThanksCount = sumThanksCount;
+        mTrustCount = trustCount;
         mMistrustCount = mistrustCount;
         mThanksCount = thanksCount;
         mIsTrust = isTrust;
@@ -125,6 +129,10 @@ public final class GetProfileInfoResponse
 
     public final int getSumThanksCount () {
         return mSumThanksCount;
+    }
+
+    public final int getTrustCount () {
+        return mTrustCount;
     }
 
     public final int getMistrustCount () {

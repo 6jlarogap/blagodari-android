@@ -264,7 +264,8 @@ public final class ProfileFragment
         mViewModel.getCardNumber().set(getProfileInfoResponse.getCardNumber());
         mViewModel.getFame().set(getProfileInfoResponse.getFame());
         mViewModel.getSumThanksCount().set(getProfileInfoResponse.getSumThanksCount());
-        mViewModel.getTrustlessCount().set(getProfileInfoResponse.getMistrustCount());
+        mViewModel.getTrustCount().set(getProfileInfoResponse.getTrustCount());
+        mViewModel.getMistrustCount().set(getProfileInfoResponse.getMistrustCount());
         mViewModel.getThanksCount().set((getProfileInfoResponse.getThanksCount() != null ? getProfileInfoResponse.getThanksCount() : 0));
         mViewModel.getIsTrust().set(getProfileInfoResponse.getIsTrust());
         mViewModel.getThanksUsers().setValue(getProfileInfoResponse.getThanksUsers());

@@ -46,6 +46,7 @@ public final class GetProfileInfoRequest
         final int fame = json.getInt("fame");
         final int sumThanksCount = json.getInt("sum_thanks_count");
         final int mistrustCount = json.getInt("trustless_count");
+        final int trustCount = fame - mistrustCount;//json.getInt("trust_count");
         Integer thanksCount;
         try {
             thanksCount = json.getInt("thanks_count");
@@ -75,6 +76,7 @@ public final class GetProfileInfoRequest
                 cardNumber,
                 fame,
                 sumThanksCount,
+                trustCount,
                 mistrustCount,
                 thanksCount,
                 isTrust,

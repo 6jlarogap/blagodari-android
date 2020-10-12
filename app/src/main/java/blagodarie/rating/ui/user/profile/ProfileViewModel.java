@@ -12,7 +12,6 @@ import androidx.lifecycle.ViewModel;
 import java.util.List;
 
 import blagodarie.rating.server.GetProfileInfoResponse;
-import blagodarie.rating.ui.user.DisplayThanksUser;
 
 public final class ProfileViewModel
         extends ViewModel {
@@ -49,7 +48,10 @@ public final class ProfileViewModel
     private final ObservableInt mSumThanksCount = new ObservableInt(0);
 
     @NonNull
-    private final ObservableInt mTrustlessCount = new ObservableInt(0);
+    private final ObservableInt mTrustCount = new ObservableInt(0);
+
+    @NonNull
+    private final ObservableInt mMistrustCount = new ObservableInt(0);
 
     @NonNull
     private final ObservableField<Integer> mThanksCount = new ObservableField<>();
@@ -122,8 +124,13 @@ public final class ProfileViewModel
     }
 
     @NonNull
-    public final ObservableInt getTrustlessCount () {
-        return mTrustlessCount;
+    public final ObservableInt getTrustCount () {
+        return mTrustCount;
+    }
+
+    @NonNull
+    public final ObservableInt getMistrustCount () {
+        return mMistrustCount;
     }
 
     @NonNull
