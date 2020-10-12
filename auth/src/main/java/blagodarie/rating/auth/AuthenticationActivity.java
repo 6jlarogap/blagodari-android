@@ -21,6 +21,8 @@ import androidx.navigation.Navigation;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -98,8 +100,12 @@ public final class AuthenticationActivity
                 requestIdToken(oauth2ClientId).
                 build();
         final GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(activity, gso);
-        final Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        fragment.startActivityForResult(signInIntent, ACTIVITY_REQUEST_CODE_GOGGLE_SIGN_IN);
+        mGoogleSignInClient.
+                signOut().
+                addOnCompleteListener(activity, task -> {
+                    final Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+                    fragment.startActivityForResult(signInIntent, ACTIVITY_REQUEST_CODE_GOGGLE_SIGN_IN);
+                });
     }
 
     public static Intent createSelfIntent (
