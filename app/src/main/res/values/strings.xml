@@ -23,7 +23,7 @@
     <string name="notification_title_cancel_mistrust_pattern">%s %s восстановил доверие к вам</string>
 
     <string name="btn_thanks">Благодарить</string>
-    <string name="btn_mistrust">Утрата доверия</string>
+    <string name="btn_mistrust">Недоверие</string>
     <string name="btn_set_trust">Установить доверие</string>
     <string name="btn_trust">Доверие</string>
     <string name="btn_cancel_mistrust">Восстановить доверие</string>

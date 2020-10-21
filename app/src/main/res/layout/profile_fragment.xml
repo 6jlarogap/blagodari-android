@@ -19,21 +19,6 @@
             app:elevation="6dp"
             app:fabSize="mini" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="@dimen/fab_margin"
-            android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.THANKS)}"
-            android:src="@drawable/heart"
-            android:visibility="@{!ViewModel.isOwnProfile() ? View.VISIBLE : View.GONE}"
-            app:backgroundTint="@android:color/white"
-            app:borderWidth="0dp"
-            app:elevation="2dp"
-            app:fabSize="normal"
-            app:maxImageSize="40dp"
-            app:pressedTranslationZ="12dp" />
-
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/srlRefreshProfileInfo"
             android:layout_width="match_parent"
@@ -96,89 +81,20 @@
                         android:layout_height="wrap_content"
                         android:text="@{ViewModel.isOwnProfile || !ViewModel.isHaveAccount ? String.format(@string/txt_self_profile_trust, ViewModel.mistrustCount) : String.format(@string/txt_trust, ViewModel.trustCount, ViewModel.mistrustCount)}" />
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/tilCardNumber"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentStart="true"
-                            android:layout_alignParentTop="true"
-                            android:layout_toStartOf="@+id/llButtons">
-
-                            <EditText
-                                android:id="@+id/etCardNumber"
-                                style="@style/TextAppearance.AppCompat.Body1"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:enabled="@{ViewModel.currentMode == Mode.EDIT ? true : false}"
-                                android:hint="@string/txt_card_number"
-                                android:importantForAutofill="no"
-                                android:inputType="number"
-                                android:maxLength="16"
-                                android:text="@{ViewModel.cardNumber}" />
-
-                        </com.google.android.material.textfield.TextInputLayout>
-
-                        <LinearLayout
-                            android:id="@+id/llButtons"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:orientation="horizontal">
-
-                            <androidx.appcompat.widget.AppCompatImageButton
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical"
-                                android:onClick="@{() -> UserActionListener.onEditCardNumber()}"
-                                android:src="@drawable/pencil"
-                                android:visibility="@{ViewModel.isOwnProfile &amp;&amp; ViewModel.currentMode == Mode.VIEW ? View.VISIBLE : View.GONE}" />
-
-                            <androidx.appcompat.widget.AppCompatImageButton
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical"
-                                android:onClick="@{() -> UserActionListener.onCopyCardNumber()}"
-                                android:src="@drawable/content_copy"
-                                android:visibility='@{ViewModel.currentMode == Mode.VIEW &amp;&amp; !ViewModel.cardNumber.equals("") ? View.VISIBLE : View.GONE}' />
-
-                            <androidx.appcompat.widget.AppCompatImageButton
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical"
-                                android:onClick="@{() -> UserActionListener.onSaveCardNumber()}"
-                                android:src="@drawable/content_save"
-                                android:visibility="@{ViewModel.currentMode == Mode.EDIT ? View.VISIBLE : View.GONE}" />
-
-                            <androidx.appcompat.widget.AppCompatImageButton
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical"
-                                android:onClick="@{() -> UserActionListener.onCancelEditCardNumber()}"
-                                android:src="@drawable/cancel"
-                                android:visibility="@{ViewModel.currentMode == Mode.EDIT ? View.VISIBLE : View.GONE}" />
-
-                        </LinearLayout>
-
-                    </RelativeLayout>
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_horizontal"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:padding="5dp">
 
                         <Button
                             style="?android:attr/buttonStyle"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:layout_gravity="center_horizontal"
-                            android:backgroundTint="@{ViewModel.isTrust != null &amp;&amp; !ViewModel.isTrust ? @android:color/holo_green_dark : @color/light_gray}"
+                            android:layout_weight="1"
+                            android:background="@{ViewModel.isTrust != null &amp;&amp; ViewModel.isTrust ? @android:color/holo_green_dark : @color/light_gray}"
                             android:enabled="@{ViewModel.isTrust == null || !ViewModel.isTrust}"
                             android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISTRUST_CANCEL)}"
                             android:text="@string/btn_trust"
@@ -190,7 +106,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
                             android:layout_weight="1"
-                            android:backgroundTint="@{ViewModel.isTrust != null &amp;&amp; ViewModel.isTrust ? @android:color/holo_red_dark : @color/light_gray}"
+                            android:background="@{ViewModel.isTrust != null &amp;&amp; !ViewModel.isTrust ? @android:color/holo_red_dark : @color/light_gray}"
                             android:enabled="@{ViewModel.isTrust == null || ViewModel.isTrust}"
                             android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISTRUST)}"
                             android:text="@string/btn_mistrust"
@@ -198,11 +114,43 @@
 
                     </LinearLayout>
 
-                    <Button
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:onClick="@{() -> UserActionListener.onOperations()}"
-                        android:text="@{ViewModel.isOwnProfile || !ViewModel.isHaveAccount ? String.format(@string/txt_self_profile_thanks_count, ViewModel.sumThanksCount) : String.format(@string/txt_thanks_count, ViewModel.sumThanksCount, ViewModel.thanksCount)}" />
+                        android:gravity="end"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/btnThanksCount"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:onClick="@{() -> UserActionListener.onOperations()}"
+                            android:text="@{ViewModel.isOwnProfile || !ViewModel.isHaveAccount ? String.format(@string/txt_self_profile_thanks_count, ViewModel.sumThanksCount) : String.format(@string/txt_thanks_count, ViewModel.sumThanksCount, ViewModel.thanksCount)}"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/fabThanks"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constrainedWidth="true"/>
+
+                        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                            android:id="@+id/fabThanks"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|end"
+                            android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.THANKS)}"
+                            android:src="@drawable/heart"
+                            android:visibility="@{!ViewModel.isOwnProfile() ? View.VISIBLE : View.GONE}"
+                            app:backgroundTint="@android:color/white"
+                            app:borderWidth="0dp"
+                            app:elevation="2dp"
+                            app:fabSize="mini"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:maxImageSize="40dp"
+                            app:pressedTranslationZ="12dp" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <Button
                         android:layout_width="match_parent"
