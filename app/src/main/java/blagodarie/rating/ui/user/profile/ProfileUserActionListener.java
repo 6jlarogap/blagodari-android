@@ -10,14 +10,6 @@ public interface ProfileUserActionListener {
 
     void onAddOperation (@NonNull final OperationType operationType);
 
-    void onCopyCardNumber ();
-
-    void onEditCardNumber ();
-
-    void onSaveCardNumber ();
-
-    void onCancelEditCardNumber ();
-
     void onOperations ();
 
     void onWishes ();

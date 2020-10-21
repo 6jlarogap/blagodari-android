@@ -2,9 +2,6 @@ package blagodarie.rating.ui.user.profile;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -46,8 +43,6 @@ import blagodarie.rating.databinding.ThanksUserItemBinding;
 import blagodarie.rating.server.GetProfileInfoRequest;
 import blagodarie.rating.server.GetProfileInfoResponse;
 import blagodarie.rating.server.ServerApiClient;
-import blagodarie.rating.server.ServerApiResponse;
-import blagodarie.rating.server.ServerConnector;
 import blagodarie.rating.ui.AccountProvider;
 import blagodarie.rating.ui.user.GridAutofitLayoutManager;
 import blagodarie.rating.ui.user.ThanksUserAdapter;
@@ -331,51 +326,6 @@ public final class ProfileFragment
     }
 
     @Override
-    public void onCopyCardNumber () {
-        Log.d(TAG, "onCopyCardNumber");
-        final ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
-        final ClipData clip = ClipData.newPlainText(getText(R.string.txt_card_number), mBinding.etCardNumber.getText().toString());
-        if (clipboard != null) {
-            clipboard.setPrimaryClip(clip);
-            Toast.makeText(requireContext(), R.string.info_msg_copied_to_clipboard, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onEditCardNumber () {
-        Log.d(TAG, "onEditCardNumber");
-        mViewModel.setCurrentMode(ProfileViewModel.Mode.EDIT);
-    }
-
-    @Override
-    public void onSaveCardNumber () {
-        Log.d(TAG, "onSaveCardNumber");
-        mViewModel.setCurrentMode(ProfileViewModel.Mode.VIEW);
-
-        final String cardNumber = mBinding.etCardNumber.getText().toString();
-        if (cardNumber.isEmpty() || cardNumber.length() == 16) {
-            AccountProvider.getAuthToken(
-                    requireActivity(),
-                    mAccount,
-                    authToken -> {
-                        if (authToken != null) {
-                            updateCardNumber(authToken, cardNumber);
-                        }
-                    });
-        } else {
-            mViewModel.getCardNumber().notifyChange();
-            Toast.makeText(requireContext(), getString(blagodarie.rating.auth.R.string.err_msg_incorrect_card_number), Toast.LENGTH_LONG).show();
-        }
-    }
-
-    @Override
-    public void onCancelEditCardNumber () {
-        Log.d(TAG, "onCancelEditCardNumber");
-        mViewModel.getCardNumber().notifyChange();
-        mViewModel.setCurrentMode(ProfileViewModel.Mode.VIEW);
-    }
-
-    @Override
     public void onOperations () {
         mFragmentCommunicator.toOperationsFromProfile();
     }
@@ -403,45 +353,6 @@ public final class ProfileFragment
         i.setData(Uri.parse(String.format(getString(R.string.url_social_graph), mAccount.name, mUserId)));
         startActivity(i);
         */
-    }
-
-    private void updateCardNumber (
-            @NonNull final String authToken,
-            @NonNull final String cardNumber
-    ) {
-        Log.d(TAG, "updateProfileData");
-
-        final String content = String.format("{\"credit_card\":\"%s\"}", cardNumber);
-
-        mDisposables.add(
-                Observable.
-                        fromCallable(() -> ServerConnector.sendAuthRequestAndGetResponse("updateprofileinfo", authToken, content)).
-                        subscribeOn(Schedulers.io()).
-                        observeOn(AndroidSchedulers.mainThread()).
-                        subscribe(
-                                serverApiResponse -> {
-                                    Log.d(TAG, serverApiResponse.toString());
-                                    onUpdateCardNumberComplete(serverApiResponse);
-                                },
-                                throwable -> {
-                                    Log.e(TAG, Log.getStackTraceString(throwable));
-                                    Toast.makeText(requireContext(), throwable.getMessage(), Toast.LENGTH_LONG).show();
-                                }
-                        )
-        );
-    }
-
-    private void onUpdateCardNumberComplete (
-            @NonNull final ServerApiResponse serverApiResponse
-    ) {
-        Log.d(TAG, "onUpdateCardNumberComplete serverApiResponse=" + serverApiResponse);
-        if (serverApiResponse.getCode() == 200) {
-            mViewModel.getCardNumber().set(mBinding.etCardNumber.getText().toString());
-            Toast.makeText(requireContext(), R.string.info_msg_update_data_complete, Toast.LENGTH_LONG).show();
-        } else {
-            mViewModel.getCardNumber().notifyChange();
-            Toast.makeText(requireContext(), R.string.err_msg_update_data_failed, Toast.LENGTH_LONG).show();
-        }
     }
 
 }
