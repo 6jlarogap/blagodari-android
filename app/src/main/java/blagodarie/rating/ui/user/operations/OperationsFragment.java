@@ -24,7 +24,7 @@ import java.util.concurrent.Executors;
 
 import blagodarie.rating.OperationToAnyTextManager;
 import blagodarie.rating.OperationToUserManager;
-import blagodarie.rating.OperationType;
+import blagodarie.rating.model.entities.OperationType;
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.OperationsFragmentBinding;
 import blagodarie.rating.ui.AccountProvider;

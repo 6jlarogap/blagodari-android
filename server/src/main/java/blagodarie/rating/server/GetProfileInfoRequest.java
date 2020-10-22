@@ -1,5 +1,7 @@
 package blagodarie.rating.server;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import org.json.JSONArray;
@@ -15,10 +17,12 @@ import okhttp3.Request;
 public final class GetProfileInfoRequest
         extends ServerApiRequest<GetProfileInfoResponse> {
 
+    private static final String TAG = GetProfileInfoRequest.class.getSimpleName();
+
     public GetProfileInfoRequest (
             @NonNull final String userId
     ) {
-        super("getprofileinfo?uuid=" + userId);
+        super(String.format("getprofileinfo?uuid=%s", userId));
     }
 
     @NonNull
@@ -31,6 +35,7 @@ public final class GetProfileInfoRequest
     protected GetProfileInfoResponse parseOkResponse (
             @NonNull final String responseBody
     ) throws JSONException {
+        Log.d(TAG, "parseOkResponse responseBody=" + responseBody);
         final JSONObject json = new JSONObject(responseBody);
 
         final String photo = json.getString("photo");
@@ -59,14 +64,14 @@ public final class GetProfileInfoRequest
         } catch (JSONException e) {
             isTrust = null;
         }
-        final List<GetProfileInfoResponse.ThanksUser> thanksUsers = new ArrayList<>();
+        final List<GetThanksUsersResponse.ThanksUser> thanksUsers = new ArrayList<>();
         final JSONArray thanksUsersJSONArray = json.getJSONArray("thanks_users");
         for (int i = 0; i < thanksUsersJSONArray.length(); i++) {
             final JSONObject thanksUserJSONObject = thanksUsersJSONArray.getJSONObject(i);
             final String thanksUserPhoto = thanksUserJSONObject.getString("photo");
             final String thanksUserIdString = thanksUserJSONObject.getString("user_uuid");
             final UUID thanksUserId = UUID.fromString(thanksUserIdString);
-            thanksUsers.add(new GetProfileInfoResponse.ThanksUser(thanksUserId, thanksUserPhoto));
+            thanksUsers.add(new GetThanksUsersResponse.ThanksUser(thanksUserId, thanksUserPhoto));
         }
         return new GetProfileInfoResponse(
                 photo,

@@ -7,10 +7,10 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import java.util.UUID;
 
+import blagodarie.rating.model.entities.OperationType;
 import blagodarie.rating.server.AddOperationToUserRequest;
 import blagodarie.rating.server.OperationToUser;
 import blagodarie.rating.server.ServerApiClient;
@@ -57,8 +57,7 @@ public final class OperationToUserManager
     ) {
         Log.d(TAG, "addOperation");
 
-        final ServerApiClient serverApiClient = new ServerApiClient();
-        serverApiClient.setAuthToken(authToken);
+        final ServerApiClient serverApiClient = new ServerApiClient(authToken);
 
         disposables.add(
                 Observable.

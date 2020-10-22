@@ -1,4 +1,4 @@
-package blagodarie.rating.ui.user.wishes;
+package blagodarie.rating.model.entities;
 
 import androidx.annotation.NonNull;
 
@@ -7,8 +7,10 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 
+import blagodarie.rating.model.IWish;
+
 public final class Wish
-        implements Serializable {
+        implements IWish, Serializable {
 
     @NonNull
     private final UUID mUuid;
@@ -20,17 +22,18 @@ public final class Wish
     private String mText;
 
     @NonNull
-    private Date mTimestamp;
+    private Date mLastEdit;
 
     public Wish (
             @NonNull final UUID uuid,
             @NonNull final UUID ownerUuid,
             @NonNull final String text,
-            @NonNull final Date timestamp) {
+            @NonNull final Date lastEdit
+    ) {
         mUuid = uuid;
         mOwnerUuid = ownerUuid;
         mText = text;
-        mTimestamp = timestamp;
+        mLastEdit = lastEdit;
     }
 
     @NonNull
@@ -49,16 +52,16 @@ public final class Wish
     }
 
     @NonNull
-    public final Date getTimestamp () {
-        return mTimestamp;
+    public final Date getLastEdit () {
+        return mLastEdit;
     }
 
     public final void setText (@NonNull final String text) {
         mText = text;
     }
 
-    public final void setTimestamp (@NonNull final Date timestamp) {
-        mTimestamp = timestamp;
+    public final void setLastEdit (@NonNull final Date lastEdit) {
+        mLastEdit = lastEdit;
     }
 
     @Override
@@ -80,7 +83,7 @@ public final class Wish
                 "mUuid=" + mUuid +
                 ", mOwnerUuid=" + mOwnerUuid +
                 ", mText='" + mText + '\'' +
-                ", mTimestamp=" + mTimestamp +
+                ", mTimestamp=" + mLastEdit +
                 '}';
     }
 

@@ -12,8 +12,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.WishItemBinding;
+import blagodarie.rating.model.IWish;
+
 final class WishesAdapter
-        extends PagedListAdapter<Wish, WishesAdapter.WishViewHolder> {
+        extends PagedListAdapter<IWish, WishesAdapter.WishViewHolder> {
 
     @NonNull
     private final OnWishClickListener mOnWishClickListener;
@@ -39,7 +41,7 @@ final class WishesAdapter
             @NonNull WishViewHolder holder,
             int position
     ) {
-        final Wish wish = getItem(position);
+        final IWish wish = getItem(position);
         if (wish != null) {
             holder.bind(wish, view -> mOnWishClickListener.onClick(wish));
         }
@@ -57,7 +59,7 @@ final class WishesAdapter
         }
 
         void bind (
-                @NonNull final Wish wish,
+                @NonNull final IWish wish,
                 @NonNull final View.OnClickListener onWishClickListener
         ) {
             itemView.setOnClickListener(onWishClickListener);
@@ -65,21 +67,21 @@ final class WishesAdapter
         }
     }
 
-    private static DiffUtil.ItemCallback<Wish> DIFF_CALLBACK =
-            new DiffUtil.ItemCallback<Wish>() {
+    private static DiffUtil.ItemCallback<IWish> DIFF_CALLBACK =
+            new DiffUtil.ItemCallback<IWish>() {
 
                 @Override
                 public boolean areItemsTheSame (
-                        Wish oldWish,
-                        Wish newWish
+                        IWish oldWish,
+                        IWish newWish
                 ) {
                     return false;
                 }
 
                 @Override
                 public boolean areContentsTheSame (
-                        Wish oldWish,
-                        Wish newWish
+                        IWish oldWish,
+                        IWish newWish
                 ) {
                     return false;
                 }

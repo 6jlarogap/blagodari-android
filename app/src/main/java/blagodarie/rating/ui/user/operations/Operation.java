@@ -6,7 +6,7 @@ import androidx.annotation.Nullable;
 import java.util.Date;
 import java.util.UUID;
 
-import blagodarie.rating.OperationType;
+import blagodarie.rating.model.entities.OperationType;
 
 public final class Operation {
 

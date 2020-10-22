@@ -1,5 +1,7 @@
 package blagodarie.rating.server;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import org.json.JSONException;
@@ -9,6 +11,8 @@ import okhttp3.Request;
 
 public final class GetRatingLatestVersionRequest
         extends ServerApiRequest<GetRatingLatestVersionResponse> {
+
+    private static final String TAG = GetRatingLatestVersionRequest.class.getSimpleName();
 
     public GetRatingLatestVersionRequest () {
         super("getratinglatestversion");
@@ -24,6 +28,7 @@ public final class GetRatingLatestVersionRequest
     protected GetRatingLatestVersionResponse parseOkResponse (
             @NonNull final String responseBody
     ) throws JSONException {
+        Log.d(TAG, "parseOkResponse responseBody=" + responseBody);
         final JSONObject json = new JSONObject(responseBody);
         final boolean ratingGooglePlayUpdate = true;//json.getBoolean("rating_google_play_update");
         final int versionCode = 100;//json.getInt("version_code");

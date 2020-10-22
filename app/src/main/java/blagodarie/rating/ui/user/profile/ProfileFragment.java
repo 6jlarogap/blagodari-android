@@ -2,6 +2,8 @@ package blagodarie.rating.ui.user.profile;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -11,15 +13,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.BindingAdapter;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.paging.LivePagedListBuilder;
+import androidx.paging.PagedList;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
@@ -33,19 +39,23 @@ import org.jetbrains.annotations.NotNull;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Executors;
 
+import blagodarie.rating.AppExecutors;
+import blagodarie.rating.OperationManager;
 import blagodarie.rating.OperationToUserManager;
-import blagodarie.rating.OperationType;
 import blagodarie.rating.R;
 import blagodarie.rating.auth.AccountGeneral;
+import blagodarie.rating.databinding.EnterOperationCommentDialogBinding;
 import blagodarie.rating.databinding.ProfileFragmentBinding;
-import blagodarie.rating.databinding.ThanksUserItemBinding;
+import blagodarie.rating.model.entities.OperationType;
+import blagodarie.rating.repository.AsyncRepository;
+import blagodarie.rating.repository.AsyncServerRepository;
 import blagodarie.rating.server.GetProfileInfoRequest;
 import blagodarie.rating.server.GetProfileInfoResponse;
 import blagodarie.rating.server.ServerApiClient;
 import blagodarie.rating.ui.AccountProvider;
 import blagodarie.rating.ui.user.GridAutofitLayoutManager;
-import blagodarie.rating.ui.user.ThanksUserAdapter;
 import blagodarie.rating.ui.user.UserViewModel;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -74,7 +84,7 @@ public final class ProfileFragment
 
     private ProfileFragmentBinding mBinding;
 
-    private ThanksUserAdapter mThanksUserAdapter;
+    private ThanksUsersAdapter mThanksUsersAdapter;
 
     private Account mAccount;
 
@@ -84,6 +94,9 @@ public final class ProfileFragment
     private CompositeDisposable mDisposables = new CompositeDisposable();
 
     private FragmentCommunicator mFragmentCommunicator;
+
+    @NonNull
+    private final AsyncRepository mRepository = new AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread());
 
     @NotNull
     @Override
@@ -147,7 +160,7 @@ public final class ProfileFragment
 
     private void initThanksUserAdapter () {
         Log.d(TAG, "initThanksUserAdapter");
-        mThanksUserAdapter = new ThanksUserAdapter(this::onThanksUserClick);
+        mThanksUsersAdapter = new ThanksUsersAdapter(this::onThanksUserClick);
     }
 
     private void initViewModel () {
@@ -155,7 +168,6 @@ public final class ProfileFragment
         mViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
         mViewModel.isHaveAccount().set(mAccount != null);
         mViewModel.isOwnProfile().set(mAccount != null && mAccount.name.equals(mUserId.toString()));
-        mViewModel.getThanksUsers().observe(requireActivity(), mThanksUserAdapter::setData);
         mViewModel.getQrCode().set(createQrCodeBitmap());
     }
 
@@ -164,7 +176,7 @@ public final class ProfileFragment
         mBinding.setUserActionListener(this);
         mBinding.srlRefreshProfileInfo.setOnRefreshListener(this::refreshProfileData);
         mBinding.rvThanksUsers.setLayoutManager(new GridAutofitLayoutManager(requireContext(), (int) ((getResources().getDimension(R.dimen.thanks_user_photo_width) + (getResources().getDimension(R.dimen.thanks_user_photo_margin) * 2)))));
-        mBinding.rvThanksUsers.setAdapter(mThanksUserAdapter);
+        mBinding.rvThanksUsers.setAdapter(mThanksUsersAdapter);
         mBinding.setViewModel(mViewModel);
     }
 
@@ -206,15 +218,11 @@ public final class ProfileFragment
         }
     }
 
-    private void onThanksUserClick (@NonNull final View view) {
+    private void onThanksUserClick (@NonNull final UUID userId) {
         Log.d(TAG, "onThanksUserClick");
-        final ThanksUserItemBinding thanksUserItemBinding = DataBindingUtil.findBinding(view);
-        if (thanksUserItemBinding != null) {
-            final String userId = thanksUserItemBinding.getThanksUser().getUserId().toString();
-            final Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(getString(R.string.url_profile, userId)));
-            startActivity(i);
-        }
+        final Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(getString(R.string.url_profile, userId)));
+        startActivity(i);
     }
 
     private void downloadProfileData (
@@ -223,8 +231,7 @@ public final class ProfileFragment
         Log.d(TAG, "downloadProfileData");
         mViewModel.getDownloadInProgress().set(true);
 
-        final ServerApiClient apiClient = new ServerApiClient();
-        apiClient.setAuthToken(authToken);
+        final ServerApiClient apiClient = new ServerApiClient(authToken);
         final GetProfileInfoRequest getProfileInfoRequest = new GetProfileInfoRequest(mUserId.toString());
         mDisposables.add(
                 Observable.
@@ -242,6 +249,24 @@ public final class ProfileFragment
                                 }
                         )
         );
+
+        refreshThanksUsers();
+    }
+
+    private void refreshThanksUsers () {
+        final ThanksUsersDataSource.ThanksUserDataSourceFactory sourceFactory = new ThanksUsersDataSource.ThanksUserDataSourceFactory(mUserId);
+
+        final PagedList.Config config = new PagedList.Config.Builder()
+                .setEnablePlaceholders(false)
+                .setPageSize(10)
+                .build();
+
+        mViewModel.setThanksUsers(
+                new LivePagedListBuilder<>(sourceFactory, config).
+                        setFetchExecutor(Executors.newSingleThreadExecutor()).
+                        build()
+        );
+        mViewModel.getThanksUsers().observe(requireActivity(), mThanksUsersAdapter::submitList);
     }
 
     private void handleGetProfileInfoResponse (
@@ -263,7 +288,6 @@ public final class ProfileFragment
         mViewModel.getMistrustCount().set(getProfileInfoResponse.getMistrustCount());
         mViewModel.getThanksCount().set((getProfileInfoResponse.getThanksCount() != null ? getProfileInfoResponse.getThanksCount() : 0));
         mViewModel.getIsTrust().set(getProfileInfoResponse.getIsTrust());
-        mViewModel.getThanksUsers().setValue(getProfileInfoResponse.getThanksUsers());
     }
 
     @BindingAdapter({"imageUrl"})
@@ -279,7 +303,7 @@ public final class ProfileFragment
     }
 
     @Override
-    public void onShareProfile () {
+    public void onShareProfileClick () {
         final Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.url_profile, mUserId.toString()));
@@ -288,7 +312,21 @@ public final class ProfileFragment
     }
 
     @Override
-    public void onAddOperation (@NonNull final OperationType operationType) {
+    public void onTrustClick () {
+        addOperation(OperationType.MISTRUST_CANCEL);
+    }
+
+    @Override
+    public void onMistrustClick () {
+        addOperation(OperationType.MISTRUST);
+    }
+
+    @Override
+    public void onThanksClick () {
+        addOperation(OperationType.THANKS);
+    }
+
+    public void addOperation (@NonNull final OperationType operationType) {
         Log.d(TAG, "onAddOperation");
         if (mAccount != null) {
             new OperationToUserManager().
@@ -300,6 +338,7 @@ public final class ProfileFragment
                             operationType,
                             this::refreshProfileData
                     );
+
         } else {
             AccountProvider.createAccount(
                     requireActivity(),
@@ -326,27 +365,27 @@ public final class ProfileFragment
     }
 
     @Override
-    public void onOperations () {
+    public void onOperationsClick () {
         mFragmentCommunicator.toOperationsFromProfile();
     }
 
     @Override
-    public void onWishes () {
+    public void onWishesClick () {
         mFragmentCommunicator.toWishes();
     }
 
     @Override
-    public void onAbilities () {
+    public void onAbilitiesClick () {
         mFragmentCommunicator.toAbilities();
     }
 
     @Override
-    public void onKeys () {
+    public void onKeysClick () {
         mFragmentCommunicator.toKeysFromProfile();
     }
 
     @Override
-    public void onSocialGraph () {
+    public void onSocialGraphClick () {
         mFragmentCommunicator.toGraph();
         /*
         final Intent i = new Intent(Intent.ACTION_VIEW);

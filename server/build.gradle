@@ -39,6 +39,7 @@ dependencies {
     //Не увеличивать! Уменьшено для поддержки Android < 5.0
     implementation 'com.squareup.okhttp3:okhttp:3.12.1'
     implementation 'androidx.annotation:annotation:1.1.0'
+    implementation project(path: ':model')
 
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'

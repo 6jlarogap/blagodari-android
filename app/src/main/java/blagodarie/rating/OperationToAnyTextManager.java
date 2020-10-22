@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 
 import java.util.UUID;
 
+import blagodarie.rating.model.entities.OperationType;
 import blagodarie.rating.server.AddOperationToAnyTextRequest;
 import blagodarie.rating.server.OperationToAnyText;
 import blagodarie.rating.server.ServerApiClient;
@@ -58,8 +59,7 @@ public final class OperationToAnyTextManager
     ) {
         Log.d(TAG, "addOperation");
 
-        final ServerApiClient serverApiClient = new ServerApiClient();
-        serverApiClient.setAuthToken(authToken);
+        final ServerApiClient serverApiClient = new ServerApiClient(authToken);
 
         disposables.add(
                 Observable.

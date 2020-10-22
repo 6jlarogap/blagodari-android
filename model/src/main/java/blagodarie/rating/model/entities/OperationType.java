@@ -1,6 +1,8 @@
-package blagodarie.rating;
+package blagodarie.rating.model.entities;
 
 import androidx.annotation.Nullable;
+
+import blagodarie.rating.model.R;
 
 public enum OperationType {
 

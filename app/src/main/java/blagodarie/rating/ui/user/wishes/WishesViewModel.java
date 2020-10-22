@@ -6,10 +6,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.paging.PagedList;
 
+import blagodarie.rating.model.IWish;
+import blagodarie.rating.model.entities.Wish;
+
 public final class WishesViewModel
         extends ViewModel {
 
-    private LiveData<PagedList<Wish>> mWishes;
+    private LiveData<PagedList<IWish>> mWishes;
 
     @NonNull
     private final ObservableBoolean mOwnProfile = new ObservableBoolean(false);
@@ -18,11 +21,11 @@ public final class WishesViewModel
     private final ObservableBoolean mDownloadInProgress = new ObservableBoolean(false);
 
     @NonNull
-    public LiveData<PagedList<Wish>> getWishes () {
+    public LiveData<PagedList<IWish>> getWishes () {
         return mWishes;
     }
 
-    public void setWishes (@NonNull final LiveData<PagedList<Wish>> wishes) {
+    public void setWishes (@NonNull final LiveData<PagedList<IWish>> wishes) {
         mWishes = wishes;
     }
 

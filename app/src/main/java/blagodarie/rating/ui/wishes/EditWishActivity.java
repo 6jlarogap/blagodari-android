@@ -20,10 +20,10 @@ import java.util.Locale;
 
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.EditWishActivityBinding;
+import blagodarie.rating.model.entities.Wish;
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
 import blagodarie.rating.ui.AccountProvider;
-import blagodarie.rating.ui.user.wishes.Wish;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -112,7 +112,7 @@ public final class EditWishActivity
             @NonNull final String authToken
     ) {
         Log.d(TAG, "downloadProfileData");
-        final String content = String.format(Locale.ENGLISH, "{\"uuid\":\"%s\",\"text\":\"%s\",\"last_edit\":%d}", mWish.getUuid().toString(), mWish.getText(), mWish.getTimestamp().getTime());
+        final String content = String.format(Locale.ENGLISH, "{\"uuid\":\"%s\",\"text\":\"%s\",\"last_edit\":%d}", mWish.getUuid().toString(), mWish.getText(), mWish.getLastEdit().getTime());
         mCompositeDisposable.add(
                 Observable.
                         fromCallable(() -> ServerConnector.sendAuthRequestAndGetResponse("addorupdatewish", authToken, content)).
@@ -136,7 +136,7 @@ public final class EditWishActivity
                 return true;
             case R.id.miSave:
                 mWish.setText(mActivityBinding.etWishText.getText().toString());
-                mWish.setTimestamp(new Date());
+                mWish.setLastEdit(new Date());
                 getAuthTokenAndAddOrUpdateWish();
                 return true;
         }
