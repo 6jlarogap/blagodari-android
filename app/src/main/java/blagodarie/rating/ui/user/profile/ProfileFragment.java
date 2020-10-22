@@ -2,8 +2,6 @@ package blagodarie.rating.ui.user.profile;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -13,15 +11,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.BindingAdapter;
-import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.paging.LivePagedListBuilder;
@@ -42,11 +37,9 @@ import java.util.UUID;
 import java.util.concurrent.Executors;
 
 import blagodarie.rating.AppExecutors;
-import blagodarie.rating.OperationManager;
 import blagodarie.rating.OperationToUserManager;
 import blagodarie.rating.R;
 import blagodarie.rating.auth.AccountGeneral;
-import blagodarie.rating.databinding.EnterOperationCommentDialogBinding;
 import blagodarie.rating.databinding.ProfileFragmentBinding;
 import blagodarie.rating.model.entities.OperationType;
 import blagodarie.rating.repository.AsyncRepository;
