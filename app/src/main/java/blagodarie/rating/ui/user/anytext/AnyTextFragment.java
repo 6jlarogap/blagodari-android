@@ -36,11 +36,11 @@ import java.util.Map;
 import java.util.UUID;
 
 import blagodarie.rating.OperationToAnyTextManager;
-import blagodarie.rating.OperationType;
+import blagodarie.rating.model.entities.OperationType;
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.AnyTextFragmentBinding;
 import blagodarie.rating.databinding.ThanksUserItemBinding;
-import blagodarie.rating.server.GetProfileInfoResponse;
+import blagodarie.rating.server.GetThanksUsersResponse;
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
 import blagodarie.rating.ui.AccountProvider;
@@ -278,13 +278,13 @@ public final class AnyTextFragment
                         mViewModel.getIsTrust().set(null);
                     }
 
-                    final List<GetProfileInfoResponse.ThanksUser> thanksUsers = new ArrayList<>();
+                    final List<GetThanksUsersResponse.ThanksUser> thanksUsers = new ArrayList<>();
                     final JSONArray thanksUsersJSONArray = userJSON.getJSONArray("thanks_users");
                     for (int i = 0; i < thanksUsersJSONArray.length(); i++) {
                         final JSONObject thanksUserJSONObject = thanksUsersJSONArray.getJSONObject(i);
                         final String thanksUserPhoto = thanksUserJSONObject.getString("photo");
                         final String thanksUserUUID = thanksUserJSONObject.getString("user_uuid");
-                        thanksUsers.add(new GetProfileInfoResponse.ThanksUser(UUID.fromString(thanksUserUUID), thanksUserPhoto));
+                        thanksUsers.add(new GetThanksUsersResponse.ThanksUser(UUID.fromString(thanksUserUUID), thanksUserPhoto));
                     }
                     mViewModel.getThanksUsers().setValue(thanksUsers);
 

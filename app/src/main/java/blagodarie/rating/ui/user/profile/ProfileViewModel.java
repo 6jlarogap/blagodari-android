@@ -6,22 +6,17 @@ import androidx.annotation.NonNull;
 import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableField;
 import androidx.databinding.ObservableInt;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.paging.PagedList;
 
 import java.util.List;
 
-import blagodarie.rating.server.GetProfileInfoResponse;
+import blagodarie.rating.server.GetThanksUsersResponse;
 
 public final class ProfileViewModel
         extends ViewModel {
-
-    public enum Mode {
-        VIEW, EDIT
-    }
-
-    @NonNull
-    private final ObservableField<Mode> mCurrentMode = new ObservableField<>(Mode.VIEW);
 
     @NonNull
     private final ObservableField<String> mLastName = new ObservableField<>("");
@@ -68,19 +63,9 @@ public final class ProfileViewModel
     @NonNull
     private final ObservableBoolean mOwnProfile = new ObservableBoolean(false);
 
-    @NonNull
-    private final MutableLiveData<List<GetProfileInfoResponse.ThanksUser>> mThanksUsers = new MutableLiveData<>();
+    private LiveData<PagedList<GetThanksUsersResponse.ThanksUser>> mThanksUsers;
 
     public ProfileViewModel () {
-    }
-
-    @NonNull
-    public final ObservableField<Mode> getCurrentMode () {
-        return mCurrentMode;
-    }
-
-    public final void setCurrentMode (@NonNull final Mode mode) {
-        mCurrentMode.set(mode);
     }
 
     @NonNull
@@ -158,8 +143,14 @@ public final class ProfileViewModel
     }
 
     @NonNull
-    public MutableLiveData<List<GetProfileInfoResponse.ThanksUser>> getThanksUsers () {
+    public LiveData<PagedList<GetThanksUsersResponse.ThanksUser>> getThanksUsers () {
         return mThanksUsers;
+    }
+
+    public void setThanksUsers (
+            @NonNull final LiveData<PagedList<GetThanksUsersResponse.ThanksUser>> thanksUsers
+    ) {
+        mThanksUsers = thanksUsers;
     }
 
 }

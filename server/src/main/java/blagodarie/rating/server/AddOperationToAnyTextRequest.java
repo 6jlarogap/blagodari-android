@@ -1,5 +1,7 @@
 package blagodarie.rating.server;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import org.json.JSONException;
@@ -13,6 +15,8 @@ import okhttp3.RequestBody;
 
 public final class AddOperationToAnyTextRequest
         extends ServerApiRequest<AddOperationToAnyTextResponse> {
+
+    private static final String TAG = AddOperationToAnyTextRequest.class.getSimpleName();
 
     @NonNull
     private final OperationToAnyText mOperation;
@@ -35,6 +39,7 @@ public final class AddOperationToAnyTextRequest
     protected AddOperationToAnyTextResponse parseOkResponse (
             @NonNull final String responseBody
     ) throws JSONException {
+        Log.d(TAG, "parseOkResponse responseBody=" + responseBody);
         final JSONObject json = new JSONObject(responseBody);
         final UUID textId = UUID.fromString(json.getString("text_id_to"));
         return new AddOperationToAnyTextResponse(textId);

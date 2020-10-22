@@ -1,5 +1,7 @@
 package blagodarie.rating.server;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import org.json.JSONException;
@@ -12,6 +14,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public abstract class ServerApiRequest<ApiResponseType extends _ServerApiResponse> {
+
+    private static final String TAG = ServerApiRequest.class.getSimpleName();
 
     protected static final MediaType JSON_TYPE = MediaType.parse("application/json; charset=utf-8");
     private final static String API_BASE_URL = BuildConfig.DEBUG ? "https://api.dev.благодарие.рф/api/" : "https://api.благодарие.рф/api/";
@@ -41,22 +45,29 @@ public abstract class ServerApiRequest<ApiResponseType extends _ServerApiRespons
     @NonNull
     ApiResponseType parseResponse (
             @NonNull final Response response
-    ) throws ServerException, JSONException, IOException, EmptyBodyException {
+    ) throws JSONException, IOException, EmptyResponseException, HttpException {
+        Log.d(TAG, "parseOkResponse response=" + response.toString());
         if (response.code() == 200) {
             if (response.body() != null) {
                 return parseOkResponse(response.body().string());
             } else {
-                throw new EmptyBodyException();
+                throw new EmptyResponseException();
             }
-        } else if (response.code() == 401) {
-            throw new UnauthorizedException();
+        } else if (response.code() >= 400 && response.code() <= 499) {
+            if (response.code() == 401) {
+                throw new BadAuthorizationTokenException();
+            } else {
+                String errorMessage = null;
+                if (response.body() != null) {
+                    final JSONObject jsonObject = new JSONObject(response.body().string());
+                    errorMessage = jsonObject.getString("message");
+                }
+                throw new BadRequestException(response.code(), response.message() + " - " + errorMessage);
+            }
+        } else if (response.code() >= 500 && response.code() <= 599) {
+            throw new ServerInternalException(response.code(), response.message());
         } else {
-            String errorMessage = null;
-            if (response.body() != null) {
-                final JSONObject jsonObject = new JSONObject(response.body().string());
-                errorMessage = jsonObject.getString("message");
-            }
-            throw new ServerException(errorMessage, response.code());
+            throw new HttpException(response.code(), response.message());
         }
     }
 

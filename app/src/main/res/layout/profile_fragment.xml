@@ -12,7 +12,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top|end"
             android:layout_margin="@dimen/fab_margin"
-            android:onClick="@{() -> UserActionListener.onShareProfile()}"
+            android:onClick="@{() -> UserActionListener.onShareProfileClick()}"
             android:src="@drawable/share_variant"
             app:backgroundTint="@color/colorPrimary"
             app:borderWidth="0dp"
@@ -96,7 +96,7 @@
                             android:layout_weight="1"
                             android:background="@{ViewModel.isTrust != null &amp;&amp; ViewModel.isTrust ? @android:color/holo_green_dark : @color/light_gray}"
                             android:enabled="@{ViewModel.isTrust == null || !ViewModel.isTrust}"
-                            android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISTRUST_CANCEL)}"
+                            android:onClick="@{() -> UserActionListener.onTrustClick()}"
                             android:text="@string/btn_trust"
                             android:visibility="@{!ViewModel.isOwnProfile ? View.VISIBLE : View.GONE}" />
 
@@ -108,7 +108,7 @@
                             android:layout_weight="1"
                             android:background="@{ViewModel.isTrust != null &amp;&amp; !ViewModel.isTrust ? @android:color/holo_red_dark : @color/light_gray}"
                             android:enabled="@{ViewModel.isTrust == null || ViewModel.isTrust}"
-                            android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.MISTRUST)}"
+                            android:onClick="@{() -> UserActionListener.onMistrustClick()}"
                             android:text="@string/btn_mistrust"
                             android:visibility="@{!ViewModel.isOwnProfile ? View.VISIBLE : View.GONE}" />
 
@@ -124,7 +124,7 @@
                             android:id="@+id/btnThanksCount"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:onClick="@{() -> UserActionListener.onOperations()}"
+                            android:onClick="@{() -> UserActionListener.onOperationsClick()}"
                             android:text="@{ViewModel.isOwnProfile || !ViewModel.isHaveAccount ? String.format(@string/txt_self_profile_thanks_count, ViewModel.sumThanksCount) : String.format(@string/txt_thanks_count, ViewModel.sumThanksCount, ViewModel.thanksCount)}"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toStartOf="@id/fabThanks"
@@ -137,7 +137,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical|end"
-                            android:onClick="@{() -> UserActionListener.onAddOperation(OperationType.THANKS)}"
+                            android:onClick="@{() -> UserActionListener.onThanksClick()}"
                             android:src="@drawable/heart"
                             android:visibility="@{!ViewModel.isOwnProfile() ? View.VISIBLE : View.GONE}"
                             app:backgroundTint="@android:color/white"
@@ -155,25 +155,25 @@
                     <Button
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:onClick="@{() -> UserActionListener.onKeys()}"
+                        android:onClick="@{() -> UserActionListener.onKeysClick()}"
                         android:text="@string/btn_keys" />
 
                     <Button
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:onClick="@{() -> UserActionListener.onWishes()}"
+                        android:onClick="@{() -> UserActionListener.onWishesClick()}"
                         android:text="@string/btn_wishes" />
 
                     <Button
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:onClick="@{() -> UserActionListener.onAbilities()}"
+                        android:onClick="@{() -> UserActionListener.onAbilitiesClick()}"
                         android:text="@string/btn_ability" />
 
                     <Button
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:onClick="@{() -> UserActionListener.onSocialGraph()}"
+                        android:onClick="@{() -> UserActionListener.onSocialGraphClick()}"
                         android:text="@string/btn_social_graph" />
 
                     <TextView
@@ -201,9 +201,7 @@
 
         <import type="android.view.View" />
 
-        <import type="blagodarie.rating.ui.user.profile.ProfileViewModel.Mode" />
-
-        <import type="blagodarie.rating.OperationType" />
+        <import type="blagodarie.rating.model.entities.OperationType" />
 
         <variable
             name="ViewModel"

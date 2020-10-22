@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="operation_type_name_thanks">Благодарность</string>
+    <string name="operation_type_name_trustless">Утрата доверия</string>
+    <string name="operation_type_name_trustless_cancel">Восстановление доверия</string>
+</resources>

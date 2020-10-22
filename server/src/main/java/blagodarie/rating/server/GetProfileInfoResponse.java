@@ -11,33 +11,6 @@ import java.util.UUID;
 public final class GetProfileInfoResponse
         extends _ServerApiResponse {
 
-    public static final class ThanksUser {
-
-        @NonNull
-        private final UUID mUserId;
-
-        @NonNull
-        private final String mPhoto;
-
-        public ThanksUser (
-                @NonNull final UUID userId,
-                @NonNull final String photo
-        ) {
-            mUserId = userId;
-            mPhoto = photo;
-        }
-
-        @NonNull
-        public UUID getUserId () {
-            return mUserId;
-        }
-
-        @NonNull
-        public String getPhoto () {
-            return mPhoto;
-        }
-    }
-
     @NonNull
     private final String mPhoto;
 
@@ -68,7 +41,7 @@ public final class GetProfileInfoResponse
     private final Boolean mIsTrust;
 
     @NonNull
-    private final List<ThanksUser> mThanksUsers;
+    private final List<GetThanksUsersResponse.ThanksUser> mThanksUsers;
 
     public GetProfileInfoResponse (
             @NonNull final String photo,
@@ -82,7 +55,7 @@ public final class GetProfileInfoResponse
             final int mistrustCount,
             @Nullable final Integer thanksCount,
             @Nullable final Boolean isTrust,
-            @NonNull final List<ThanksUser> thanksUsers
+            @NonNull final List<GetThanksUsersResponse.ThanksUser> thanksUsers
     ) {
         mPhoto = photo;
         mFirstName = firstName;
@@ -150,7 +123,7 @@ public final class GetProfileInfoResponse
     }
 
     @NonNull
-    public final List<ThanksUser> getThanksUsers () {
+    public final List<GetThanksUsersResponse.ThanksUser> getThanksUsers () {
         return mThanksUsers;
     }
 }

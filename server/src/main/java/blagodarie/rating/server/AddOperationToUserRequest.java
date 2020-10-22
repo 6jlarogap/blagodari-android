@@ -1,5 +1,7 @@
 package blagodarie.rating.server;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import java.util.Locale;
@@ -9,6 +11,8 @@ import okhttp3.RequestBody;
 
 public final class AddOperationToUserRequest
         extends ServerApiRequest<AddOperationToUserResponse> {
+
+    private static final String TAG = AddOperationToUserRequest.class.getSimpleName();
 
     @NonNull
     private final OperationToUser mOperation;
@@ -31,6 +35,7 @@ public final class AddOperationToUserRequest
     protected AddOperationToUserResponse parseOkResponse (
             @NonNull final String responseBody
     ) {
+        Log.d(TAG, "parseOkResponse responseBody=" + responseBody);
         return new AddOperationToUserResponse();
     }
 

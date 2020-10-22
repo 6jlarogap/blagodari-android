@@ -13,24 +13,25 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.paging.LivePagedListBuilder;
-import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
 import java.util.UUID;
-import java.util.concurrent.Executors;
 
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.WishesFragmentBinding;
+import blagodarie.rating.model.IWish;
+import blagodarie.rating.model.entities.Wish;
+import blagodarie.rating.repository.Repository;
+import blagodarie.rating.repository.ServerRepository;
 import blagodarie.rating.ui.user.profile.ProfileFragmentArgs;
 import blagodarie.rating.ui.wishes.EditWishActivity;
 import io.reactivex.disposables.CompositeDisposable;
 
 public final class WishesFragment
-extends Fragment {
+        extends Fragment {
 
     private static final String TAG = WishesFragment.class.getSimpleName();
 
@@ -43,6 +44,8 @@ extends Fragment {
     private Account mAccount;
 
     private UUID mUserId;
+
+    private Repository mRepository = new ServerRepository();
 
     @NonNull
     private CompositeDisposable mDisposables = new CompositeDisposable();
@@ -114,18 +117,7 @@ extends Fragment {
 
     private void refreshWishes () {
         Log.d(TAG, "refreshWishes");
-        final WishesDataSource.WishesDataSourceFactory sourceFactory = new WishesDataSource.WishesDataSourceFactory(mUserId);
-
-        final PagedList.Config config = new PagedList.Config.Builder()
-                .setEnablePlaceholders(false)
-                .setPageSize(10)
-                .build();
-
-        mViewModel.setWishes(
-                new LivePagedListBuilder<>(sourceFactory, config).
-                        setFetchExecutor(Executors.newSingleThreadExecutor()).
-                        build()
-        );
+        mViewModel.setWishes(mRepository.getUserWishes(mUserId));
         mViewModel.getWishes().observe(requireActivity(), mWishesAdapter::submitList);
     }
 
@@ -145,7 +137,7 @@ extends Fragment {
         mWishesAdapter = new WishesAdapter(this::onWishClick);
     }
 
-    private void onWishClick (@NonNull final Wish wish) {
+    private void onWishClick (@NonNull final IWish wish) {
         final Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(getString(R.string.url_wish, wish.getUuid())));
         startActivity(i);

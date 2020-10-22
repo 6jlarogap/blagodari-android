@@ -2,21 +2,25 @@ package blagodarie.rating.ui.user.profile;
 
 import androidx.annotation.NonNull;
 
-import blagodarie.rating.OperationType;
+import blagodarie.rating.model.entities.OperationType;
 
 public interface ProfileUserActionListener {
 
-    void onShareProfile ();
+    void onShareProfileClick ();
 
-    void onAddOperation (@NonNull final OperationType operationType);
+    void onTrustClick();
 
-    void onOperations ();
+    void onMistrustClick();
 
-    void onWishes ();
+    void onThanksClick();
 
-    void onAbilities ();
+    void onOperationsClick ();
 
-    void onKeys ();
+    void onWishesClick ();
 
-    void onSocialGraph ();
+    void onAbilitiesClick ();
+
+    void onKeysClick ();
+
+    void onSocialGraphClick ();
 }

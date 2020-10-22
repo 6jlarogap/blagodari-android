@@ -6,104 +6,74 @@ import androidx.annotation.NonNull;
 import androidx.paging.DataSource;
 import androidx.paging.PositionalDataSource;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
-import blagodarie.rating.server.ServerApiResponse;
-import blagodarie.rating.server.ServerConnector;
+import blagodarie.rating.model.IWish;
+import blagodarie.rating.server.GetUserWishesRequest;
+import blagodarie.rating.server.GetUserWishesResponse;
+import blagodarie.rating.server.ServerApiClient;
 
 public class WishesDataSource
-        extends PositionalDataSource<Wish> {
+        extends PositionalDataSource<IWish> {
+
     private static final String TAG = WishesDataSource.class.getSimpleName();
 
     @NonNull
     private final UUID mUserId;
 
-    WishesDataSource (@NonNull final UUID userId) {
+    public WishesDataSource (
+            @NonNull final UUID userId
+    ) {
         Log.d(TAG, "OperationDataSource");
         mUserId = userId;
     }
 
     @Override
-    public void loadInitial (@NonNull PositionalDataSource.LoadInitialParams params, @NonNull PositionalDataSource.LoadInitialCallback<Wish> callback) {
+    public void loadInitial (
+            @NonNull final PositionalDataSource.LoadInitialParams params,
+            @NonNull final PositionalDataSource.LoadInitialCallback<IWish> callback
+    ) {
         Log.d(TAG, "loadInitial from=" + params.requestedStartPosition + ", pageSize=" + params.pageSize);
+        final ServerApiClient client = new ServerApiClient();
+        final GetUserWishesRequest request = new GetUserWishesRequest(mUserId, params.requestedStartPosition, params.pageSize);
         try {
-            final ServerApiResponse serverApiResponse = ServerConnector.sendRequestAndGetResponse(String.format(Locale.ENGLISH, "/getuserwishes?uuid=%s&from=%d&count=%d", mUserId.toString(), params.requestedStartPosition, params.pageSize));
-            if (serverApiResponse.getCode() == 200) {
-                if (serverApiResponse.getBody() != null) {
-                    final String responseBody = serverApiResponse.getBody();
-                    Log.d(TAG, "responseBody=" + responseBody);
-                    try {
-                        final JSONArray jsonOperations = new JSONObject(responseBody).getJSONArray("wishes");
-                        final List<Wish> wishes = new ArrayList<>();
-                        for (int i = 0; i < jsonOperations.length(); i++) {
-                            final JSONObject operationJsonObject = jsonOperations.getJSONObject(i);
-                            final UUID id = UUID.fromString(operationJsonObject.getString("uuid"));
-                            final String text = operationJsonObject.getString("text");
-                            final Date lastEdit = new Date(operationJsonObject.getLong("last_edit"));
-                            wishes.add(new Wish(id, mUserId, text, lastEdit));
-                        }
-                        callback.onResult(wishes, 0);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+            final GetUserWishesResponse response = client.execute(request);
+            callback.onResult(response.getWishes(), 0);
+        } catch (Exception e) {
+            Log.e(TAG, Log.getStackTraceString(e));
         }
     }
 
     @Override
-    public void loadRange (@NonNull PositionalDataSource.LoadRangeParams params, @NonNull PositionalDataSource.LoadRangeCallback<Wish> callback) {
+    public void loadRange (
+            @NonNull final PositionalDataSource.LoadRangeParams params,
+            @NonNull final PositionalDataSource.LoadRangeCallback<IWish> callback
+    ) {
         Log.d(TAG, "loadRange startPosition=" + params.startPosition + ", loadSize=" + params.loadSize);
+        final ServerApiClient client = new ServerApiClient();
+        final GetUserWishesRequest request = new GetUserWishesRequest(mUserId, params.startPosition, params.loadSize);
         try {
-            final ServerApiResponse serverApiResponse = ServerConnector.sendRequestAndGetResponse(String.format(Locale.ENGLISH, "/getuserwishes?uuid=%s&from=%d&count=%d", mUserId.toString(), params.startPosition, params.loadSize));
-            if (serverApiResponse.getCode() == 200) {
-                if (serverApiResponse.getBody() != null) {
-                    final String responseBody = serverApiResponse.getBody();
-                    Log.d(TAG, "responseBody=" + responseBody);
-                    try {
-                        final JSONArray jsonOperations = new JSONObject(responseBody).getJSONArray("wishes");
-                        final List<Wish> wishes = new ArrayList<>();
-                        for (int i = 0; i < jsonOperations.length(); i++) {
-                            final JSONObject operationJsonObject = jsonOperations.getJSONObject(i);
-                            final UUID id = UUID.fromString(operationJsonObject.getString("uuid"));
-                            final String text = operationJsonObject.getString("text");
-                            final Date lastEdit = new Date(operationJsonObject.getLong("last_edit"));
-                            wishes.add(new Wish(id, mUserId, text, lastEdit));
-                        }
-                        callback.onResult(wishes);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+            final GetUserWishesResponse response = client.execute(request);
+            callback.onResult(response.getWishes());
+        } catch (Exception e) {
+            Log.e(TAG, Log.getStackTraceString(e));
         }
     }
 
-    static class WishesDataSourceFactory
-            extends DataSource.Factory<Integer, Wish> {
+    public static class WishesDataSourceFactory
+            extends DataSource.Factory<Integer, IWish> {
 
         @NonNull
         private final UUID mUserId;
 
-        WishesDataSourceFactory (@NonNull final UUID userId) {
+        public WishesDataSourceFactory (
+                @NonNull final UUID userId
+        ) {
             mUserId = userId;
         }
 
         @Override
-        public DataSource<Integer, Wish> create () {
+        public DataSource<Integer, IWish> create () {
             return new WishesDataSource(mUserId);
         }
 

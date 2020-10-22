@@ -1,3 +1,4 @@
+include ':model'
 include ':update'
 include ':server'
 include ':auth'

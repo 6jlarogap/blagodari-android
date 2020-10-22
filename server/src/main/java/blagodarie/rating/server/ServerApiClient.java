@@ -25,13 +25,13 @@ import okhttp3.Response;
 public final class ServerApiClient {
 
     @Nullable
-    private String mAuthToken;
+    private final String mAuthToken;
 
-    public ServerApiClient (
-    ) {
+    public ServerApiClient () {
+        this(null);
     }
 
-    public void setAuthToken (
+    public ServerApiClient (
             @Nullable final String mAuthToken
     ) {
         this.mAuthToken = mAuthToken;
@@ -98,7 +98,7 @@ public final class ServerApiClient {
 
     public <T extends _ServerApiResponse> T execute (
             @NonNull final ServerApiRequest<T> apiRequest
-    ) throws IOException, EmptyBodyException, ServerException, JSONException {
+    ) throws IOException, JSONException, HttpException {
         final Request.Builder builder = apiRequest.getRequestBuilder();
 
         if (isAuthorized()) {

@@ -1,5 +1,7 @@
 package blagodarie.rating.server;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import org.json.JSONException;
@@ -12,6 +14,8 @@ import okhttp3.RequestBody;
 
 public final class SignUpRequest
         extends ServerApiRequest<SignUpResponse> {
+
+    private static final String TAG = SignUpRequest.class.getSimpleName();
 
     @NonNull
     private final String mGoogleToken;
@@ -34,6 +38,7 @@ public final class SignUpRequest
     protected SignUpResponse parseOkResponse (
             @NonNull final String responseBody
     ) throws JSONException {
+        Log.d(TAG, "parseOkResponse responseBody=" + responseBody);
         final JSONObject json = new JSONObject(responseBody);
         final String userIdString = json.getString("user_uuid");
         final UUID userId = UUID.fromString(userIdString);

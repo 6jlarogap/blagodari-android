@@ -43,7 +43,7 @@
 
         <import type="android.view.View" />
 
-        <import type="blagodarie.rating.OperationType" />
+        <import type="blagodarie.rating.model.entities.OperationType" />
 
         <variable
             name="UserActionsListener"

@@ -2,7 +2,7 @@ package blagodarie.rating.ui.user.anytext;
 
 import androidx.annotation.NonNull;
 
-import blagodarie.rating.OperationType;
+import blagodarie.rating.model.entities.OperationType;
 
 public interface AnyTextUserActionListener {
 

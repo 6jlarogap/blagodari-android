@@ -79,10 +79,6 @@
     <string name="txt_comment">Комментарий</string>
     <string name="txt_key">%s: %s</string>
 
-    <string name="operation_type_name_thanks">Благодарность</string>
-    <string name="operation_type_name_trustless">Утрата доверия</string>
-    <string name="operation_type_name_trustless_cancel">Восстановление доверия</string>
-
     <string name="key_type_phone">Телефон</string>
     <string name="key_type_email">Емэйл</string>
     <string name="key_type_credit_card">Номер карты</string>

@@ -15,13 +15,13 @@ import java.util.List;
 
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.ThanksUserItemBinding;
-import blagodarie.rating.server.GetProfileInfoResponse;
+import blagodarie.rating.server.GetThanksUsersResponse;
 
 public final class ThanksUserAdapter
         extends RecyclerView.Adapter<ThanksUserAdapter.ThanksUserViewHolder> {
 
     @NonNull
-    private final List<GetProfileInfoResponse.ThanksUser> mThanksUsers = new ArrayList<>();
+    private final List<GetThanksUsersResponse.ThanksUser> mThanksUsers = new ArrayList<>();
 
     @NonNull
     private final View.OnClickListener mOnThanksUserClickListener;
@@ -46,7 +46,7 @@ public final class ThanksUserAdapter
             @NonNull final ThanksUserViewHolder holder,
             final int position
     ) {
-        final GetProfileInfoResponse.ThanksUser displayThanksUser = mThanksUsers.get(position);
+        final GetThanksUsersResponse.ThanksUser displayThanksUser = mThanksUsers.get(position);
         if (displayThanksUser != null) {
             holder.bind(displayThanksUser, mOnThanksUserClickListener);
         }
@@ -58,7 +58,7 @@ public final class ThanksUserAdapter
     }
 
     public final void setData (
-            @NonNull final List<GetProfileInfoResponse.ThanksUser> thanksUsers
+            @NonNull final List<GetThanksUsersResponse.ThanksUser> thanksUsers
     ) {
         mThanksUsers.clear();
         mThanksUsers.addAll(thanksUsers);
@@ -77,7 +77,7 @@ public final class ThanksUserAdapter
         }
 
         void bind (
-                @NonNull final GetProfileInfoResponse.ThanksUser displayThanksUser,
+                @NonNull final GetThanksUsersResponse.ThanksUser displayThanksUser,
                 @NonNull final View.OnClickListener onThanksUserClickListener
         ) {
             itemView.setOnClickListener(onThanksUserClickListener);
