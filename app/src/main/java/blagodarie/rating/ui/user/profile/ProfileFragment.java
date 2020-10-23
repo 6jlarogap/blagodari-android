@@ -37,23 +37,17 @@ import java.util.UUID;
 import java.util.concurrent.Executors;
 
 import blagodarie.rating.AppExecutors;
-import blagodarie.rating.OperationToUserManager;
 import blagodarie.rating.R;
+import blagodarie.rating.operations.OperationToUserManager;
 import blagodarie.rating.auth.AccountGeneral;
 import blagodarie.rating.databinding.ProfileFragmentBinding;
 import blagodarie.rating.model.entities.OperationType;
-import blagodarie.rating.repository.AsyncRepository;
 import blagodarie.rating.repository.AsyncServerRepository;
-import blagodarie.rating.server.GetProfileInfoRequest;
-import blagodarie.rating.server.GetProfileInfoResponse;
-import blagodarie.rating.server.ServerApiClient;
+import blagodarie.rating.server.BadAuthorizationTokenException;
 import blagodarie.rating.ui.AccountProvider;
 import blagodarie.rating.ui.user.GridAutofitLayoutManager;
 import blagodarie.rating.ui.user.UserViewModel;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 
 public final class ProfileFragment
         extends Fragment
@@ -89,7 +83,7 @@ public final class ProfileFragment
     private FragmentCommunicator mFragmentCommunicator;
 
     @NonNull
-    private final AsyncRepository mRepository = new AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread());
+    private final AsyncServerRepository mRepository = new AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread());
 
     @NotNull
     @Override
@@ -224,24 +218,21 @@ public final class ProfileFragment
         Log.d(TAG, "downloadProfileData");
         mViewModel.getDownloadInProgress().set(true);
 
-        final ServerApiClient apiClient = new ServerApiClient(authToken);
-        final GetProfileInfoRequest getProfileInfoRequest = new GetProfileInfoRequest(mUserId.toString());
-        mDisposables.add(
-                Observable.
-                        fromCallable(() -> apiClient.execute(getProfileInfoRequest)).
-                        subscribeOn(Schedulers.io()).
-                        observeOn(AndroidSchedulers.mainThread()).
-                        subscribe(
-                                getProfileInfoResponse -> {
-                                    mViewModel.getDownloadInProgress().set(false);
-                                    handleGetProfileInfoResponse(getProfileInfoResponse);
-                                },
-                                throwable -> {
-                                    mViewModel.getDownloadInProgress().set(false);
-                                    Toast.makeText(requireActivity(), throwable.getMessage(), Toast.LENGTH_LONG).show();
-                                }
-                        )
-        );
+        mRepository.setAuthToken(authToken);
+        mRepository.getProfileInfo(
+                mUserId,
+                profileInfo -> {
+                    mViewModel.getDownloadInProgress().set(false);
+                    mViewModel.getProfileInfo().set(profileInfo);
+                    if (mViewModel.isOwnProfile().get()) {
+                        AccountManager.get(requireContext()).setUserData(mAccount, AccountGeneral.USER_DATA_PHOTO, profileInfo.getPhoto());
+                        new ViewModelProvider(requireActivity()).get(UserViewModel.class).getOwnAccountPhotoUrl().setValue(profileInfo.getPhoto());
+                    }
+                },
+                throwable -> {
+                    mViewModel.getDownloadInProgress().set(false);
+                    Toast.makeText(requireActivity(), throwable.getMessage(), Toast.LENGTH_LONG).show();
+                });
 
         refreshThanksUsers();
     }
@@ -262,27 +253,6 @@ public final class ProfileFragment
         mViewModel.getThanksUsers().observe(requireActivity(), mThanksUsersAdapter::submitList);
     }
 
-    private void handleGetProfileInfoResponse (
-            @NonNull final GetProfileInfoResponse getProfileInfoResponse
-    ) {
-        Log.d(TAG, "handleGetProfileInfoResponse");
-        mViewModel.getPhoto().set(getProfileInfoResponse.getPhoto());
-        if (mViewModel.isOwnProfile().get()) {
-            AccountManager.get(requireContext()).setUserData(mAccount, AccountGeneral.USER_DATA_PHOTO, getProfileInfoResponse.getPhoto());
-            new ViewModelProvider(requireActivity()).get(UserViewModel.class).getOwnAccountPhotoUrl().setValue(getProfileInfoResponse.getPhoto());
-        }
-        mViewModel.getFirstName().set(getProfileInfoResponse.getFirstName());
-        mViewModel.getMiddleName().set(getProfileInfoResponse.getMiddleName());
-        mViewModel.getLastName().set(getProfileInfoResponse.getLastName());
-        mViewModel.getCardNumber().set(getProfileInfoResponse.getCardNumber());
-        mViewModel.getFame().set(getProfileInfoResponse.getFame());
-        mViewModel.getSumThanksCount().set(getProfileInfoResponse.getSumThanksCount());
-        mViewModel.getTrustCount().set(getProfileInfoResponse.getTrustCount());
-        mViewModel.getMistrustCount().set(getProfileInfoResponse.getMistrustCount());
-        mViewModel.getThanksCount().set((getProfileInfoResponse.getThanksCount() != null ? getProfileInfoResponse.getThanksCount() : 0));
-        mViewModel.getIsTrust().set(getProfileInfoResponse.getIsTrust());
-    }
-
     @BindingAdapter({"imageUrl"})
     public static void loadImage (ImageView view, String url) {
         if (url != null && !url.isEmpty()) {
@@ -296,7 +266,7 @@ public final class ProfileFragment
     }
 
     @Override
-    public void onShareProfileClick () {
+    public void onShareClick () {
         final Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.url_profile, mUserId.toString()));
@@ -306,32 +276,49 @@ public final class ProfileFragment
 
     @Override
     public void onTrustClick () {
-        addOperation(OperationType.MISTRUST_CANCEL);
+        attemptToAddOperation(OperationType.TRUST);
     }
 
     @Override
     public void onMistrustClick () {
-        addOperation(OperationType.MISTRUST);
+        attemptToAddOperation(OperationType.MISTRUST);
     }
 
     @Override
     public void onThanksClick () {
-        addOperation(OperationType.THANKS);
+        attemptToAddOperation(OperationType.THANKS);
     }
 
-    public void addOperation (@NonNull final OperationType operationType) {
+    public void attemptToAddOperation (@NonNull final OperationType operationType) {
         Log.d(TAG, "onAddOperation");
         if (mAccount != null) {
-            new OperationToUserManager().
-                    createOperationToUser(
-                            requireActivity(),
-                            mDisposables,
-                            mAccount,
-                            mUserId,
-                            operationType,
-                            this::refreshProfileData
-                    );
-
+            AccountProvider.getAuthToken(requireActivity(), mAccount, authToken -> {
+                if (authToken != null) {
+                    mRepository.setAuthToken(authToken);
+                    new OperationToUserManager().
+                            createOperationToUser(
+                                    requireActivity(),
+                                    UUID.fromString(mAccount.name),
+                                    mUserId,
+                                    operationType,
+                                    mRepository,
+                                    () -> {
+                                        Toast.makeText(requireContext(), R.string.info_msg_saved, Toast.LENGTH_LONG).show();
+                                        refreshProfileData();
+                                    },
+                                    throwable -> {
+                                        Log.e(TAG, Log.getStackTraceString(throwable));
+                                        if (throwable instanceof BadAuthorizationTokenException) {
+                                            AccountManager.get(requireContext()).invalidateAuthToken(getString(R.string.account_type), authToken);
+                                            attemptToAddOperation(operationType);
+                                        } else {
+                                            Toast.makeText(requireContext(), R.string.err_msg_not_saved, Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                } else {
+                    Toast.makeText(requireContext(), R.string.info_msg_need_log_in, Toast.LENGTH_LONG).show();
+                }
+            });
         } else {
             AccountProvider.createAccount(
                     requireActivity(),
@@ -341,15 +328,9 @@ public final class ProfileFragment
                             mViewModel.isHaveAccount().set(true);
                             mViewModel.isOwnProfile().set(mAccount.name.equals(mUserId.toString()));
                             if (!mViewModel.isOwnProfile().get()) {
-                                new OperationToUserManager().
-                                        createOperationToUser(
-                                                requireActivity(),
-                                                mDisposables,
-                                                mAccount,
-                                                mUserId,
-                                                operationType,
-                                                this::refreshProfileData
-                                        );
+                                attemptToAddOperation(operationType);
+                            } else {
+                                Toast.makeText(requireContext(), R.string.info_msg_cant_add_operation_to_own_profile, Toast.LENGTH_LONG).show();
                             }
                         }
                     }

@@ -83,7 +83,7 @@ public class MyFirebaseMessagingServise
                         channelName = getApplicationContext().getString(R.string.notification_chanel_name_mistrust);
                         channelDescription = getApplicationContext().getString(R.string.notification_chanel_description_mistrust);
                         break;
-                    case MISTRUST_CANCEL:
+                    case TRUST:
                         title = getApplicationContext().getString(R.string.notification_title_cancel_mistrust_pattern, firstName, lastName);
                         channelId = getApplicationContext().getString(R.string.notification_chanel_id_cancel_mistrust);
                         channelName = getApplicationContext().getString(R.string.notification_chanel_name_cancel_mistrust);

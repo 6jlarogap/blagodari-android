@@ -2,200 +2,216 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab"
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="top|end"
-            android:layout_margin="@dimen/fab_margin"
-            android:onClick="@{() -> UserActionListener.onShareProfileClick()}"
-            android:src="@drawable/share_variant"
-            app:backgroundTint="@color/colorPrimary"
-            app:borderWidth="0dp"
-            app:elevation="6dp"
-            app:fabSize="mini" />
+            android:layout_gravity="center"
+            android:text="@string/info_msg_missing_profile"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:visibility="@{ViewModel.profileInfo == null ? View.VISIBLE : View.GONE}" />
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/srlRefreshProfileInfo"
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:refreshing="@{ViewModel.downloadInProgress}">
+            android:visibility="@{ViewModel.profileInfo != null ? View.VISIBLE : View.GONE}">
 
-            <androidx.core.widget.NestedScrollView
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_margin="@dimen/fab_margin"
+                android:onClick="@{() -> UserActionListener.onShareClick()}"
+                android:src="@drawable/share_variant"
+                app:backgroundTint="@color/colorPrimary"
+                app:borderWidth="0dp"
+                app:elevation="6dp"
+                app:fabSize="mini" />
+
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/srlRefreshProfileInfo"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+                app:refreshing="@{ViewModel.downloadInProgress}">
 
-                <LinearLayout
+                <androidx.core.widget.NestedScrollView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:paddingLeft="@dimen/activity_horizontal_margin"
-                    android:paddingRight="@dimen/activity_horizontal_margin"
-                    android:paddingBottom="@dimen/activity_vertical_margin">
-
-                    <TextView
-                        style="@style/TextAppearance.AppCompat.Headline"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:gravity="center_horizontal"
-                        android:text='@{ViewModel.lastName + " " + ViewModel.firstName + (ViewModel.middleName.equals("") ? "" : " " + ViewModel.middleName)}' />
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/ivPhoto"
-                        imageUrl="@{ViewModel.photo}"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_margin="5dp"
-                        android:adjustViewBounds="true"
-                        android:maxWidth="200dp"
-                        android:scaleType="centerInside"
-                        android:src="@drawable/account_200dp" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/ivQRCode"
-                        imageBitmap="@{ViewModel.qrCode}"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_margin="5dp"
-                        android:adjustViewBounds="true"
-                        android:maxWidth="200dp"
-                        android:scaleType="centerInside" />
-
-                    <TextView
-                        style="@style/TextAppearance.AppCompat.Body1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@{String.format(@string/txt_fame, ViewModel.fame)}" />
-
-                    <TextView
-                        style="@style/TextAppearance.AppCompat.Body1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@{ViewModel.isOwnProfile || !ViewModel.isHaveAccount ? String.format(@string/txt_self_profile_trust, ViewModel.mistrustCount) : String.format(@string/txt_trust, ViewModel.trustCount, ViewModel.mistrustCount)}" />
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_horizontal"
-                        android:orientation="horizontal"
-                        android:padding="5dp">
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:paddingLeft="@dimen/activity_horizontal_margin"
+                        android:paddingRight="@dimen/activity_horizontal_margin"
+                        android:paddingBottom="@dimen/activity_vertical_margin">
 
-                        <Button
-                            style="?android:attr/buttonStyle"
-                            android:layout_width="0dp"
+                        <TextView
+                            style="@style/TextAppearance.AppCompat.Headline"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
-                            android:layout_weight="1"
-                            android:background="@{ViewModel.isTrust != null &amp;&amp; ViewModel.isTrust ? @android:color/holo_green_dark : @color/light_gray}"
-                            android:enabled="@{ViewModel.isTrust == null || !ViewModel.isTrust}"
-                            android:onClick="@{() -> UserActionListener.onTrustClick()}"
-                            android:text="@string/btn_trust"
-                            android:visibility="@{!ViewModel.isOwnProfile ? View.VISIBLE : View.GONE}" />
+                            android:gravity="center_horizontal"
+                            android:text='@{ViewModel.profileInfo.fullName}' />
 
-                        <Button
-                            style="?android:attr/buttonStyle"
-                            android:layout_width="0dp"
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/ivPhoto"
+                            imageUrl="@{ViewModel.profileInfo.photo}"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
-                            android:layout_weight="1"
-                            android:background="@{ViewModel.isTrust != null &amp;&amp; !ViewModel.isTrust ? @android:color/holo_red_dark : @color/light_gray}"
-                            android:enabled="@{ViewModel.isTrust == null || ViewModel.isTrust}"
-                            android:onClick="@{() -> UserActionListener.onMistrustClick()}"
-                            android:text="@string/btn_mistrust"
-                            android:visibility="@{!ViewModel.isOwnProfile ? View.VISIBLE : View.GONE}" />
+                            android:layout_margin="5dp"
+                            android:adjustViewBounds="true"
+                            android:maxWidth="200dp"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/account_200dp" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/ivQRCode"
+                            imageBitmap="@{ViewModel.qrCode}"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_margin="5dp"
+                            android:adjustViewBounds="true"
+                            android:maxWidth="200dp"
+                            android:scaleType="centerInside" />
+
+                        <TextView
+                            style="@style/TextAppearance.AppCompat.Body1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@{String.format(@string/txt_fame, ViewModel.profileInfo.fame)}" />
+
+                        <TextView
+                            style="@style/TextAppearance.AppCompat.Body1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@{ViewModel.isOwnProfile || !ViewModel.isHaveAccount ? String.format(@string/txt_own_profile_trust, ViewModel.profileInfo.mistrustCount) : String.format(@string/txt_trust, ViewModel.profileInfo.trustCount, ViewModel.profileInfo.mistrustCount)}" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_horizontal"
+                            android:orientation="horizontal"
+                            android:padding="5dp">
+
+                            <Button
+                                style="?android:attr/buttonStyle"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_weight="1"
+                                android:background="@{ViewModel.profileInfo.isTrust != null &amp;&amp; ViewModel.profileInfo.isTrust ? @android:color/holo_green_light : @color/light_gray}"
+                                android:enabled="@{ViewModel.profileInfo.isTrust == null || !ViewModel.profileInfo.isTrust}"
+                                android:onClick="@{() -> UserActionListener.onTrustClick()}"
+                                android:text="@string/btn_trust"
+                                android:textColor="@{ViewModel.profileInfo.isTrust != null &amp;&amp; ViewModel.profileInfo.isTrust ? @android:color/white : @android:color/black}"
+                                android:visibility="@{!ViewModel.isOwnProfile ? View.VISIBLE : View.GONE}" />
+
+                            <Button
+                                style="?android:attr/buttonStyle"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_weight="1"
+                                android:background="@{ViewModel.profileInfo.isTrust != null &amp;&amp; !ViewModel.profileInfo.isTrust ? @android:color/holo_red_dark : @color/light_gray}"
+                                android:enabled="@{ViewModel.profileInfo.isTrust == null || ViewModel.profileInfo.isTrust}"
+                                android:onClick="@{() -> UserActionListener.onMistrustClick()}"
+                                android:text="@string/btn_mistrust"
+                                android:textColor="@{ViewModel.profileInfo.isTrust != null &amp;&amp; !ViewModel.profileInfo.isTrust ? @android:color/white : @android:color/black}"
+                                android:visibility="@{!ViewModel.isOwnProfile ? View.VISIBLE : View.GONE}" />
+
+                        </LinearLayout>
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="end"
+                            android:orientation="horizontal">
+
+                            <Button
+                                android:id="@+id/btnThanksCount"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="@{() -> UserActionListener.onOperationsClick()}"
+                                android:text="@{ViewModel.isOwnProfile || !ViewModel.isHaveAccount ? String.format(@string/txt_own_profile_thanks_count, ViewModel.profileInfo.sumThanksCount) : String.format(@string/txt_thanks_count, ViewModel.profileInfo.sumThanksCount, ViewModel.profileInfo.thanksCount)}"
+                                app:layout_constrainedWidth="true"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toStartOf="@id/fabThanks"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                                android:id="@+id/fabThanks"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical|end"
+                                android:onClick="@{() -> UserActionListener.onThanksClick()}"
+                                android:src="@drawable/heart_outline"
+                                android:visibility="@{!ViewModel.isOwnProfile() ? View.VISIBLE : View.GONE}"
+                                app:backgroundTint="@color/colorPrimary"
+                                app:borderWidth="0dp"
+                                app:elevation="2dp"
+                                app:fabSize="mini"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:pressedTranslationZ="12dp" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <Button
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:onClick="@{() -> UserActionListener.onKeysClick()}"
+                            android:text="@string/btn_keys" />
+
+                        <Button
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:onClick="@{() -> UserActionListener.onWishesClick()}"
+                            android:text="@string/btn_wishes" />
+
+                        <Button
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:onClick="@{() -> UserActionListener.onAbilitiesClick()}"
+                            android:text="@string/btn_ability" />
+
+                        <Button
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:onClick="@{() -> UserActionListener.onSocialGraphClick()}"
+                            android:text="@string/btn_social_graph" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:text="@string/txt_thanks_and_thanked_users" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rvThanksUsers"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fadeScrollbars="false"
+                            android:scrollbars="vertical" />
 
                     </LinearLayout>
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="end"
-                        android:orientation="horizontal">
+                </androidx.core.widget.NestedScrollView>
 
-                        <Button
-                            android:id="@+id/btnThanksCount"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:onClick="@{() -> UserActionListener.onOperationsClick()}"
-                            android:text="@{ViewModel.isOwnProfile || !ViewModel.isHaveAccount ? String.format(@string/txt_self_profile_thanks_count, ViewModel.sumThanksCount) : String.format(@string/txt_thanks_count, ViewModel.sumThanksCount, ViewModel.thanksCount)}"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@id/fabThanks"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constrainedWidth="true"/>
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-                        <com.google.android.material.floatingactionbutton.FloatingActionButton
-                            android:id="@+id/fabThanks"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical|end"
-                            android:onClick="@{() -> UserActionListener.onThanksClick()}"
-                            android:src="@drawable/heart"
-                            android:visibility="@{!ViewModel.isOwnProfile() ? View.VISIBLE : View.GONE}"
-                            app:backgroundTint="@android:color/white"
-                            app:borderWidth="0dp"
-                            app:elevation="2dp"
-                            app:fabSize="mini"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:maxImageSize="40dp"
-                            app:pressedTranslationZ="12dp" />
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:onClick="@{() -> UserActionListener.onKeysClick()}"
-                        android:text="@string/btn_keys" />
-
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:onClick="@{() -> UserActionListener.onWishesClick()}"
-                        android:text="@string/btn_wishes" />
-
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:onClick="@{() -> UserActionListener.onAbilitiesClick()}"
-                        android:text="@string/btn_ability" />
-
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:onClick="@{() -> UserActionListener.onSocialGraphClick()}"
-                        android:text="@string/btn_social_graph" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:text="@string/txt_thanks_users" />
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rvThanksUsers"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fadeScrollbars="false"
-                        android:scrollbars="vertical" />
-
-                </LinearLayout>
-
-            </androidx.core.widget.NestedScrollView>
-
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </FrameLayout>
 
     <data>
 

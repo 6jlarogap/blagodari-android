@@ -6,10 +6,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.paging.PagedList;
 
+import blagodarie.rating.model.IDisplayOperation;
+import blagodarie.rating.model.entities.DisplayOperation;
+
 public final class OperationsViewModel
         extends ViewModel {
 
-    private LiveData<PagedList<Operation>> mOperations;
+    private LiveData<PagedList<IDisplayOperation>> mOperations;
 
     @NonNull
     private final ObservableBoolean mHaveAccount = new ObservableBoolean(false);
@@ -21,11 +24,11 @@ public final class OperationsViewModel
     private final ObservableBoolean mDownloadInProgress = new ObservableBoolean(false);
 
     @NonNull
-    public LiveData<PagedList<Operation>> getOperations () {
+    public LiveData<PagedList<IDisplayOperation>> getOperations () {
         return mOperations;
     }
 
-    public void setOperations (@NonNull final LiveData<PagedList<Operation>> operations) {
+    public void setOperations (@NonNull final LiveData<PagedList<IDisplayOperation>> operations) {
         mOperations = operations;
     }
 

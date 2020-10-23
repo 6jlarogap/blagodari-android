@@ -1,4 +1,4 @@
-package blagodarie.rating;
+package blagodarie.rating.operations;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 
+import blagodarie.rating.R;
 import blagodarie.rating.databinding.EnterOperationCommentDialogBinding;
 
 abstract class OperationManager {
@@ -20,7 +21,7 @@ abstract class OperationManager {
         void onCommentAdded (@NonNull final String comment);
     }
 
-    void requireOperationComment (
+    protected void showOperationCommentDialog (
             @NonNull final Activity activity,
             @NonNull final OnAddCommentListener onAddCommentListener
     ) {
@@ -44,5 +45,4 @@ abstract class OperationManager {
         binding.etOperationComment.requestFocus();
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
     }
-
 }

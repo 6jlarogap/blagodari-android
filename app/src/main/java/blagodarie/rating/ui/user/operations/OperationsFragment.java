@@ -1,6 +1,7 @@
 package blagodarie.rating.ui.user.operations;
 
 import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,32 +9,33 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.paging.LivePagedListBuilder;
-import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
-import java.util.concurrent.Executors;
 
-import blagodarie.rating.OperationToAnyTextManager;
-import blagodarie.rating.OperationToUserManager;
+import blagodarie.rating.AppExecutors;
+import blagodarie.rating.operations.OperationToAnyTextManager;
+import blagodarie.rating.operations.OperationToUserManager;
 import blagodarie.rating.model.entities.OperationType;
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.OperationsFragmentBinding;
+import blagodarie.rating.repository.AsyncServerRepository;
+import blagodarie.rating.repository.ServerRepository;
+import blagodarie.rating.server.BadAuthorizationTokenException;
 import blagodarie.rating.ui.AccountProvider;
 import io.reactivex.disposables.CompositeDisposable;
 
 public final class OperationsFragment
         extends Fragment
-        implements OperationsUserActionListener,
-        OperationsAdapter.OnItemClickListener {
+        implements OperationsUserActionListener {
 
     private static final String TAG = OperationsFragment.class.getSimpleName();
 
@@ -51,6 +53,27 @@ public final class OperationsFragment
 
     @NonNull
     private CompositeDisposable mDisposables = new CompositeDisposable();
+
+    @NonNull
+    private final AsyncServerRepository mAsyncRepository = new AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread());
+
+    @NonNull
+    private final ServerRepository mRepository = new ServerRepository();
+
+    @NonNull
+    private final OperationsAdapter.OnItemClickListener mOnOperationClickListener = new OperationsAdapter.OnItemClickListener() {
+        @Override
+        public void onOperationClick (@NonNull final UUID userId) {
+            final Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(getString(R.string.url_profile, userId.toString())));
+            startActivity(i);
+        }
+
+        @Override
+        public void onThanksClick (@NonNull final UUID userIdTo) {
+            attemptToAddOperation(OperationType.THANKS, userIdTo);
+        }
+    };
 
     @NotNull
     @Override
@@ -104,7 +127,7 @@ public final class OperationsFragment
     }
 
     private void initOperationsAdapter () {
-        mOperationsAdapter = new OperationsAdapter(this, mViewModel);
+        mOperationsAdapter = new OperationsAdapter(mOnOperationClickListener, mViewModel);
     }
 
     private void initBinding (
@@ -134,47 +157,73 @@ public final class OperationsFragment
     }
 
     private void refreshOperations () {
-        final OperationsDataSource.OperationsDataSourceFactory sourceFactory = new OperationsDataSource.OperationsDataSourceFactory(mUserId, mAnyTextId);
-
-        final PagedList.Config config = new PagedList.Config.Builder()
-                .setEnablePlaceholders(false)
-                .setPageSize(10)
-                .build();
-
-        mViewModel.setOperations(
-                new LivePagedListBuilder<>(sourceFactory, config).
-                        setFetchExecutor(Executors.newSingleThreadExecutor()).
-                        build()
-        );
+        Log.d(TAG, "refreshOperations");
+        mViewModel.setOperations(mUserId != null ? mRepository.getUserOperations(mUserId) : mRepository.getAnyTextOperations(mAnyTextId));
         mViewModel.getOperations().observe(requireActivity(), mOperationsAdapter::submitList);
     }
 
     @Override
-    public void onAddOperation (@NonNull final OperationType operationType) {
+    public void onThanksClick () {
+        attemptToAddOperation(OperationType.THANKS, mUserId);
+    }
+
+    private void attemptToAddOperation (
+            @NonNull final OperationType operationType,
+            @Nullable final UUID userIdTo
+    ) {
         Log.d(TAG, "onAddOperation");
         if (mAccount != null) {
-            if (mUserId != null) {
-                new OperationToUserManager().
-                        createOperationToUser(
-                                requireActivity(),
-                                mDisposables,
-                                mAccount,
-                                mUserId,
-                                operationType,
-                                this::refreshOperations
-                        );
-            } else {
-                new OperationToAnyTextManager().
-                        createOperationToAnyText(
-                                requireActivity(),
-                                mDisposables,
-                                mAccount,
-                                mAnyTextId,
-                                "",
-                                operationType,
-                                (textId) -> refreshOperations()
-                        );
-            }
+            AccountProvider.getAuthToken(requireActivity(), mAccount, authToken -> {
+                if (authToken != null) {
+                    mAsyncRepository.setAuthToken(authToken);
+                    if (userIdTo != null) {
+                        new OperationToUserManager().
+                                createOperationToUser(
+                                        requireActivity(),
+                                        UUID.fromString(mAccount.name),
+                                        userIdTo,
+                                        operationType,
+                                        mAsyncRepository,
+                                        () -> {
+                                            Toast.makeText(requireContext(), R.string.info_msg_saved, Toast.LENGTH_LONG).show();
+                                            refreshOperations();
+                                        },
+                                        throwable -> {
+                                            Log.e(TAG, Log.getStackTraceString(throwable));
+                                            if (throwable instanceof BadAuthorizationTokenException) {
+                                                AccountManager.get(requireContext()).invalidateAuthToken(getString(R.string.account_type), authToken);
+                                                attemptToAddOperation(operationType, userIdTo);
+                                            } else {
+                                                Toast.makeText(requireContext(), R.string.err_msg_not_saved, Toast.LENGTH_LONG).show();
+                                            }
+                                        });
+                    } else {
+                        new OperationToAnyTextManager().
+                                createOperationToAnyText(
+                                        requireActivity(),
+                                        UUID.fromString(mAccount.name),
+                                        mAnyTextId,
+                                        operationType,
+                                        "",
+                                        mAsyncRepository,
+                                        () -> {
+                                            Toast.makeText(requireContext(), R.string.info_msg_saved, Toast.LENGTH_LONG).show();
+                                            refreshOperations();
+                                        },
+                                        throwable -> {
+                                            Log.e(TAG, Log.getStackTraceString(throwable));
+                                            if (throwable instanceof BadAuthorizationTokenException) {
+                                                AccountManager.get(requireContext()).invalidateAuthToken(getString(R.string.account_type), authToken);
+                                                attemptToAddOperation(operationType, userIdTo);
+                                            } else {
+                                                Toast.makeText(requireContext(), R.string.err_msg_not_saved, Toast.LENGTH_LONG).show();
+                                            }
+                                        });
+                    }
+                } else {
+                    Toast.makeText(requireContext(), R.string.info_msg_need_log_in, Toast.LENGTH_LONG).show();
+                }
+            });
         } else {
             AccountProvider.createAccount(
                     requireActivity(),
@@ -184,28 +233,9 @@ public final class OperationsFragment
                             mViewModel.isHaveAccount().set(true);
                             mViewModel.isOwnProfile().set(mAccount.name.equals(mUserId.toString()));
                             if (!mViewModel.isOwnProfile().get()) {
-                                if (mUserId != null) {
-                                    new OperationToUserManager().
-                                            createOperationToUser(
-                                                    requireActivity(),
-                                                    mDisposables,
-                                                    mAccount,
-                                                    mUserId,
-                                                    operationType,
-                                                    this::refreshOperations
-                                            );
-                                } else {
-                                    new OperationToAnyTextManager().
-                                            createOperationToAnyText(
-                                                    requireActivity(),
-                                                    mDisposables,
-                                                    mAccount,
-                                                    mAnyTextId,
-                                                    "",
-                                                    operationType,
-                                                    (textId) -> refreshOperations()
-                                            );
-                                }
+                                attemptToAddOperation(operationType, userIdTo);
+                            } else {
+                                Toast.makeText(requireContext(), R.string.info_msg_cant_add_operation_to_own_profile, Toast.LENGTH_LONG).show();
                             }
                         }
                     }
@@ -213,55 +243,4 @@ public final class OperationsFragment
         }
     }
 
-
-    @Override
-    public void onOperationClick (
-            @NonNull final UUID userId
-    ) {
-        final Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(getString(R.string.url_profile, userId.toString())));
-        startActivity(i);
-    }
-
-    @Override
-    public void onThanksClick (
-            @NonNull final UUID userIdTo
-    ) {
-        Log.d(TAG, "onThanksClick");
-        if (mAccount != null) {
-            new OperationToUserManager().
-                    createOperationToUser(
-                            requireActivity(),
-                            mDisposables,
-                            mAccount,
-                            userIdTo,
-                            OperationType.THANKS,
-                            () -> {
-                            }
-                    );
-        } else {
-            AccountProvider.createAccount(
-                    requireActivity(),
-                    account -> {
-                        if (account != null) {
-                            mAccount = account;
-                            mViewModel.isHaveAccount().set(true);
-                            mViewModel.isOwnProfile().set(mAccount.name.equals(mUserId.toString()));
-                            if (!mViewModel.isOwnProfile().get()) {
-                                new OperationToUserManager().
-                                        createOperationToUser(
-                                                requireActivity(),
-                                                mDisposables,
-                                                mAccount,
-                                                userIdTo,
-                                                OperationType.THANKS,
-                                                () -> {
-                                                }
-                                        );
-                            }
-                        }
-                    }
-            );
-        }
-    }
 }

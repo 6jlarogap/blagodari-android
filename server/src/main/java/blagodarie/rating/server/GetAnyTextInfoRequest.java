@@ -8,20 +8,21 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.UUID;
 
-import blagodarie.rating.model.entities.ProfileInfo;
+import blagodarie.rating.model.entities.AnyTextInfo;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public final class GetProfileInfoRequest
-        extends ServerApiRequest<GetProfileInfoResponse> {
+public class GetAnyTextInfoRequest
+        extends ServerApiRequest<GetAnyTextInfoResponse> {
 
-    private static final String TAG = GetProfileInfoRequest.class.getSimpleName();
+    private static final String TAG = GetAnyTextInfoRequest.class.getSimpleName();
 
-    public GetProfileInfoRequest (
-            @NonNull final String userId
+    public GetAnyTextInfoRequest (
+            @NonNull final String anyText
     ) {
-        super(String.format("getprofileinfo?uuid=%s", userId));
+        super(String.format("gettextinfo?text=%s", anyText));
     }
 
     @NonNull
@@ -31,15 +32,13 @@ public final class GetProfileInfoRequest
     }
 
     @Override
-    protected GetProfileInfoResponse parseOkResponse (
+    protected GetAnyTextInfoResponse parseOkResponse (
             @NonNull final String responseBody
     ) throws JSONException {
         Log.d(TAG, "parseOkResponse responseBody=" + responseBody);
         final JSONObject json = new JSONObject(responseBody);
 
-        final String photo = json.getString("photo");
-        final String firstName = json.getString("first_name");
-        final String lastName = json.getString("last_name");
+        final UUID anyTextId = UUID.fromString(json.getString("uuid"));
         final int fame = json.getInt("fame");
         final int sumThanksCount = json.getInt("sum_thanks_count");
         final int mistrustCount = json.getInt("trustless_count");
@@ -56,25 +55,22 @@ public final class GetProfileInfoRequest
         } catch (JSONException e) {
             isTrust = null;
         }
-        return new GetProfileInfoResponse(
-                new ProfileInfo(
-                        firstName,
-                        lastName,
-                        photo,
+        return new GetAnyTextInfoResponse(
+                new AnyTextInfo(
+                        anyTextId,
                         fame,
                         trustCount,
                         mistrustCount,
                         sumThanksCount,
                         thanksCount,
-                        isTrust
-                )
+                        isTrust)
         );
     }
 
     @Override
-    protected GetProfileInfoResponse parse400Response (
+    protected GetAnyTextInfoResponse parse400Response (
             @NonNull final Response response
     ) {
-        return new GetProfileInfoResponse(null);
+        return new GetAnyTextInfoResponse(null);
     }
 }

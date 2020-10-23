@@ -1,6 +1,7 @@
 package blagodarie.rating.ui.user.anytext;
 
 import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -25,31 +26,24 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import blagodarie.rating.OperationToAnyTextManager;
-import blagodarie.rating.model.entities.OperationType;
+import blagodarie.rating.AppExecutors;
 import blagodarie.rating.R;
+import blagodarie.rating.operations.OperationToAnyTextManager;
 import blagodarie.rating.databinding.AnyTextFragmentBinding;
 import blagodarie.rating.databinding.ThanksUserItemBinding;
-import blagodarie.rating.server.GetThanksUsersResponse;
-import blagodarie.rating.server.ServerApiResponse;
-import blagodarie.rating.server.ServerConnector;
+import blagodarie.rating.model.entities.AnyTextInfo;
+import blagodarie.rating.model.entities.OperationType;
+import blagodarie.rating.repository.AsyncServerRepository;
+import blagodarie.rating.server.BadAuthorizationTokenException;
 import blagodarie.rating.ui.AccountProvider;
 import blagodarie.rating.ui.user.GridAutofitLayoutManager;
 import blagodarie.rating.ui.user.ThanksUserAdapter;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 
 public final class AnyTextFragment
         extends Fragment
@@ -77,6 +71,9 @@ public final class AnyTextFragment
     private CompositeDisposable mDisposables = new CompositeDisposable();
 
     private FragmentCommunicator mFragmentCommunicator;
+
+    @NonNull
+    private final AsyncServerRepository mRepository = new AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread());
 
     @NotNull
     @Override
@@ -215,106 +212,27 @@ public final class AnyTextFragment
     ) {
         Log.d(TAG, "downloadAnyTextData");
         mViewModel.getDownloadInProgress().set(true);
-        mDisposables.add(
-                Observable.
-                        fromCallable(() -> {
-                            if (authToken != null) {
-                                return ServerConnector.sendAuthRequestAndGetResponse("gettextinfo?text=" + mAnyText, authToken);
-                            } else {
-                                return ServerConnector.sendRequestAndGetResponse("gettextinfo?text=" + mAnyText);
-                            }
-                        }).
-                        subscribeOn(Schedulers.io()).
-                        observeOn(AndroidSchedulers.mainThread()).
-                        subscribe(
-                                serverApiResponse -> {
-                                    mViewModel.getDownloadInProgress().set(false);
-                                    extractDataFromServerApiResponse(serverApiResponse);
-                                },
-                                throwable -> {
-                                    mViewModel.getDownloadInProgress().set(false);
-                                    Toast.makeText(requireContext(), throwable.getMessage(), Toast.LENGTH_LONG).show();
-                                }
-                        )
-        );
-    }
 
-    private void extractDataFromServerApiResponse (ServerApiResponse serverApiResponse) {
-        Log.d(TAG, "extractDataFromServerApiResponse");
-        if (serverApiResponse.getCode() == 200) {
-            if (serverApiResponse.getBody() != null) {
-                final String responseBody = serverApiResponse.getBody();
-                try {
-                    final JSONObject userJSON = new JSONObject(responseBody);
-
-                    final String idString = userJSON.getString("uuid");
-                    try {
-                        mAnyTextId = UUID.fromString(idString);
-                        mViewModel.getAnyTextId().set(mAnyTextId);
-                    } catch (IllegalArgumentException e) {
-                        //do nothing
+        mRepository.setAuthToken(authToken);
+        mRepository.getAnyTextInfo(
+                mAnyText,
+                anyTextInfo -> {
+                    mViewModel.getDownloadInProgress().set(false);
+                    if (anyTextInfo != null) {
+                        mViewModel.getAnyTextInfo().set(anyTextInfo);
+                        mAnyTextId = anyTextInfo.getAnyTextId();
+                    } else {
+                        mViewModel.getAnyTextInfo().set(AnyTextInfo.EMPTY_ANY_TEXT);
                     }
-
-                    final int fame = userJSON.getInt("fame");
-                    mViewModel.getFame().set(fame);
-
-                    final int sumThanksCount = userJSON.getInt("sum_thanks_count");
-                    mViewModel.getSumThanksCount().set(sumThanksCount);
-
-                    final int mistrustCount = userJSON.getInt("trustless_count");
-                    mViewModel.getTrustlessCount().set(mistrustCount);
-
-                    try {
-                        final int thanksCount = userJSON.getInt("thanks_count");
-                        mViewModel.getThanksCount().set(thanksCount);
-                    } catch (JSONException e) {
-                        mViewModel.getThanksCount().set(null);
-                    }
-
-                    try {
-                        final boolean isTrust = userJSON.getBoolean("is_trust");
-                        mViewModel.getIsTrust().set(isTrust);
-                    } catch (JSONException e) {
-                        mViewModel.getIsTrust().set(null);
-                    }
-
-                    final List<GetThanksUsersResponse.ThanksUser> thanksUsers = new ArrayList<>();
-                    final JSONArray thanksUsersJSONArray = userJSON.getJSONArray("thanks_users");
-                    for (int i = 0; i < thanksUsersJSONArray.length(); i++) {
-                        final JSONObject thanksUserJSONObject = thanksUsersJSONArray.getJSONObject(i);
-                        final String thanksUserPhoto = thanksUserJSONObject.getString("photo");
-                        final String thanksUserUUID = thanksUserJSONObject.getString("user_uuid");
-                        thanksUsers.add(new GetThanksUsersResponse.ThanksUser(UUID.fromString(thanksUserUUID), thanksUserPhoto));
-                    }
-                    mViewModel.getThanksUsers().setValue(thanksUsers);
-
-                } catch (JSONException e) {
-                    Log.e(TAG, Log.getStackTraceString(e));
-                    Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-                } catch (IllegalArgumentException e) {
-                    Log.e(TAG, Log.getStackTraceString(e));
-                    Toast.makeText(requireContext(), getString(blagodarie.rating.auth.R.string.err_msg_incorrect_user_id), Toast.LENGTH_LONG).show();
-                }
-            }
-
-        }/* else if (serverApiResponse.getCode() == 400) {
-            if (serverApiResponse.getBody() != null) {
-                final String responseBody = serverApiResponse.getBody();
-                try {
-                    final JSONObject userJSON = new JSONObject(responseBody);
-                    final String message = userJSON.getString("message");
-                    Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
-                    requireActivity().finish();
-                } catch (JSONException e) {
-                    Log.e(TAG, Log.getStackTraceString(e));
-                    Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            }
-        }*/
+                },
+                throwable -> {
+                    mViewModel.getDownloadInProgress().set(false);
+                    Toast.makeText(requireActivity(), throwable.getMessage(), Toast.LENGTH_LONG).show();
+                });
     }
 
     @Override
-    public void onShareAnyText () {
+    public void onShareClick () {
         final Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, mAnyText);
@@ -323,23 +241,51 @@ public final class AnyTextFragment
     }
 
     @Override
-    public void onAddOperation (@NonNull final OperationType operationType) {
+    public void onTrustClick () {
+        attemptToAddOperation(OperationType.TRUST);
+    }
+
+    @Override
+    public void onMistrustClick () {
+        attemptToAddOperation(OperationType.MISTRUST);
+    }
+
+    @Override
+    public void onThanksClick () {
+        attemptToAddOperation(OperationType.THANKS);
+    }
+
+    public void attemptToAddOperation (@NonNull final OperationType operationType) {
         Log.d(TAG, "onAddOperation");
         if (mAccount != null) {
-            new OperationToAnyTextManager().
-                    createOperationToAnyText(
-                            requireActivity(),
-                            mDisposables,
-                            mAccount,
-                            mAnyTextId,
-                            mAnyText,
-                            operationType,
-                            (textId) -> {
-                                mAnyTextId = textId;
-                                mViewModel.getAnyTextId().set(mAnyTextId);
-                                refreshAnyTextData();
-                            }
-                    );
+            AccountProvider.getAuthToken(requireActivity(), mAccount, authToken -> {
+                if (authToken != null) {
+                    mRepository.setAuthToken(authToken);
+                    new OperationToAnyTextManager().
+                            createOperationToAnyText(
+                                    requireActivity(),
+                                    UUID.fromString(mAccount.name),
+                                    mAnyTextId,
+                                    operationType,
+                                    mAnyText,
+                                    mRepository,
+                                    () -> {
+                                        Toast.makeText(requireContext(), R.string.info_msg_saved, Toast.LENGTH_LONG).show();
+                                        refreshAnyTextData();
+                                    },
+                                    throwable -> {
+                                        Log.e(TAG, Log.getStackTraceString(throwable));
+                                        if (throwable instanceof BadAuthorizationTokenException) {
+                                            AccountManager.get(requireContext()).invalidateAuthToken(getString(R.string.account_type), authToken);
+                                            attemptToAddOperation(operationType);
+                                        } else {
+                                            Toast.makeText(requireContext(), R.string.err_msg_not_saved, Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                } else {
+                    Toast.makeText(requireContext(), R.string.info_msg_need_log_in, Toast.LENGTH_LONG).show();
+                }
+            });
         } else {
             AccountProvider.createAccount(
                     requireActivity(),
@@ -347,20 +293,7 @@ public final class AnyTextFragment
                         if (account != null) {
                             mAccount = account;
                             mViewModel.isHaveAccount().set(true);
-                            new OperationToAnyTextManager().
-                                    createOperationToAnyText(
-                                            requireActivity(),
-                                            mDisposables,
-                                            mAccount,
-                                            mAnyTextId,
-                                            mAnyText,
-                                            operationType,
-                                            (textId) -> {
-                                                mAnyTextId = textId;
-                                                mViewModel.getAnyTextId().set(mAnyTextId);
-                                                refreshAnyTextData();
-                                            }
-                                    );
+                            attemptToAddOperation(operationType);
                         }
                     }
             );
@@ -368,7 +301,7 @@ public final class AnyTextFragment
     }
 
     @Override
-    public void onOperations () {
+    public void onOperationsClick () {
         mFragmentCommunicator.toOperationsFromAnyText(mAnyTextId);
     }
 

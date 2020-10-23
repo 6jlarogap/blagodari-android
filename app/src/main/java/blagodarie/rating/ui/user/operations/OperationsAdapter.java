@@ -15,9 +15,11 @@ import java.util.UUID;
 
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.OperationItemBinding;
+import blagodarie.rating.model.IDisplayOperation;
+import blagodarie.rating.model.entities.DisplayOperation;
 
 final class OperationsAdapter
-        extends PagedListAdapter<Operation, OperationsAdapter.OperationViewHolder> {
+        extends PagedListAdapter<IDisplayOperation, OperationsAdapter.OperationViewHolder> {
 
     interface OnItemClickListener {
         void onOperationClick (@NonNull final UUID userId);
@@ -56,7 +58,7 @@ final class OperationsAdapter
             @NonNull OperationViewHolder holder,
             int position
     ) {
-        final Operation operation = getItem(position);
+        final IDisplayOperation operation = getItem(position);
         if (operation != null) {
             holder.bind(operation, mOnItemClickListener, mOperationsViewModel);
         }
@@ -74,7 +76,7 @@ final class OperationsAdapter
         }
 
         void bind (
-                @NonNull final Operation operation,
+                @NonNull final IDisplayOperation operation,
                 @NonNull final OnItemClickListener onItemClickListener,
                 @NonNull final OperationsViewModel viewModel
         ) {
@@ -87,21 +89,21 @@ final class OperationsAdapter
         }
     }
 
-    private static DiffUtil.ItemCallback<Operation> DIFF_CALLBACK =
-            new DiffUtil.ItemCallback<Operation>() {
+    private static DiffUtil.ItemCallback<IDisplayOperation> DIFF_CALLBACK =
+            new DiffUtil.ItemCallback<IDisplayOperation>() {
 
                 @Override
                 public boolean areItemsTheSame (
-                        Operation oldOperation,
-                        Operation newOperation
+                        IDisplayOperation oldItem,
+                        IDisplayOperation newItem
                 ) {
                     return false;
                 }
 
                 @Override
                 public boolean areContentsTheSame (
-                        Operation oldOperation,
-                        Operation newOperation
+                        IDisplayOperation oldItem,
+                        IDisplayOperation newItem
                 ) {
                     return false;
                 }
