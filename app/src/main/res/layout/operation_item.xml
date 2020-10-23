@@ -78,9 +78,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="5dp"
-                android:src="@drawable/heart"
+                android:src="@drawable/heart_outline"
                 android:visibility="@{ViewModel.isOwnProfile() ? View.VISIBLE : View.GONE}"
-                app:backgroundTint="@android:color/white"
+                app:backgroundTint="@color/colorPrimary"
                 app:borderWidth="0dp"
                 app:elevation="2dp"
                 app:fabSize="mini"
@@ -89,7 +89,6 @@
                 app:layout_constraintStart_toEndOf="@id/llOperationInfo"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.0"
-                app:maxImageSize="40dp"
                 app:pressedTranslationZ="12dp" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -104,7 +103,7 @@
 
         <variable
             name="Operation"
-            type="blagodarie.rating.ui.user.operations.Operation" />
+            type="blagodarie.rating.model.IDisplayOperation" />
 
         <variable
             name="OperationName"

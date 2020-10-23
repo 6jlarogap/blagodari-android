@@ -40,11 +40,12 @@ abstract class AbstractOperation
         return mUserIdFrom;
     }
 
+    @NonNull
     public final OperationType getOperationType () {
         return mOperationType;
     }
 
-    @Nullable
+    @NonNull
     public final String getComment () {
         return mComment;
     }

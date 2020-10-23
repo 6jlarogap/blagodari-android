@@ -7,8 +7,8 @@ import blagodarie.rating.model.R;
 public enum OperationType {
 
     THANKS(1, R.string.operation_type_name_thanks),
-    MISTRUST(2, R.string.operation_type_name_trustless),
-    MISTRUST_CANCEL(3, R.string.operation_type_name_trustless_cancel);
+    MISTRUST(2, R.string.operation_type_name_mistrust),
+    TRUST(3, R.string.operation_type_name_trust);
 
     private final int mId;
 
@@ -41,7 +41,7 @@ public enum OperationType {
                 operationType = MISTRUST;
                 break;
             case 3:
-                operationType = MISTRUST_CANCEL;
+                operationType = TRUST;
                 break;
             default:
                 operationType = null;

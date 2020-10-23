@@ -49,6 +49,9 @@
     <string name="info_msg_you_use_latest_version">Вы используете последнюю версию</string>
     <string name="info_msg_function_in_developing">Функция в разработке</string>
     <string name="info_msg_update_available">Доступна новая версия</string>
+    <string name="info_msg_cant_add_operation_to_own_profile">Нельзя выполнить эту операцию для собственного профиля.</string>
+    <string name="info_msg_need_log_in">Необходимо авторизоваться</string>
+    <string name="info_msg_missing_profile">Такого профиля не существует</string>
 
     <string name="qstn_want_load_new_version">Желаете загрузить новую версию %d?</string>
     <string name="qstn_delete_key">Удалить ключ?</string>
@@ -61,16 +64,18 @@
     <string name="err_msg_missing_account">Не указан аккаунт</string>
     <string name="err_msg_incorrect_link">Неверная ссылка</string>
     <string name="err_msg_required_to_fill">Обязательно для заполнения</string>
+    <string name="err_msg_not_saved">Не удалось сохранить</string>
 
     <string name="txt_fame">Известность: %d</string>
-    <string name="txt_self_profile_thanks_count">Благодарности: %d</string>
+    <string name="txt_own_profile_thanks_count">Благодарности: %d</string>
     <string name="txt_thanks_count">Благодарности/мои: %d/%d</string>
-    <string name="txt_self_profile_trust">Утраты доверия: %d</string>
+    <string name="txt_own_profile_trust">Утраты доверия: %d</string>
     <string name="txt_trust">Доверие/утраты: %d/%d</string>
     <string name="txt_yes">Да</string>
     <string name="txt_no">Нет</string>
     <string name="txt_card_number">Номер карты</string>
-    <string name="txt_thanks_users">Поблагодарившие и отблагодаренные</string>
+    <string name="txt_thanks_and_thanked_users">Поблагодарившие и отблагодаренные</string>
+    <string name="txt_thanks_users">Поблагодарившие</string>
     <string name="txt_version">Версия: %s</string>
     <string name="txt_share">Потелиться</string>
     <string name="txt_my_account">Мой профиль</string>

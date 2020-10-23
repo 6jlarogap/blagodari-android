@@ -10,8 +10,8 @@ android {
         applicationId "blagodarie.rating"
         minSdkVersion 19
         targetSdkVersion 30
-        versionCode 30
-        versionName "0.0.30"
+        versionCode 31
+        versionName "0.0.31"
 
         project.ext.set("archivesBaseName", "rating-" + defaultConfig.versionName)
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

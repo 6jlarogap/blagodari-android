@@ -53,22 +53,33 @@ public abstract class ServerApiRequest<ApiResponseType extends _ServerApiRespons
             } else {
                 throw new EmptyResponseException();
             }
-        } else if (response.code() >= 400 && response.code() <= 499) {
-            if (response.code() == 401) {
-                throw new BadAuthorizationTokenException();
-            } else {
-                String errorMessage = null;
-                if (response.body() != null) {
-                    final JSONObject jsonObject = new JSONObject(response.body().string());
-                    errorMessage = jsonObject.getString("message");
-                }
-                throw new BadRequestException(response.code(), response.message() + " - " + errorMessage);
+        } else if (response.code() == 400) {
+            return parse400Response(response);
+        } else if (response.code() == 401) {
+            throw new BadAuthorizationTokenException();
+        } else if (response.code() >= 402 && response.code() <= 499) {
+            String errorMessage = null;
+            if (response.body() != null) {
+                final JSONObject jsonObject = new JSONObject(response.body().string());
+                errorMessage = jsonObject.getString("message");
             }
+            throw new BadRequestException(response.code(), response.message() + " - " + errorMessage);
         } else if (response.code() >= 500 && response.code() <= 599) {
             throw new ServerInternalException(response.code(), response.message());
         } else {
             throw new HttpException(response.code(), response.message());
         }
+    }
+
+    protected ApiResponseType parse400Response (
+            @NonNull final Response response
+    ) throws JSONException, IOException, BadRequestException {
+        String errorMessage = null;
+        if (response.body() != null) {
+            final JSONObject jsonObject = new JSONObject(response.body().string());
+            errorMessage = jsonObject.getString("message");
+        }
+        throw new BadRequestException(response.code(), response.message() + " - " + errorMessage);
     }
 
     protected abstract ApiResponseType parseOkResponse (
