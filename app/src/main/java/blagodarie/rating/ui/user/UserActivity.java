@@ -196,6 +196,7 @@ public final class UserActivity
             final Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
 
             appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+                Log.d(TAG, "appUpdateInfo=" + appUpdateInfo.toString());
                 if (appUpdateInfo.availableVersionCode() > BuildConfig.VERSION_CODE) {
                     if (!getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).contains(String.valueOf(appUpdateInfo.availableVersionCode()))) {
                         new AlertDialog.
