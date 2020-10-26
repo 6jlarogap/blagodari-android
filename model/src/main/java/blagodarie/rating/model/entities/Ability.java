@@ -1,5 +1,6 @@
 package blagodarie.rating.model.entities;
 
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 
 import java.io.Serializable;
@@ -8,6 +9,7 @@ import java.util.UUID;
 
 import blagodarie.rating.model.IAbility;
 
+@Keep
 public final class Ability
         implements IAbility, Serializable {
 
