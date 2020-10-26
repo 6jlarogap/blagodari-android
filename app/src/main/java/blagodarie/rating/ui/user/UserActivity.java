@@ -210,13 +210,15 @@ public final class UserActivity
                                             intent.setData(Uri.parse(getString(R.string.url_play_market)));
                                             startActivity(intent);
                                         }).
-                                setNegativeButton(android.R.string.cancel, null).
+                                setNegativeButton(
+                                        android.R.string.cancel,
+                                        (dialog, which) -> getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).
+                                                edit().
+                                                putInt(String.valueOf(appUpdateInfo.availableVersionCode()), appUpdateInfo.availableVersionCode()).
+                                                apply()).
                                 create().
                                 show();
-                        getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).
-                                edit().
-                                putInt(String.valueOf(appUpdateInfo.availableVersionCode()), appUpdateInfo.availableVersionCode()).
-                                apply();
+
 
                     }
                 }
