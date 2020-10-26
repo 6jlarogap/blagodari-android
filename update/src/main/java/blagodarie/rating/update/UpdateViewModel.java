@@ -2,6 +2,7 @@ package blagodarie.rating.update;
 
 import android.util.Log;
 
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.databinding.ObservableFloat;
 import androidx.databinding.ObservableInt;
@@ -41,6 +42,7 @@ public final class UpdateViewModel
     @NonNull
     private final ObservableFloat mDownloadedBytes = new ObservableFloat(0);
 
+    @Keep
     public UpdateViewModel (
             @NonNull final String versionName
     ) {

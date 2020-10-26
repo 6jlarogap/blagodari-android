@@ -12,7 +12,7 @@ import blagodarie.rating.model.IAbility;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
-public class AddOrUpdateAbilityRequest
+public final class AddOrUpdateAbilityRequest
         extends ServerApiRequest<AddOrUpdateAbilityResponse> {
 
     private static final String TAG = AddOrUpdateAbilityRequest.class.getSimpleName();

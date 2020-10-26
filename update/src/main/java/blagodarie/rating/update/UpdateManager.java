@@ -42,6 +42,8 @@ public final class UpdateManager {
 
     private GetRatingLatestVersionResponse mLastResponse;
 
+    private Integer mLastVersionCodeOnMarket;
+
     public UpdateManager (
             @NonNull final String fileProviderAuthorities
     ) {
@@ -92,12 +94,12 @@ public final class UpdateManager {
 
                 appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
                     Log.d(TAG, "appUpdateInfo=" + appUpdateInfo.toString());
+                    mLastVersionCodeOnMarket = appUpdateInfo.availableVersionCode();
                     if (appUpdateInfo.availableVersionCode() > BuildConfig.VERSION_CODE) {
                         if (!context.getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).contains(String.valueOf(appUpdateInfo.availableVersionCode()))) {
                             showUpdateDialog(
                                     context,
                                     (dialogInterface, i) -> toUpdate(context)
-
                             );
                         }
                     }
@@ -125,7 +127,7 @@ public final class UpdateManager {
         new AlertDialog.
                 Builder(context).
                 setTitle(R.string.info_msg_update_available).
-                setMessage(context.getString(R.string.qstn_want_load_new_version, mLastResponse.getVersionCode())).
+                setMessage(context.getString(R.string.qstn_want_load_new_version, mLastResponse.isRatingGooglePlayUpdate() ? mLastVersionCodeOnMarket : mLastResponse.getVersionCode())).
                 setPositiveButton(
                         R.string.btn_update,
                         onOkClickListener).
