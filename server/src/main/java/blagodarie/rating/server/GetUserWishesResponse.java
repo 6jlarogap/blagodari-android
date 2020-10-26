@@ -8,7 +8,7 @@ import java.util.List;
 import blagodarie.rating.model.IWish;
 import blagodarie.rating.model.entities.Wish;
 
-public class GetUserWishesResponse
+public final class GetUserWishesResponse
         extends _ServerApiResponse {
 
     @NonNull

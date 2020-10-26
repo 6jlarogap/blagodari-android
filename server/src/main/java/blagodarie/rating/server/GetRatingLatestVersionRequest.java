@@ -30,8 +30,8 @@ public final class GetRatingLatestVersionRequest
     ) throws JSONException {
         Log.d(TAG, "parseOkResponse responseBody=" + responseBody);
         final JSONObject json = new JSONObject(responseBody);
-        final boolean ratingGooglePlayUpdate = true;//json.getBoolean("rating_google_play_update");
-        final int versionCode = 100;//json.getInt("version_code");
+        final boolean ratingGooglePlayUpdate = json.getBoolean("rating_google_play_update");
+        final int versionCode = json.getInt("version_code");
         final String versionName = json.getString("version_name");
         final String path = json.getString("path");
         return new GetRatingLatestVersionResponse(ratingGooglePlayUpdate, versionCode, versionName, path);

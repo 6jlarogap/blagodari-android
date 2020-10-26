@@ -13,7 +13,7 @@ import blagodarie.rating.server.GetUserWishesRequest;
 import blagodarie.rating.server.GetUserWishesResponse;
 import blagodarie.rating.server.ServerApiClient;
 
-public class WishesDataSource
+class WishesDataSource
         extends PositionalDataSource<IWish> {
 
     private static final String TAG = WishesDataSource.class.getSimpleName();
@@ -21,7 +21,7 @@ public class WishesDataSource
     @NonNull
     private final UUID mUserId;
 
-    public WishesDataSource (
+    WishesDataSource (
             @NonNull final UUID userId
     ) {
         Log.d(TAG, "OperationDataSource");
@@ -60,13 +60,13 @@ public class WishesDataSource
         }
     }
 
-    public static class WishesDataSourceFactory
+    static class WishesDataSourceFactory
             extends DataSource.Factory<Integer, IWish> {
 
         @NonNull
         private final UUID mUserId;
 
-        public WishesDataSourceFactory (
+        WishesDataSourceFactory (
                 @NonNull final UUID userId
         ) {
             mUserId = userId;

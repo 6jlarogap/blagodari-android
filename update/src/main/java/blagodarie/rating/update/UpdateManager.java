@@ -1,10 +1,18 @@
 package blagodarie.rating.update;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+
+import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.tasks.Task;
 
 import blagodarie.rating.server.GetRatingLatestVersionRequest;
 import blagodarie.rating.server.GetRatingLatestVersionResponse;
@@ -16,12 +24,12 @@ import io.reactivex.schedulers.Schedulers;
 
 public final class UpdateManager {
 
+    private static final String TAG = UpdateManager.class.getSimpleName();
+
+    private static final String NEW_VERSION_NOTIFICATION_PREFERENCE = "blagodarie.rating.update.UpdateManager.newVersionNotification";
+
     public interface OnCheckUpdateListener {
-        void onHaveUpdate (@NonNull final NewVersionInfo newVersionInfo);
-
-        void onNothingUpdate ();
-
-        void onUpdateFromMarket ();
+        void onHaveUpdate ();
     }
 
     @FunctionalInterface
@@ -29,7 +37,21 @@ public final class UpdateManager {
         void onError (@NonNull final Throwable throwable);
     }
 
-    public static Disposable checkUpdate (
+    @NonNull
+    private final String mFileProviderAuthorities;
+
+    private GetRatingLatestVersionResponse mLastResponse;
+
+    private Integer mLastVersionCodeOnMarket;
+
+    public UpdateManager (
+            @NonNull final String fileProviderAuthorities
+    ) {
+        mFileProviderAuthorities = fileProviderAuthorities;
+    }
+
+    public Disposable checkUpdate (
+            @NonNull final Context context,
             final int currentCodeVersion,
             @NonNull final OnCheckUpdateListener onCheckUpdateListener,
             @NonNull final OnErrorListener onErrorListener
@@ -41,33 +63,88 @@ public final class UpdateManager {
                 subscribeOn(Schedulers.io()).
                 observeOn(AndroidSchedulers.mainThread()).
                 subscribe(
-                        response -> handleCheckUpdateResponse(currentCodeVersion, response, onCheckUpdateListener),
+                        response -> {
+                            mLastResponse = response;
+                            handleCheckUpdateResponse(context, currentCodeVersion, onCheckUpdateListener);
+                        },
                         onErrorListener::onError
                 );
     }
 
-    private static void handleCheckUpdateResponse (
+    private void handleCheckUpdateResponse (
+            @NonNull final Context context,
             final int currentCodeVersion,
-            @NonNull final GetRatingLatestVersionResponse response,
             @NonNull final OnCheckUpdateListener onCheckUpdateListener
     ) {
-        if (!response.isRatingGooglePlayUpdate()) {
-            if (response.getVersionCode() > currentCodeVersion) {
-                onCheckUpdateListener.onHaveUpdate(new NewVersionInfo(response.getVersionCode(), response.getVersionName(), Uri.parse(response.getPath())));
-            } else {
-                onCheckUpdateListener.onNothingUpdate();
+        if (!mLastResponse.isRatingGooglePlayUpdate()) {
+            if (mLastResponse.getVersionCode() > currentCodeVersion) {
+                onCheckUpdateListener.onHaveUpdate();
+                if (!context.getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).contains(String.valueOf(mLastResponse.getVersionCode()))) {
+                    showUpdateDialog(
+                            context,
+                            (dialogInterface, i) -> toUpdate(context)
+                    );
+                }
             }
         } else {
-            onCheckUpdateListener.onUpdateFromMarket();
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                final AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(context);
+
+                final Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
+
+                appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+                    Log.d(TAG, "appUpdateInfo=" + appUpdateInfo.toString());
+                    mLastVersionCodeOnMarket = appUpdateInfo.availableVersionCode();
+                    if (appUpdateInfo.availableVersionCode() > BuildConfig.VERSION_CODE) {
+                        if (!context.getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).contains(String.valueOf(appUpdateInfo.availableVersionCode()))) {
+                            showUpdateDialog(
+                                    context,
+                                    (dialogInterface, i) -> toUpdate(context)
+                            );
+                        }
+                    }
+                });
+            }
         }
     }
 
-    public static void startUpdate (
-            @NonNull final Context context,
-            @NonNull final String fileProviderAuthorities,
-            @NonNull final NewVersionInfo newVersionInfo
+    public void toUpdate (
+            @NonNull final Context context
     ) {
-        final Intent intent = UpdateActivity.createSelfIntent(context, fileProviderAuthorities, newVersionInfo.getVersionName(), newVersionInfo.getPath());
+        if (mLastResponse.isRatingGooglePlayUpdate()) {
+            final Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(context.getString(R.string.url_play_market)));
+            context.startActivity(intent);
+        } else {
+            startUpdate(context);
+        }
+    }
+
+    private void showUpdateDialog (
+            @NonNull final Context context,
+            @NonNull final DialogInterface.OnClickListener onOkClickListener
+    ) {
+        new AlertDialog.
+                Builder(context).
+                setTitle(R.string.info_msg_update_available).
+                setMessage(context.getString(R.string.qstn_want_load_new_version, mLastResponse.isRatingGooglePlayUpdate() ? mLastVersionCodeOnMarket : mLastResponse.getVersionCode())).
+                setPositiveButton(
+                        R.string.btn_update,
+                        onOkClickListener).
+                setNegativeButton(
+                        android.R.string.cancel,
+                        (dialogInterface, i) -> context.getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).
+                                edit().
+                                putInt(String.valueOf(mLastResponse.getVersionCode()), mLastResponse.getVersionCode()).
+                                apply()).
+                create().
+                show();
+    }
+
+    private void startUpdate (
+            @NonNull final Context context
+    ) {
+        final Intent intent = UpdateActivity.createSelfIntent(context, mFileProviderAuthorities, mLastResponse.getVersionName(), Uri.parse(mLastResponse.getPath()));
         context.startActivity(intent);
     }
 }

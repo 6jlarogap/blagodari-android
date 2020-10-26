@@ -18,10 +18,10 @@ import blagodarie.rating.model.IWish;
 import blagodarie.rating.model.entities.Wish;
 import okhttp3.Request;
 
-public class GetUserWishesRequest
+public final class GetUserWishesRequest
         extends ServerApiRequest<GetUserWishesResponse> {
 
-    private static final String TAG = GetThanksUsersRequest.class.getSimpleName();
+    private static final String TAG = GetUserWishesRequest.class.getSimpleName();
 
     @NonNull
     private final UUID mUserId;

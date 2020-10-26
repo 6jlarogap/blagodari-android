@@ -4,4 +4,10 @@
     <string name="update_progress_percent">%d %%</string>
     <string name="downloaded_mb">Загружено %.2f mb</string>
     <string name="total_mb">%.2f mb</string>
+    <string name="file_name">blagodarie %s.apk</string>
+    <string name="url_play_market">https://play.google.com/store/apps/details?id=blagodarie.rating</string>
+
+    <string name="btn_update">Обновить</string>
+    <string name="info_msg_update_available">Доступна новая версия</string>
+    <string name="qstn_want_load_new_version">Желаете загрузить новую версию %d?</string>
 </resources>

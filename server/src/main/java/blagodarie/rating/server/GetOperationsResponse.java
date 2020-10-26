@@ -7,7 +7,7 @@ import java.util.List;
 
 import blagodarie.rating.model.IDisplayOperation;
 
-public class GetOperationsResponse
+public final class GetOperationsResponse
         extends _ServerApiResponse {
 
     @NonNull

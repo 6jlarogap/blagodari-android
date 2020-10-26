@@ -15,10 +15,10 @@ public final class AddOperationToUserRequest
     private static final String TAG = AddOperationToUserRequest.class.getSimpleName();
 
     @NonNull
-    private final OperationToUser mOperation;
+    private final blagodarie.rating.model.entities.OperationToUser mOperation;
 
     public AddOperationToUserRequest (
-            @NonNull final OperationToUser operation
+            @NonNull final blagodarie.rating.model.entities.OperationToUser operation
     ) {
         super("addoperation");
         mOperation = operation;
@@ -43,9 +43,9 @@ public final class AddOperationToUserRequest
         return String.format(
                 Locale.ENGLISH,
                 "{\"user_id_to\":\"%s\",\"operation_type_id\":%d,\"timestamp\":%d,\"comment\":\"%s\"}",
-                mOperation.getUserIdTo().toString(),
-                mOperation.getOperationTypeId(),
-                mOperation.getTimestamp(),
+                mOperation.getIdTo().toString(),
+                mOperation.getOperationType().getId(),
+                mOperation.getTimestamp().getTime(),
                 mOperation.getComment()
         );
     }

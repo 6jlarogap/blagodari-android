@@ -42,6 +42,13 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_profileFragment_to_abilitiesFragment"
+            app:destination="@id/abilitiesFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/startFragment2"
@@ -142,5 +149,36 @@
         <argument
             android:name="user_id"
             app:argType="java.util.UUID" />
+    </fragment>
+    <fragment
+        android:id="@+id/abilitiesFragment"
+        android:name="blagodarie.rating.ui.user.abilities.AbilitiesFragment"
+        android:label="AbilitiesFragment" >
+        <argument
+            android:name="user_id"
+            app:argType="java.util.UUID" />
+        <argument
+            android:name="account"
+            app:argType="android.accounts.Account"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_abilitiesFragment_to_editAbilityFragment"
+            app:destination="@id/editAbilityFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/editAbilityFragment"
+        android:name="blagodarie.rating.ui.user.abilities.EditAbilityFragment"
+        android:label="EditAbilityFragment" >
+        <argument
+            android:name="account"
+            app:argType="android.accounts.Account" />
+        <argument
+            android:name="ability"
+            app:argType="blagodarie.rating.model.entities.Ability"
+            app:nullable="true" />
     </fragment>
 </navigation>

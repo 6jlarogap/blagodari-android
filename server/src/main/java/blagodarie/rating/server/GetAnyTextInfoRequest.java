@@ -14,7 +14,7 @@ import blagodarie.rating.model.entities.AnyTextInfo;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class GetAnyTextInfoRequest
+public final class GetAnyTextInfoRequest
         extends ServerApiRequest<GetAnyTextInfoResponse> {
 
     private static final String TAG = GetAnyTextInfoRequest.class.getSimpleName();

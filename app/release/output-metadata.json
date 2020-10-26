@@ -11,10 +11,10 @@
       "type": "SINGLE",
       "filters": [],
       "properties": [],
-      "versionCode": 31,
-      "versionName": "0.0.31",
+      "versionCode": 32,
+      "versionName": "0.0.32",
       "enabled": true,
-      "outputFile": "rating-0.0.31-release.apk"
+      "outputFile": "rating-0.0.32-release.apk"
     }
   ]
 }

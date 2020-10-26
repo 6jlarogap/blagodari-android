@@ -42,6 +42,7 @@
     <string name="rqst_choose_account">Выберите аккаунт</string>
     <string name="rqst_scan_qr_code">Отсканируйте QR-код</string>
     <string name="rqst_enter_your_wish">Напишите ваше желание</string>
+    <string name="rqst_enter_your_ability">Напишите вашу возможность</string>
     <string name="rqst_enter_your_comment">Напишите ваш комментарий</string>
     <string name="rqst_enter_key">Введите ключ</string>
 
@@ -80,6 +81,7 @@
     <string name="txt_share">Потелиться</string>
     <string name="txt_my_account">Мой профиль</string>
     <string name="txt_logout">Выйти из аккаунта</string>
+    <string name="txt_update">Обновить</string>
     <string name="txt_qr_code_scan">Сканировать QR-код</string>
     <string name="txt_comment">Комментарий</string>
     <string name="txt_key">%s: %s</string>

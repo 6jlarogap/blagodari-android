@@ -52,7 +52,7 @@ public final class UpdateActivity
         mLatestVersionName = getIntent().getStringExtra(EXTRA_LATEST_VERSION_NAME);
         mLatestVersionUri = getIntent().getParcelableExtra(EXTRA_LATEST_VERSION_URI);
         mFileProviderAuthorities = getIntent().getStringExtra(EXTRA_FILE_PROVIDER_AUTHORITIES);
-        mFileName = "new version.apk";//String.format("%s %s.apk", getString(R.string.app_name), mLatestVersionName);
+        mFileName = getString(R.string.file_name, mLatestVersionName);
         mFile = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), mFileName);
 
         initViewModel();

@@ -20,10 +20,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Date;
 import java.util.UUID;
 
+import blagodarie.rating.AppExecutors;
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.WishesFragmentBinding;
 import blagodarie.rating.model.IWish;
 import blagodarie.rating.model.entities.Wish;
+import blagodarie.rating.repository.AsyncRepository;
+import blagodarie.rating.repository.AsyncServerRepository;
 import blagodarie.rating.repository.Repository;
 import blagodarie.rating.repository.ServerRepository;
 import blagodarie.rating.ui.user.profile.ProfileFragmentArgs;
@@ -45,7 +48,7 @@ public final class WishesFragment
 
     private UUID mUserId;
 
-    private Repository mRepository = new ServerRepository();
+    private AsyncRepository mAsyncRepository = new AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread());
 
     @NonNull
     private CompositeDisposable mDisposables = new CompositeDisposable();
@@ -117,7 +120,7 @@ public final class WishesFragment
 
     private void refreshWishes () {
         Log.d(TAG, "refreshWishes");
-        mViewModel.setWishes(mRepository.getUserWishes(mUserId));
+        mViewModel.setWishes(mAsyncRepository.getLiveDataPagedListFromDataSource(new WishesDataSource.WishesDataSourceFactory(mUserId)));
         mViewModel.getWishes().observe(requireActivity(), mWishesAdapter::submitList);
     }
 

@@ -66,16 +66,10 @@ public final class AddKeyFragment
     }
 
     @Override
-    public void onActivityCreated (@Nullable Bundle savedInstanceState) {
+    public void onActivityCreated (@Nullable final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         setupBinding();
-    }
-
-    @Override
-    public void onStart () {
-        Log.d(TAG, "onStart");
-        super.onStart();
     }
 
     @Override
