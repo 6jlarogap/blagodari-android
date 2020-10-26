@@ -2,6 +2,9 @@ package blagodarie.rating.repository;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
+import androidx.paging.DataSource;
+import androidx.paging.PagedList;
 
 import java.util.UUID;
 
@@ -49,4 +52,7 @@ public interface AsyncRepository {
             @NonNull final OnErrorListener onErrorListener
     );
 
+    <T> LiveData<PagedList<T>> getLiveDataPagedListFromDataSource(
+            @NonNull final DataSource.Factory<Integer, T> dataSourceFactory
+    );
 }

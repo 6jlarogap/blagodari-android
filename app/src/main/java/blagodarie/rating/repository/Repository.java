@@ -20,12 +20,6 @@ import blagodarie.rating.server.HttpException;
 
 public interface Repository {
 
-    LiveData<PagedList<IWish>> getUserWishes (@NonNull final UUID userId);
-
-    LiveData<PagedList<IDisplayOperation>> getUserOperations (@NonNull final UUID userId);
-
-    LiveData<PagedList<IDisplayOperation>> getAnyTextOperations (@NonNull final UUID anyTextId);
-
     void insertOperationToUser (
             @NonNull final OperationToUser operation
     ) throws JSONException, IOException, HttpException;

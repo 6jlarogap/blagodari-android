@@ -19,8 +19,6 @@ import androidx.annotation.Nullable;
 import androidx.databinding.BindingAdapter;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.paging.LivePagedListBuilder;
-import androidx.paging.PagedList;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
@@ -34,14 +32,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.Executors;
 
 import blagodarie.rating.AppExecutors;
 import blagodarie.rating.R;
-import blagodarie.rating.operations.OperationToUserManager;
 import blagodarie.rating.auth.AccountGeneral;
 import blagodarie.rating.databinding.ProfileFragmentBinding;
 import blagodarie.rating.model.entities.OperationType;
+import blagodarie.rating.operations.OperationToUserManager;
 import blagodarie.rating.repository.AsyncServerRepository;
 import blagodarie.rating.server.BadAuthorizationTokenException;
 import blagodarie.rating.ui.AccountProvider;
@@ -83,7 +80,7 @@ public final class ProfileFragment
     private FragmentCommunicator mFragmentCommunicator;
 
     @NonNull
-    private final AsyncServerRepository mRepository = new AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread());
+    private final AsyncServerRepository mAsyncRepository = new AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread());
 
     @NotNull
     @Override
@@ -218,13 +215,15 @@ public final class ProfileFragment
         Log.d(TAG, "downloadProfileData");
         mViewModel.getDownloadInProgress().set(true);
 
-        mRepository.setAuthToken(authToken);
-        mRepository.getProfileInfo(
+        mAsyncRepository.setAuthToken(authToken);
+        mAsyncRepository.getProfileInfo(
                 mUserId,
                 profileInfo -> {
                     mViewModel.getDownloadInProgress().set(false);
                     mViewModel.getProfileInfo().set(profileInfo);
-                    if (mViewModel.isOwnProfile().get()) {
+                    if (profileInfo != null &&
+                            profileInfo.getPhoto() != null &&
+                            mViewModel.isOwnProfile().get()) {
                         AccountManager.get(requireContext()).setUserData(mAccount, AccountGeneral.USER_DATA_PHOTO, profileInfo.getPhoto());
                         new ViewModelProvider(requireActivity()).get(UserViewModel.class).getOwnAccountPhotoUrl().setValue(profileInfo.getPhoto());
                     }
@@ -238,18 +237,7 @@ public final class ProfileFragment
     }
 
     private void refreshThanksUsers () {
-        final ThanksUsersDataSource.ThanksUserDataSourceFactory sourceFactory = new ThanksUsersDataSource.ThanksUserDataSourceFactory(mUserId);
-
-        final PagedList.Config config = new PagedList.Config.Builder()
-                .setEnablePlaceholders(false)
-                .setPageSize(10)
-                .build();
-
-        mViewModel.setThanksUsers(
-                new LivePagedListBuilder<>(sourceFactory, config).
-                        setFetchExecutor(Executors.newSingleThreadExecutor()).
-                        build()
-        );
+        mViewModel.setThanksUsers(mAsyncRepository.getLiveDataPagedListFromDataSource(new ThanksUsersDataSource.ThanksUserDataSourceFactory(mUserId)));
         mViewModel.getThanksUsers().observe(requireActivity(), mThanksUsersAdapter::submitList);
     }
 
@@ -294,14 +282,14 @@ public final class ProfileFragment
         if (mAccount != null) {
             AccountProvider.getAuthToken(requireActivity(), mAccount, authToken -> {
                 if (authToken != null) {
-                    mRepository.setAuthToken(authToken);
+                    mAsyncRepository.setAuthToken(authToken);
                     new OperationToUserManager().
                             createOperationToUser(
                                     requireActivity(),
                                     UUID.fromString(mAccount.name),
                                     mUserId,
                                     operationType,
-                                    mRepository,
+                                    mAsyncRepository,
                                     () -> {
                                         Toast.makeText(requireContext(), R.string.info_msg_saved, Toast.LENGTH_LONG).show();
                                         refreshProfileData();

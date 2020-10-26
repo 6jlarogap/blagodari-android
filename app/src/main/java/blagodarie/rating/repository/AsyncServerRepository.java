@@ -2,9 +2,14 @@ package blagodarie.rating.repository;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
+import androidx.paging.DataSource;
+import androidx.paging.LivePagedListBuilder;
+import androidx.paging.PagedList;
 
 import java.util.UUID;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import blagodarie.rating.model.IAnyTextInfo;
 import blagodarie.rating.model.IProfileInfo;
@@ -106,4 +111,18 @@ public final class AsyncServerRepository
         });
     }
 
+    @NonNull
+    @Override
+    public <T> LiveData<PagedList<T>> getLiveDataPagedListFromDataSource(
+            @NonNull final DataSource.Factory<Integer, T> dataSourceFactory
+    ){
+        final PagedList.Config config = new PagedList.Config.Builder()
+                .setEnablePlaceholders(false)
+                .setPageSize(10)
+                .build();
+
+        return new LivePagedListBuilder<>(dataSourceFactory, config).
+                setFetchExecutor(mExecutor).
+                build();
+    }
 }

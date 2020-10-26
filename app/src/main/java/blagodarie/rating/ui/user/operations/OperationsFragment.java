@@ -22,13 +22,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 import blagodarie.rating.AppExecutors;
-import blagodarie.rating.operations.OperationToAnyTextManager;
-import blagodarie.rating.operations.OperationToUserManager;
-import blagodarie.rating.model.entities.OperationType;
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.OperationsFragmentBinding;
+import blagodarie.rating.model.entities.OperationType;
+import blagodarie.rating.operations.OperationToAnyTextManager;
+import blagodarie.rating.operations.OperationToUserManager;
 import blagodarie.rating.repository.AsyncServerRepository;
-import blagodarie.rating.repository.ServerRepository;
 import blagodarie.rating.server.BadAuthorizationTokenException;
 import blagodarie.rating.ui.AccountProvider;
 import io.reactivex.disposables.CompositeDisposable;
@@ -56,9 +55,6 @@ public final class OperationsFragment
 
     @NonNull
     private final AsyncServerRepository mAsyncRepository = new AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread());
-
-    @NonNull
-    private final ServerRepository mRepository = new ServerRepository();
 
     @NonNull
     private final OperationsAdapter.OnItemClickListener mOnOperationClickListener = new OperationsAdapter.OnItemClickListener() {
@@ -158,7 +154,11 @@ public final class OperationsFragment
 
     private void refreshOperations () {
         Log.d(TAG, "refreshOperations");
-        mViewModel.setOperations(mUserId != null ? mRepository.getUserOperations(mUserId) : mRepository.getAnyTextOperations(mAnyTextId));
+        mViewModel.setOperations(
+                mUserId != null ?
+                        mAsyncRepository.getLiveDataPagedListFromDataSource(new UserOperationsDataSource.UserOperationsDataSourceFactory(mUserId)) :
+                        mAsyncRepository.getLiveDataPagedListFromDataSource(new AnyTextOperationsDataSource.AnyTextOperationsDataSourceFactory(mAnyTextId))
+        );
         mViewModel.getOperations().observe(requireActivity(), mOperationsAdapter::submitList);
     }
 
