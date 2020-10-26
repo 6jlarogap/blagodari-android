@@ -3,7 +3,6 @@ package blagodarie.rating.ui.user;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -17,7 +16,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.core.view.GravityCompat;
@@ -28,10 +26,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
-import com.google.android.play.core.appupdate.AppUpdateInfo;
-import com.google.android.play.core.appupdate.AppUpdateManager;
-import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
-import com.google.android.play.core.tasks.Task;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -44,20 +38,17 @@ import blagodarie.rating.R;
 import blagodarie.rating.auth.AccountGeneral;
 import blagodarie.rating.databinding.NavHeaderLayoutBinding;
 import blagodarie.rating.databinding.UserActivityBinding;
-import blagodarie.rating.model.IAbility;
 import blagodarie.rating.model.entities.Ability;
 import blagodarie.rating.ui.AccountProvider;
 import blagodarie.rating.ui.splash.SplashActivity;
 import blagodarie.rating.ui.user.abilities.AbilitiesFragment;
 import blagodarie.rating.ui.user.abilities.AbilitiesFragmentDirections;
-import blagodarie.rating.ui.user.abilities.EditAbilityFragment;
 import blagodarie.rating.ui.user.anytext.AnyTextFragment;
 import blagodarie.rating.ui.user.anytext.AnyTextFragmentDirections;
 import blagodarie.rating.ui.user.keys.KeysFragment;
 import blagodarie.rating.ui.user.keys.KeysFragmentDirections;
 import blagodarie.rating.ui.user.profile.ProfileFragment;
 import blagodarie.rating.ui.user.profile.ProfileFragmentDirections;
-import blagodarie.rating.update.NewVersionInfo;
 import blagodarie.rating.update.UpdateManager;
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -73,8 +64,6 @@ public final class UserActivity
 
     private static final String EXTRA_ANY_TEXT = "blagodarie.rating.ui.user.UserActivity.ANY_TEXT";
     public static final String EXTRA_TO_OPERATIONS = "blagodarie.rating.ui.user.UserActivity.TO_OPERATIONS";
-
-    private static final String NEW_VERSION_NOTIFICATION_PREFERENCE = "blagodarie.rating.ui.user.UserActivity.newVersionNotification";
 
     private AccountManager mAccountManager;
 
@@ -95,6 +84,8 @@ public final class UserActivity
     private AppCompatImageView ivOwnAccountPhoto;
 
     private CompositeDisposable mDisposables = new CompositeDisposable();
+
+    private UpdateManager mUpdateManger;
 
     @Override
     protected void onCreate (@Nullable final Bundle savedInstanceState) {
@@ -127,8 +118,10 @@ public final class UserActivity
                     this,
                     this::onAccountSelected
             );
+            mUpdateManger = new UpdateManager(getString(R.string.file_provider_authorities));
             mDisposables.add(
-                    UpdateManager.checkUpdate(
+                    mUpdateManger.checkUpdate(
+                            this,
                             BuildConfig.VERSION_CODE,
                             this,
                             throwable -> Toast.makeText(this, throwable.getLocalizedMessage(), Toast.LENGTH_LONG).show()
@@ -163,73 +156,9 @@ public final class UserActivity
     }
 
     @Override
-    public void onHaveUpdate (@NonNull final NewVersionInfo newVersionInfo) {
+    public void onHaveUpdate () {
         Log.d(TAG, "onHaveUpdate");
-
-        if (!getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).contains(String.valueOf(newVersionInfo.getVersionCode()))) {
-            new AlertDialog.
-                    Builder(this).
-                    setTitle(R.string.info_msg_update_available).
-                    setMessage(getString(R.string.qstn_want_load_new_version, newVersionInfo.getVersionCode())).
-                    setPositiveButton(
-                            R.string.btn_update,
-                            (dialogInterface, i) -> UpdateManager.startUpdate(
-                                    this,
-                                    getString(R.string.file_provider_authorities),
-                                    newVersionInfo)).
-                    setNegativeButton(android.R.string.cancel, null).
-                    create().
-                    show();
-            getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).
-                    edit().
-                    putInt(String.valueOf(newVersionInfo.getVersionCode()), newVersionInfo.getVersionCode()).
-                    apply();
-        }
-    }
-
-    @Override
-    public void onNothingUpdate () {
-        Log.d(TAG, "onNothingUpdate");
-        //do nothing
-    }
-
-    @Override
-    public void onUpdateFromMarket () {
-        Log.d(TAG, "onUpdateFromMarket");
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            final AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(this);
-
-            final Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
-
-            appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
-                Log.d(TAG, "appUpdateInfo=" + appUpdateInfo.toString());
-                if (appUpdateInfo.availableVersionCode() > BuildConfig.VERSION_CODE) {
-                    if (!getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).contains(String.valueOf(appUpdateInfo.availableVersionCode()))) {
-                        new AlertDialog.
-                                Builder(this).
-                                setTitle(R.string.info_msg_update_available).
-                                setMessage(getString(R.string.qstn_want_load_new_version, appUpdateInfo.availableVersionCode())).
-                                setPositiveButton(
-                                        R.string.btn_update,
-                                        (dialogInterface, i) -> {
-                                            final Intent intent = new Intent(Intent.ACTION_VIEW);
-                                            intent.setData(Uri.parse(getString(R.string.url_play_market)));
-                                            startActivity(intent);
-                                        }).
-                                setNegativeButton(
-                                        android.R.string.cancel,
-                                        (dialog, which) -> getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).
-                                                edit().
-                                                putInt(String.valueOf(appUpdateInfo.availableVersionCode()), appUpdateInfo.availableVersionCode()).
-                                                apply()).
-                                create().
-                                show();
-
-
-                    }
-                }
-            });
-        }
+        mActivityBinding.nvNavigation.getMenu().findItem(R.id.miUpdate).setVisible(true);
     }
 
     @Override
@@ -344,6 +273,8 @@ public final class UserActivity
                 case R.id.miLogout:
                     logout();
                     break;
+                case R.id.miUpdate:
+                    mUpdateManger.toUpdate(this);
                 default:
                     break;
             }
