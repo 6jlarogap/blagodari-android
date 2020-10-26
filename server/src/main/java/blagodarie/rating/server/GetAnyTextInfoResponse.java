@@ -4,7 +4,7 @@ import androidx.annotation.Nullable;
 
 import blagodarie.rating.model.IAnyTextInfo;
 
-public class GetAnyTextInfoResponse
+public final class GetAnyTextInfoResponse
         extends _ServerApiResponse {
 
     @Nullable

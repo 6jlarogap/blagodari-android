@@ -44,8 +44,13 @@ import blagodarie.rating.R;
 import blagodarie.rating.auth.AccountGeneral;
 import blagodarie.rating.databinding.NavHeaderLayoutBinding;
 import blagodarie.rating.databinding.UserActivityBinding;
+import blagodarie.rating.model.IAbility;
+import blagodarie.rating.model.entities.Ability;
 import blagodarie.rating.ui.AccountProvider;
 import blagodarie.rating.ui.splash.SplashActivity;
+import blagodarie.rating.ui.user.abilities.AbilitiesFragment;
+import blagodarie.rating.ui.user.abilities.AbilitiesFragmentDirections;
+import blagodarie.rating.ui.user.abilities.EditAbilityFragment;
 import blagodarie.rating.ui.user.anytext.AnyTextFragment;
 import blagodarie.rating.ui.user.anytext.AnyTextFragmentDirections;
 import blagodarie.rating.ui.user.keys.KeysFragment;
@@ -61,7 +66,8 @@ public final class UserActivity
         implements ProfileFragment.FragmentCommunicator,
         AnyTextFragment.FragmentCommunicator,
         UpdateManager.OnCheckUpdateListener,
-        KeysFragment.FragmentCommunicator {
+        KeysFragment.FragmentCommunicator,
+        AbilitiesFragment.FragmentCommunicator {
 
     private static final String TAG = UserActivity.class.getSimpleName();
 
@@ -499,7 +505,9 @@ public final class UserActivity
 
     @Override
     public void toAbilities () {
-        Toast.makeText(this, getString(R.string.info_msg_function_in_developing), Toast.LENGTH_LONG).show();
+        Log.d(TAG, "toAbilities");
+        final NavDirections action = ProfileFragmentDirections.actionProfileFragmentToAbilitiesFragment(mUserId, mAccount);
+        mNavController.navigate(action);
     }
 
     @Override
@@ -520,6 +528,15 @@ public final class UserActivity
     public void toAddKey () {
         Log.d(TAG, "toAddKey");
         final NavDirections action = KeysFragmentDirections.actionKeysFragmentToAddKeyFragment(mAccount);
+        mNavController.navigate(action);
+    }
+
+    @Override
+    public void toEditAbility (
+            @Nullable final Ability ability
+    ) {
+        Log.d(TAG, "toEditAbility");
+        final NavDirections action = AbilitiesFragmentDirections.actionAbilitiesFragmentToEditAbilityFragment(mAccount, ability);
         mNavController.navigate(action);
     }
 }

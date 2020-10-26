@@ -9,8 +9,8 @@ import androidx.paging.PagedList;
 
 import java.util.UUID;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
+import blagodarie.rating.model.IAbility;
 import blagodarie.rating.model.IAnyTextInfo;
 import blagodarie.rating.model.IProfileInfo;
 import blagodarie.rating.model.entities.OperationToAnyText;
@@ -111,11 +111,28 @@ public final class AsyncServerRepository
         });
     }
 
+    @Override
+    public void upsertAbility (
+            @NonNull final IAbility ability,
+            @NonNull final OnCompleteListener onCompleteListener,
+            @NonNull final OnErrorListener onErrorListener
+    ) {
+        mExecutor.execute(() -> {
+            try {
+                mServerRepository.upsertAbility(ability);
+
+                mMainThreadExecutor.execute(onCompleteListener::onComplete);
+            } catch (Throwable throwable) {
+                mMainThreadExecutor.execute(() -> onErrorListener.onError(throwable));
+            }
+        });
+    }
+
     @NonNull
     @Override
-    public <T> LiveData<PagedList<T>> getLiveDataPagedListFromDataSource(
+    public <T> LiveData<PagedList<T>> getLiveDataPagedListFromDataSource (
             @NonNull final DataSource.Factory<Integer, T> dataSourceFactory
-    ){
+    ) {
         final PagedList.Config config = new PagedList.Config.Builder()
                 .setEnablePlaceholders(false)
                 .setPageSize(10)

@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-public class GetThanksUsersResponse
+public final class GetThanksUsersResponse
         extends _ServerApiResponse {
 
     public static final class ThanksUser {

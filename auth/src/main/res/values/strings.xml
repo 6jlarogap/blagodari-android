@@ -8,6 +8,7 @@
     <string name="info_msg_update_data_complete">Данные обновлены</string>
     <string name="info_msg_add_thanks_complete">Благодарность добавлена</string>
     <string name="info_msg_wish_saved">Желание сохранено</string>
+    <string name="info_msg_ability_saved">Возможность сохранена</string>
     <string name="info_msg_key_saved">Ключ сохранен</string>
     <string name="info_msg_key_deleted">Ключ удален</string>
     <string name="info_msg_wish_deleted">Желание удалено</string>

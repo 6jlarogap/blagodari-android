@@ -10,6 +10,7 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.util.UUID;
 
+import blagodarie.rating.model.IAbility;
 import blagodarie.rating.model.IAnyTextInfo;
 import blagodarie.rating.model.IDisplayOperation;
 import blagodarie.rating.model.IProfileInfo;
@@ -30,12 +31,16 @@ public interface Repository {
     ) throws JSONException, IOException, HttpException;
 
     @Nullable
-    IProfileInfo getProfileInfo(
+    IProfileInfo getProfileInfo (
             @NonNull final UUID userId
     ) throws JSONException, IOException, HttpException;
 
     @Nullable
-    IAnyTextInfo getAnyTextInfo(
+    IAnyTextInfo getAnyTextInfo (
             @NonNull final String anyText
+    ) throws JSONException, IOException, HttpException;
+
+    void upsertAbility (
+            @NonNull final IAbility ability
     ) throws JSONException, IOException, HttpException;
 }

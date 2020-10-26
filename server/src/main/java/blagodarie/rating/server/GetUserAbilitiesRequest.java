@@ -14,24 +14,25 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-import blagodarie.rating.model.IWish;
-import blagodarie.rating.model.entities.Wish;
+import blagodarie.rating.model.IAbility;
+import blagodarie.rating.model.entities.Ability;
 import okhttp3.Request;
 
-public final class GetUserWishesRequest
-        extends ServerApiRequest<GetUserWishesResponse> {
+public final class GetUserAbilitiesRequest
+        extends ServerApiRequest<GetUserAbilitiesResponse> {
 
-    private static final String TAG = GetUserWishesRequest.class.getSimpleName();
+
+    private static final String TAG = GetUserAbilitiesRequest.class.getSimpleName();
 
     @NonNull
     private final UUID mUserId;
 
-    public GetUserWishesRequest (
+    public GetUserAbilitiesRequest (
             @NonNull final UUID userId,
             final int from,
             final int count
     ) {
-        super(String.format(Locale.ENGLISH, "/getuserwishes?uuid=%s&from=%d&count=%d", userId.toString(), from, count));
+        super(String.format(Locale.ENGLISH, "/getuserabilities?uuid=%s&from=%d&count=%d", userId.toString(), from, count));
         mUserId = userId;
     }
 
@@ -42,19 +43,19 @@ public final class GetUserWishesRequest
     }
 
     @Override
-    protected GetUserWishesResponse parseOkResponse (
+    protected GetUserAbilitiesResponse parseOkResponse (
             @NonNull final String responseBody
     ) throws JSONException {
         Log.d(TAG, "parseOkResponse responseBody=" + responseBody);
-        final JSONArray json = new JSONObject(responseBody).getJSONArray("wishes");
-        final List<IWish> wishes = new ArrayList<>();
+        final JSONArray json = new JSONObject(responseBody).getJSONArray("abilities");
+        final List<IAbility> abilities = new ArrayList<>();
         for (int i = 0; i < json.length(); i++) {
             final JSONObject operationJsonObject = json.getJSONObject(i);
             final UUID id = UUID.fromString(operationJsonObject.getString("uuid"));
             final String text = operationJsonObject.getString("text");
             final Date lastEdit = new Date(operationJsonObject.getLong("last_edit"));
-            wishes.add(new Wish(id, mUserId, text, lastEdit));
+            abilities.add(new Ability(id, mUserId, text, lastEdit));
         }
-        return new GetUserWishesResponse(wishes);
+        return new GetUserAbilitiesResponse(abilities);
     }
 }

@@ -19,13 +19,18 @@ public final class AddOperationToAnyTextRequest
     private static final String TAG = AddOperationToAnyTextRequest.class.getSimpleName();
 
     @NonNull
-    private final OperationToAnyText mOperation;
+    private final blagodarie.rating.model.entities.OperationToAnyText mOperation;
+
+    @NonNull
+    private final String mAnyText;
 
     public AddOperationToAnyTextRequest (
-            @NonNull final OperationToAnyText operation
+            @NonNull final blagodarie.rating.model.entities.OperationToAnyText operation,
+            @NonNull final String anyText
     ) {
         super("addtextoperation");
         mOperation = operation;
+        mAnyText = anyText;
     }
 
     @NonNull
@@ -48,10 +53,10 @@ public final class AddOperationToAnyTextRequest
     private String createContent () {
         return String.format(
                 Locale.ENGLISH,
-                "{" + (mOperation.getAnyTextIdTo() != null ? "\"text_id_to\":\"%s\"" : "\"text\":\"%s\"") + ",\"operation_type_id\":%d,\"timestamp\":%d,\"comment\":\"%s\"}",
-                (mOperation.getAnyTextIdTo() != null ? mOperation.getAnyTextIdTo().toString() : mOperation.getAnyText()),
-                mOperation.getOperationTypeId(),
-                mOperation.getTimestamp(),
+                "{" + (mOperation.getIdTo() != null ? "\"text_id_to\":\"%s\"" : "\"text\":\"%s\"") + ",\"operation_type_id\":%d,\"timestamp\":%d,\"comment\":\"%s\"}",
+                (mOperation.getIdTo() != null ? mOperation.getIdTo().toString() : mAnyText),
+                mOperation.getOperationType().getId(),
+                mOperation.getTimestamp().getTime(),
                 mOperation.getComment()
         );
     }

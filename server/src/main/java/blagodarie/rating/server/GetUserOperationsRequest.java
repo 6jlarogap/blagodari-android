@@ -20,7 +20,7 @@ import blagodarie.rating.model.entities.OperationType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
-public class GetUserOperationsRequest
+public final class GetUserOperationsRequest
         extends ServerApiRequest<GetOperationsResponse> {
 
     private static final String TAG = GetUserOperationsRequest.class.getSimpleName();

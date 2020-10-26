@@ -8,6 +8,7 @@ import androidx.paging.PagedList;
 
 import java.util.UUID;
 
+import blagodarie.rating.model.IAbility;
 import blagodarie.rating.model.IAnyTextInfo;
 import blagodarie.rating.model.IProfileInfo;
 import blagodarie.rating.model.entities.OperationToAnyText;
@@ -40,19 +41,25 @@ public interface AsyncRepository {
             @NonNull final OnErrorListener onErrorListener
     );
 
-    void getProfileInfo(
+    void getProfileInfo (
             @NonNull final UUID userId,
             @NonNull final OnLoadListener<IProfileInfo> onLoadListener,
             @NonNull final OnErrorListener onErrorListener
     );
 
-    void getAnyTextInfo(
+    void getAnyTextInfo (
             @NonNull final String anyText,
             @NonNull final OnLoadListener<IAnyTextInfo> onLoadListener,
             @NonNull final OnErrorListener onErrorListener
     );
 
-    <T> LiveData<PagedList<T>> getLiveDataPagedListFromDataSource(
+    void upsertAbility (
+            @NonNull final IAbility ability,
+            @NonNull final OnCompleteListener onCompleteListener,
+            @NonNull final OnErrorListener onErrorListener
+    );
+
+    <T> LiveData<PagedList<T>> getLiveDataPagedListFromDataSource (
             @NonNull final DataSource.Factory<Integer, T> dataSourceFactory
     );
 }

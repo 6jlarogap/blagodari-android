@@ -15,7 +15,7 @@ import java.util.UUID;
 
 import okhttp3.Request;
 
-public class GetThanksUsersRequest
+public final class GetThanksUsersRequest
         extends ServerApiRequest<GetThanksUsersResponse> {
 
     private static final String TAG = GetThanksUsersRequest.class.getSimpleName();
