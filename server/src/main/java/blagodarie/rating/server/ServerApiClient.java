@@ -1,6 +1,7 @@
 package blagodarie.rating.server;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,6 +24,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public final class ServerApiClient {
+
+    private static final String TAG = ServerApiClient.class.getSimpleName();
 
     @Nullable
     private final String mAuthToken;
@@ -105,6 +108,8 @@ public final class ServerApiClient {
             builder.addHeader("Authorization", String.format("Token %s", mAuthToken));
         }
 
-        return apiRequest.parseResponse(sendRequestAndGetResponse(builder.build()));
+        final Request request = builder.build();
+        Log.d(TAG, "execute request=" + request.toString());
+        return apiRequest.parseResponse(sendRequestAndGetResponse(request));
     }
 }

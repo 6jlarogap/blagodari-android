@@ -6,10 +6,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.paging.PagedList;
 
+import blagodarie.rating.model.IKey;
+import blagodarie.rating.model.entities.Key;
+
 public final class KeysViewModel
         extends ViewModel {
 
-    private LiveData<PagedList<Key>> mKeys;
+    private LiveData<PagedList<IKey>> mKeys;
 
     @NonNull
     private final ObservableBoolean mHaveAccount = new ObservableBoolean(false);
@@ -21,11 +24,11 @@ public final class KeysViewModel
     private final ObservableBoolean mDownloadInProgress = new ObservableBoolean(false);
 
     @NonNull
-    public LiveData<PagedList<Key>> getKeys () {
+    public LiveData<PagedList<IKey>> getKeys () {
         return mKeys;
     }
 
-    public void setOperations (@NonNull final LiveData<PagedList<Key>> keys) {
+    public void setOperations (@NonNull final LiveData<PagedList<IKey>> keys) {
         mKeys = keys;
     }
 

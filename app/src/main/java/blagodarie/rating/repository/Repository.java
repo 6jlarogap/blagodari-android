@@ -13,6 +13,8 @@ import java.util.UUID;
 import blagodarie.rating.model.IAbility;
 import blagodarie.rating.model.IAnyTextInfo;
 import blagodarie.rating.model.IDisplayOperation;
+import blagodarie.rating.model.IKey;
+import blagodarie.rating.model.IKeyPair;
 import blagodarie.rating.model.IProfileInfo;
 import blagodarie.rating.model.IWish;
 import blagodarie.rating.model.entities.OperationToAnyText;
@@ -42,5 +44,17 @@ public interface Repository {
 
     void upsertAbility (
             @NonNull final IAbility ability
+    ) throws JSONException, IOException, HttpException;
+
+    void insertKey(
+            @NonNull final IKeyPair keyPair
+    ) throws JSONException, IOException, HttpException;
+
+    void updateKey (
+            @NonNull final IKey key
+    ) throws JSONException, IOException, HttpException;
+
+    void deleteKey (
+            @NonNull final IKey key
     ) throws JSONException, IOException, HttpException;
 }

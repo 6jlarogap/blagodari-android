@@ -32,6 +32,10 @@ public final class AbilitiesFragment
         void toEditAbility (@Nullable final Ability ability);
     }
 
+    public interface UserActionListener {
+        void onAddAbilityClick ();
+    }
+
     private static final String TAG = AbilitiesFragment.class.getSimpleName();
 
     private AbilitiesViewModel mViewModel;
@@ -45,6 +49,13 @@ public final class AbilitiesFragment
     private UUID mUserId;
 
     private final AsyncRepository mAsyncRepository = new AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread());
+
+    private final UserActionListener mUserActionListener = new UserActionListener() {
+        @Override
+        public void onAddAbilityClick () {
+            mFragmentCommunicator.toEditAbility(null);
+        }
+    };
 
     private FragmentCommunicator mFragmentCommunicator;
 
@@ -126,7 +137,7 @@ public final class AbilitiesFragment
 
     private void setupBinding () {
         mBinding.setViewModel(mViewModel);
-        mBinding.setUserActionListener(this::onAddAbilityClick);
+        mBinding.setUserActionListener(mUserActionListener);
         mBinding.rvAbilities.setLayoutManager(new LinearLayoutManager(requireContext()));
         mBinding.rvAbilities.setAdapter(mAbilitiesAdapter);
         mBinding.srlRefreshProfileInfo.setOnRefreshListener(() -> {
@@ -140,7 +151,4 @@ public final class AbilitiesFragment
         mAbilitiesAdapter = new AbilitiesAdapter();
     }
 
-    public void onAddAbilityClick () {
-        mFragmentCommunicator.toEditAbility(null);
-    }
 }

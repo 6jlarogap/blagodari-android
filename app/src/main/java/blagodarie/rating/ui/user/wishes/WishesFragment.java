@@ -27,8 +27,6 @@ import blagodarie.rating.model.IWish;
 import blagodarie.rating.model.entities.Wish;
 import blagodarie.rating.repository.AsyncRepository;
 import blagodarie.rating.repository.AsyncServerRepository;
-import blagodarie.rating.repository.Repository;
-import blagodarie.rating.repository.ServerRepository;
 import blagodarie.rating.ui.user.profile.ProfileFragmentArgs;
 import blagodarie.rating.ui.wishes.EditWishActivity;
 import io.reactivex.disposables.CompositeDisposable;
@@ -142,7 +140,7 @@ public final class WishesFragment
 
     private void onWishClick (@NonNull final IWish wish) {
         final Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(getString(R.string.url_wish, wish.getUuid())));
+        i.setData(Uri.parse(getString(R.string.url_wish, wish.getId())));
         startActivity(i);
     }
 

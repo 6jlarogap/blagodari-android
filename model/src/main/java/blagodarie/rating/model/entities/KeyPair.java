@@ -1,15 +1,11 @@
-package blagodarie.rating.ui.user.keys;
+package blagodarie.rating.model.entities;
 
 import androidx.annotation.NonNull;
 
-import java.util.UUID;
+import blagodarie.rating.model.IKeyPair;
 
-public final class Key {
-
-    private final long mId;
-
-    @NonNull
-    private final UUID mOwnerId;
+public class KeyPair
+        implements IKeyPair {
 
     @NonNull
     private final String mValue;
@@ -17,25 +13,12 @@ public final class Key {
     @NonNull
     private final KeyType mKeyType;
 
-    Key (
-            final long id,
-            @NonNull final UUID ownerId,
+    public KeyPair (
             @NonNull final String value,
             @NonNull final KeyType keyType
     ) {
-        mId = id;
-        mOwnerId = ownerId;
         mValue = value;
         mKeyType = keyType;
-    }
-
-    public final long getId () {
-        return mId;
-    }
-
-    @NonNull
-    public final UUID getOwnerId () {
-        return mOwnerId;
     }
 
     @NonNull

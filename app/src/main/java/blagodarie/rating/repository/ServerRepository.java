@@ -10,16 +10,21 @@ import java.util.UUID;
 
 import blagodarie.rating.model.IAbility;
 import blagodarie.rating.model.IAnyTextInfo;
+import blagodarie.rating.model.IKey;
+import blagodarie.rating.model.IKeyPair;
 import blagodarie.rating.model.IProfileInfo;
 import blagodarie.rating.model.entities.OperationToAnyText;
 import blagodarie.rating.model.entities.OperationToUser;
+import blagodarie.rating.server.AddKeyRequest;
 import blagodarie.rating.server.AddOrUpdateAbilityRequest;
+import blagodarie.rating.server.DeleteKeyRequest;
 import blagodarie.rating.server.GetAnyTextInfoRequest;
 import blagodarie.rating.server.GetProfileInfoRequest;
 import blagodarie.rating.server.HttpException;
 import blagodarie.rating.server.ServerApiClient;
 import blagodarie.rating.server.AddOperationToAnyTextRequest;
 import blagodarie.rating.server.AddOperationToUserRequest;
+import blagodarie.rating.server.UpdateKeyRequest;
 
 public final class ServerRepository
         implements Repository,
@@ -78,6 +83,33 @@ public final class ServerRepository
     ) throws JSONException, IOException, HttpException {
         final ServerApiClient client = new ServerApiClient(mAuthToken);
         final AddOrUpdateAbilityRequest request = new AddOrUpdateAbilityRequest(ability);
+        client.execute(request);
+    }
+
+    @Override
+    public void insertKey (
+            @NonNull final IKeyPair keyPair
+    ) throws JSONException, IOException, HttpException {
+        final ServerApiClient client = new ServerApiClient(mAuthToken);
+        final AddKeyRequest request = new AddKeyRequest(keyPair);
+        client.execute(request);
+    }
+
+    @Override
+    public void updateKey (
+            @NonNull final IKey key
+    ) throws JSONException, IOException, HttpException {
+        final ServerApiClient client = new ServerApiClient(mAuthToken);
+        final UpdateKeyRequest request = new UpdateKeyRequest(key);
+        client.execute(request);
+    }
+
+    @Override
+    public void deleteKey (
+            @NonNull final IKey key
+    ) throws JSONException, IOException, HttpException {
+        final ServerApiClient client = new ServerApiClient(mAuthToken);
+        final DeleteKeyRequest request = new DeleteKeyRequest(key);
         client.execute(request);
     }
 }

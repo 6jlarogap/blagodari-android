@@ -12,6 +12,8 @@ import java.util.concurrent.Executor;
 
 import blagodarie.rating.model.IAbility;
 import blagodarie.rating.model.IAnyTextInfo;
+import blagodarie.rating.model.IKey;
+import blagodarie.rating.model.IKeyPair;
 import blagodarie.rating.model.IProfileInfo;
 import blagodarie.rating.model.entities.OperationToAnyText;
 import blagodarie.rating.model.entities.OperationToUser;
@@ -51,7 +53,6 @@ public final class AsyncServerRepository
         mExecutor.execute(() -> {
             try {
                 mServerRepository.insertOperationToUser(operation);
-
                 mMainThreadExecutor.execute(onCompleteListener::onComplete);
             } catch (Throwable throwable) {
                 mMainThreadExecutor.execute(() -> onErrorListener.onError(throwable));
@@ -69,7 +70,6 @@ public final class AsyncServerRepository
         mExecutor.execute(() -> {
             try {
                 mServerRepository.insertOperationToAnyText(operation, anyText);
-
                 mMainThreadExecutor.execute(onCompleteListener::onComplete);
             } catch (Throwable throwable) {
                 mMainThreadExecutor.execute(() -> onErrorListener.onError(throwable));
@@ -86,7 +86,6 @@ public final class AsyncServerRepository
         mExecutor.execute(() -> {
             try {
                 final IProfileInfo profileInfo = mServerRepository.getProfileInfo(userId);
-
                 mMainThreadExecutor.execute(() -> onLoadListener.onLoad(profileInfo));
             } catch (Throwable throwable) {
                 mMainThreadExecutor.execute(() -> onErrorListener.onError(throwable));
@@ -103,7 +102,6 @@ public final class AsyncServerRepository
         mExecutor.execute(() -> {
             try {
                 final IAnyTextInfo anyTextInfo = mServerRepository.getAnyTextInfo(anyText);
-
                 mMainThreadExecutor.execute(() -> onLoadListener.onLoad(anyTextInfo));
             } catch (Throwable throwable) {
                 mMainThreadExecutor.execute(() -> onErrorListener.onError(throwable));
@@ -120,7 +118,54 @@ public final class AsyncServerRepository
         mExecutor.execute(() -> {
             try {
                 mServerRepository.upsertAbility(ability);
+                mMainThreadExecutor.execute(onCompleteListener::onComplete);
+            } catch (Throwable throwable) {
+                mMainThreadExecutor.execute(() -> onErrorListener.onError(throwable));
+            }
+        });
+    }
 
+    @Override
+    public void insertKey (
+            @NonNull final IKeyPair keyPair,
+            @NonNull final OnCompleteListener onCompleteListener,
+            @NonNull final OnErrorListener onErrorListener
+    ) {
+        mExecutor.execute(() -> {
+            try {
+                mServerRepository.insertKey(keyPair);
+                mMainThreadExecutor.execute(onCompleteListener::onComplete);
+            } catch (Throwable throwable) {
+                mMainThreadExecutor.execute(() -> onErrorListener.onError(throwable));
+            }
+        });
+    }
+
+    @Override
+    public void updateKey (
+            @NonNull final IKey key,
+            @NonNull final OnCompleteListener onCompleteListener,
+            @NonNull final OnErrorListener onErrorListener
+    ) {
+        mExecutor.execute(() -> {
+            try {
+                mServerRepository.updateKey(key);
+                mMainThreadExecutor.execute(onCompleteListener::onComplete);
+            } catch (Throwable throwable) {
+                mMainThreadExecutor.execute(() -> onErrorListener.onError(throwable));
+            }
+        });
+    }
+
+    @Override
+    public void deleteKey (
+            @NonNull final IKey key,
+            @NonNull final OnCompleteListener onCompleteListener,
+            @NonNull final OnErrorListener onErrorListener
+    ) {
+        mExecutor.execute(() -> {
+            try {
+                mServerRepository.deleteKey(key);
                 mMainThreadExecutor.execute(onCompleteListener::onComplete);
             } catch (Throwable throwable) {
                 mMainThreadExecutor.execute(() -> onErrorListener.onError(throwable));

@@ -37,7 +37,7 @@ public final class Wish
     }
 
     @NonNull
-    public final UUID getUuid () {
+    public final UUID getId () {
         return mUuid;
     }
 

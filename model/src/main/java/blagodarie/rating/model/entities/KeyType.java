@@ -1,9 +1,8 @@
-package blagodarie.rating.ui.user.keys;
+package blagodarie.rating.model.entities;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
-import blagodarie.rating.R;
+import blagodarie.rating.model.R;
 
 public enum KeyType {
 

@@ -16,18 +16,27 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+import blagodarie.rating.model.IKey;
+import blagodarie.rating.model.entities.Key;
+import blagodarie.rating.server.GetUserKeysRequest;
+import blagodarie.rating.server.GetUserKeysResponse;
+import blagodarie.rating.server.GetUserWishesRequest;
+import blagodarie.rating.server.GetUserWishesResponse;
+import blagodarie.rating.server.ServerApiClient;
 import blagodarie.rating.server.ServerApiResponse;
 import blagodarie.rating.server.ServerConnector;
 
 public final class KeysDataSource
-        extends PositionalDataSource<Key> {
+        extends PositionalDataSource<IKey> {
 
     private static final String TAG = KeysDataSource.class.getSimpleName();
 
     @NonNull
     private final UUID mUserId;
 
-    KeysDataSource (@NonNull final UUID userId) {
+    KeysDataSource (
+            @NonNull final UUID userId
+    ) {
         Log.d(TAG, "KeysDataSource");
         mUserId = userId;
     }
@@ -35,54 +44,38 @@ public final class KeysDataSource
     @Override
     public void loadInitial (
             @NonNull final PositionalDataSource.LoadInitialParams params,
-            @NonNull final PositionalDataSource.LoadInitialCallback<Key> callback
+            @NonNull final PositionalDataSource.LoadInitialCallback<IKey> callback
     ) {
         Log.d(TAG, "loadInitial from=" + params.requestedStartPosition + ", pageSize=" + params.pageSize);
+        final ServerApiClient client = new ServerApiClient();
+        final GetUserKeysRequest request = new GetUserKeysRequest(mUserId, params.requestedStartPosition, params.pageSize);
         try {
-            final ServerApiResponse serverApiResponse = ServerConnector.sendRequestAndGetResponse(String.format(Locale.ENGLISH, "/getuserkeys?uuid=%s&from=%d&count=%d", mUserId.toString(), params.requestedStartPosition, params.pageSize));
-            callback.onResult(extractDataFromServerApiResponse(serverApiResponse), 0);
-        } catch (IOException | JSONException e) {
-            e.printStackTrace();
+            final GetUserKeysResponse response = client.execute(request);
+            callback.onResult(response.getKeys(), 0);
+        } catch (Exception e) {
+            Log.e(TAG, Log.getStackTraceString(e));
         }
     }
 
     @Override
     public void loadRange (
             @NonNull final PositionalDataSource.LoadRangeParams params,
-            @NonNull final PositionalDataSource.LoadRangeCallback<Key> callback
+            @NonNull final PositionalDataSource.LoadRangeCallback<IKey> callback
     ) {
-        Log.d(TAG, "loadRange startPosition=" + params.startPosition + ", loadSize=" + params.loadSize);
+        Log.d(TAG, "loadInitial from=" + params.startPosition + ", pageSize=" + params.loadSize);
+        final ServerApiClient client = new ServerApiClient();
+        final GetUserKeysRequest request = new GetUserKeysRequest(mUserId, params.startPosition, params.loadSize);
         try {
-            final ServerApiResponse serverApiResponse = ServerConnector.sendRequestAndGetResponse(String.format(Locale.ENGLISH, "/getuserkeys?uuid=%s&from=%d&count=%d", mUserId.toString(), params.startPosition, params.loadSize));
-            callback.onResult(extractDataFromServerApiResponse(serverApiResponse));
-        } catch (IOException | JSONException e) {
-            e.printStackTrace();
+            final GetUserKeysResponse response = client.execute(request);
+            callback.onResult(response.getKeys());
+        } catch (Exception e) {
+            Log.e(TAG, Log.getStackTraceString(e));
         }
     }
 
-    private List<Key> extractDataFromServerApiResponse (
-            @NonNull final ServerApiResponse serverApiResponse
-    ) throws JSONException {
-        final List<Key> keys = new ArrayList<>();
-        if (serverApiResponse.getCode() == 200) {
-            if (serverApiResponse.getBody() != null) {
-                final String responseBody = serverApiResponse.getBody();
-                Log.d(TAG, "responseBody=" + responseBody);
-                final JSONArray jsonOperations = new JSONObject(responseBody).getJSONArray("keys");
-                for (int i = 0; i < jsonOperations.length(); i++) {
-                    final JSONObject keysJsonObject = jsonOperations.getJSONObject(i);
-                    final long id = keysJsonObject.getLong("id");
-                    final String value = keysJsonObject.getString("value");
-                    final int typeId = keysJsonObject.getInt("type_id");
-                    keys.add(new Key(id, mUserId, value, KeyType.getById(typeId)));
-                }
-            }
-        }
-        return keys;
-    }
 
     static class KeysDataSourceFactory
-            extends DataSource.Factory<Integer, Key> {
+            extends DataSource.Factory<Integer, IKey> {
 
         @NonNull
         private final UUID mUserId;
@@ -92,7 +85,7 @@ public final class KeysDataSource
         }
 
         @Override
-        public DataSource<Integer, Key> create () {
+        public DataSource<Integer, IKey> create () {
             return new KeysDataSource(mUserId);
         }
 

@@ -45,6 +45,7 @@ import blagodarie.rating.ui.user.abilities.AbilitiesFragment;
 import blagodarie.rating.ui.user.abilities.AbilitiesFragmentDirections;
 import blagodarie.rating.ui.user.anytext.AnyTextFragment;
 import blagodarie.rating.ui.user.anytext.AnyTextFragmentDirections;
+import blagodarie.rating.ui.user.keys.AddKeyFragment;
 import blagodarie.rating.ui.user.keys.KeysFragment;
 import blagodarie.rating.ui.user.keys.KeysFragmentDirections;
 import blagodarie.rating.ui.user.profile.ProfileFragment;
@@ -58,7 +59,8 @@ public final class UserActivity
         AnyTextFragment.FragmentCommunicator,
         UpdateManager.OnCheckUpdateListener,
         KeysFragment.FragmentCommunicator,
-        AbilitiesFragment.FragmentCommunicator {
+        AbilitiesFragment.FragmentCommunicator,
+        AddKeyFragment.FragmentCommunicator {
 
     private static final String TAG = UserActivity.class.getSimpleName();
 
@@ -469,5 +471,11 @@ public final class UserActivity
         Log.d(TAG, "toEditAbility");
         final NavDirections action = AbilitiesFragmentDirections.actionAbilitiesFragmentToEditAbilityFragment(mAccount, ability);
         mNavController.navigate(action);
+    }
+
+    @Override
+    public void onKeySaved () {
+        Log.d(TAG, "onKeySaved");
+        onBackPressed();
     }
 }

@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/fab_margin"
-            android:onClick="@{() -> UserActionListener.onAddKey()}"
+            android:onClick="@{() -> UserActionListener.onAddKeyClick()}"
             android:src="@drawable/plus"
             android:visibility="@{ViewModel.isOwnProfile() ? View.VISIBLE : View.GONE}"
             app:backgroundTint="@color/colorPrimary"
@@ -46,7 +46,7 @@
 
         <variable
             name="UserActionListener"
-            type="blagodarie.rating.ui.user.keys.KeysUserActionListener" />
+            type="blagodarie.rating.ui.user.keys.KeysFragment.UserActionListener" />
 
     </data>
 </layout>
