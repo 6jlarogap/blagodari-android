@@ -36,7 +36,7 @@ public final class GetAnyTextOperationsRequest
             final int from,
             final int count
     ) {
-        super("/gettextoperations");
+        super("gettextoperations");
         mAnyTextId = anyTextId;
         mFrom = from;
         mCount = count;
