@@ -45,6 +45,7 @@
     <string name="rqst_enter_your_ability">Напишите вашу возможность</string>
     <string name="rqst_enter_your_comment">Напишите ваш комментарий</string>
     <string name="rqst_enter_key">Введите ключ</string>
+    <string name="rqst_enter_name">Введите имя</string>
 
     <string name="info_msg_copied_to_clipboard">Скопировано в буффер обмена</string>
     <string name="info_msg_you_use_latest_version">Вы используете последнюю версию</string>
@@ -68,10 +69,10 @@
     <string name="err_msg_not_saved">Не удалось сохранить</string>
 
     <string name="txt_fame">Известность: %d</string>
-    <string name="txt_own_profile_thanks_count">Благодарности: %d</string>
-    <string name="txt_thanks_count">Благодарности/мои: %d/%d</string>
+    <string name="txt_thanks_count">Благодарности: %d</string>
+    <string name="txt_sum_thanks_count_and_thanks_count">Благодарности/мои: %d/%d</string>
     <string name="txt_own_profile_trust">Утраты доверия: %d</string>
-    <string name="txt_trust">Доверие/утраты: %d/%d</string>
+    <string name="txt_trust">Доверие/недоверие: %d/%d</string>
     <string name="txt_yes">Да</string>
     <string name="txt_no">Нет</string>
     <string name="txt_card_number">Номер карты</string>
@@ -82,6 +83,7 @@
     <string name="txt_my_account">Мой профиль</string>
     <string name="txt_logout">Выйти из аккаунта</string>
     <string name="txt_update">Обновить</string>
+    <string name="txt_people">Люди</string>
     <string name="txt_qr_code_scan">Сканировать QR-код</string>
     <string name="txt_comment">Комментарий</string>
     <string name="txt_key">%s: %s</string>

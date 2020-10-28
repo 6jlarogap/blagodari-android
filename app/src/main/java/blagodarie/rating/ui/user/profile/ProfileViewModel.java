@@ -5,20 +5,19 @@ import android.graphics.Bitmap;
 import androidx.annotation.NonNull;
 import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableField;
-import androidx.databinding.ObservableInt;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.paging.PagedList;
 
-import blagodarie.rating.model.IProfileInfo;
-import blagodarie.rating.model.entities.ProfileInfo;
+import blagodarie.rating.model.IProfile;
+import blagodarie.rating.model.entities.Profile;
 import blagodarie.rating.server.GetThanksUsersResponse;
 
 public final class ProfileViewModel
         extends ViewModel {
 
     @NonNull
-    private final ObservableField<IProfileInfo> mProfileInfo = new ObservableField<>(ProfileInfo.EMPTY_PROFILE);
+    private final ObservableField<IProfile> mProfileInfo = new ObservableField<>(Profile.EMPTY_PROFILE);
 
     @NonNull
     private final ObservableField<Bitmap> mQrCode = new ObservableField<>();
@@ -38,7 +37,7 @@ public final class ProfileViewModel
     }
 
     @NonNull
-    public final ObservableField<IProfileInfo> getProfileInfo () {
+    public final ObservableField<IProfile> getProfileInfo () {
         return mProfileInfo;
     }
 

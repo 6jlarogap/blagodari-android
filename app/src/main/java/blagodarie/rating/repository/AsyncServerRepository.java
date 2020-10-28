@@ -14,7 +14,7 @@ import blagodarie.rating.model.IAbility;
 import blagodarie.rating.model.IAnyTextInfo;
 import blagodarie.rating.model.IKey;
 import blagodarie.rating.model.IKeyPair;
-import blagodarie.rating.model.IProfileInfo;
+import blagodarie.rating.model.IProfile;
 import blagodarie.rating.model.entities.OperationToAnyText;
 import blagodarie.rating.model.entities.OperationToUser;
 
@@ -80,12 +80,12 @@ public final class AsyncServerRepository
     @Override
     public void getProfileInfo (
             @NonNull final UUID userId,
-            @NonNull final OnLoadListener<IProfileInfo> onLoadListener,
+            @NonNull final OnLoadListener<IProfile> onLoadListener,
             @NonNull final OnErrorListener onErrorListener
     ) {
         mExecutor.execute(() -> {
             try {
-                final IProfileInfo profileInfo = mServerRepository.getProfileInfo(userId);
+                final IProfile profileInfo = mServerRepository.getProfileInfo(userId);
                 mMainThreadExecutor.execute(() -> onLoadListener.onLoad(profileInfo));
             } catch (Throwable throwable) {
                 mMainThreadExecutor.execute(() -> onErrorListener.onError(throwable));

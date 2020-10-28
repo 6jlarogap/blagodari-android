@@ -12,7 +12,7 @@ import blagodarie.rating.model.IAbility;
 import blagodarie.rating.model.IAnyTextInfo;
 import blagodarie.rating.model.IKey;
 import blagodarie.rating.model.IKeyPair;
-import blagodarie.rating.model.IProfileInfo;
+import blagodarie.rating.model.IProfile;
 import blagodarie.rating.model.entities.OperationToAnyText;
 import blagodarie.rating.model.entities.OperationToUser;
 
@@ -45,7 +45,7 @@ public interface AsyncRepository {
 
     void getProfileInfo (
             @NonNull final UUID userId,
-            @NonNull final OnLoadListener<IProfileInfo> onLoadListener,
+            @NonNull final OnLoadListener<IProfile> onLoadListener,
             @NonNull final OnErrorListener onErrorListener
     );
 

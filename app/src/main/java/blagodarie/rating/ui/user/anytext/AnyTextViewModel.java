@@ -5,17 +5,13 @@ import android.graphics.Bitmap;
 import androidx.annotation.NonNull;
 import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableField;
-import androidx.databinding.ObservableInt;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import java.util.List;
-import java.util.UUID;
 
 import blagodarie.rating.model.IAnyTextInfo;
-import blagodarie.rating.model.IProfileInfo;
 import blagodarie.rating.model.entities.AnyTextInfo;
-import blagodarie.rating.model.entities.ProfileInfo;
 import blagodarie.rating.server.GetThanksUsersResponse;
 
 public final class AnyTextViewModel

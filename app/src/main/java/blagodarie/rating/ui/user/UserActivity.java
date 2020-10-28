@@ -209,6 +209,12 @@ public final class UserActivity
         mNavController.navigate(action);
     }
 
+    void toPeople () {
+        Log.d(TAG, "toPeople");
+        final NavDirections action = ProfileFragmentDirections.actionProfileFragmentToPeopleFragment();
+        mNavController.navigate(action);
+    }
+
     private void initViewModel () {
         Log.d(TAG, "initViewModel");
         mViewModel = new ViewModelProvider(this).get(UserViewModel.class);
@@ -277,6 +283,8 @@ public final class UserActivity
                     break;
                 case R.id.miUpdate:
                     mUpdateManger.toUpdate(this);
+                case R.id.miPeople:
+                    toPeople();
                 default:
                     break;
             }

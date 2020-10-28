@@ -26,7 +26,7 @@ public final class SignUpResponse
     @NonNull
     private final String mAuthToken;
 
-    public SignUpResponse (
+    SignUpResponse (
             @NonNull final UUID userId,
             @NonNull final String firstName,
             @NonNull final String middleName,

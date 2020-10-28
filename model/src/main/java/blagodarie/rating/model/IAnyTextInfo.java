@@ -12,8 +12,7 @@ public interface IAnyTextInfo {
 
     int getSumThanksCount ();
 
-    @Nullable
-    Integer getThanksCount ();
+    int getThanksCount ();
 
     int getFame ();
 

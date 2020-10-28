@@ -3,10 +3,13 @@ package blagodarie.rating.model;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-public interface IProfileInfo {
+import java.util.UUID;
+
+public interface IProfile
+        extends Identifiable<UUID> {
 
     @NonNull
-    default String getFullName(){
+    default String getFullName () {
         return getLastName() + " " + getFirstName();
     }
 
@@ -21,8 +24,7 @@ public interface IProfileInfo {
 
     int getSumThanksCount ();
 
-    @Nullable
-    Integer getThanksCount ();
+    int getThanksCount ();
 
     int getFame ();
 

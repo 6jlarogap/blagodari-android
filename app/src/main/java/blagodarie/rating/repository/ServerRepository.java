@@ -12,7 +12,7 @@ import blagodarie.rating.model.IAbility;
 import blagodarie.rating.model.IAnyTextInfo;
 import blagodarie.rating.model.IKey;
 import blagodarie.rating.model.IKeyPair;
-import blagodarie.rating.model.IProfileInfo;
+import blagodarie.rating.model.IProfile;
 import blagodarie.rating.model.entities.OperationToAnyText;
 import blagodarie.rating.model.entities.OperationToUser;
 import blagodarie.rating.server.AddKeyRequest;
@@ -59,11 +59,11 @@ public final class ServerRepository
 
     @Nullable
     @Override
-    public IProfileInfo getProfileInfo (
+    public IProfile getProfileInfo (
             @NonNull final UUID userId
     ) throws JSONException, IOException, HttpException {
         final ServerApiClient client = new ServerApiClient(mAuthToken);
-        final GetProfileInfoRequest request = new GetProfileInfoRequest(userId.toString());
+        final GetProfileInfoRequest request = new GetProfileInfoRequest(userId);
         return client.execute(request).getProfileInfo();
     }
 

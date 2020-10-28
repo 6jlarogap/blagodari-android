@@ -9,7 +9,7 @@ import blagodarie.rating.model.IAnyTextInfo;
 public final class AnyTextInfo
         implements IAnyTextInfo {
 
-    public static final AnyTextInfo EMPTY_ANY_TEXT = new AnyTextInfo(null, 0,0,0,0, null, null);
+    public static final AnyTextInfo EMPTY_ANY_TEXT = new AnyTextInfo(null, 0,0,0,0, 0, null);
 
     @Nullable
     private final UUID mAnyTextId;
@@ -22,8 +22,7 @@ public final class AnyTextInfo
 
     private final int mSumThanksCount;
 
-    @Nullable
-    private final Integer mThanksCount;
+    private final int mThanksCount;
 
     @Nullable
     private final Boolean mIsTrust;
@@ -34,7 +33,7 @@ public final class AnyTextInfo
             final int trustCount,
             final int mistrustCount,
             final int sumThanksCount,
-            @Nullable final Integer thanksCount,
+            final int thanksCount,
             @Nullable final Boolean isTrust
     ) {
         mAnyTextId = anyTextId;
@@ -72,9 +71,8 @@ public final class AnyTextInfo
         return mMistrustCount;
     }
 
-    @Nullable
     @Override
-    public Integer getThanksCount () {
+    public int getThanksCount () {
         return mThanksCount;
     }
 

@@ -241,18 +241,6 @@ public final class ProfileFragment
         mViewModel.getThanksUsers().observe(requireActivity(), mThanksUsersAdapter::submitList);
     }
 
-    @BindingAdapter({"imageUrl"})
-    public static void loadImage (ImageView view, String url) {
-        if (url != null && !url.isEmpty()) {
-            Picasso.get().load(url).into(view);
-        }
-    }
-
-    @BindingAdapter({"imageBitmap"})
-    public static void loadImage (ImageView view, Bitmap bitmap) {
-        view.setImageBitmap(bitmap);
-    }
-
     @Override
     public void onShareClick () {
         final Intent sendIntent = new Intent();

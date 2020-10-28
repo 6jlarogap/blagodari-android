@@ -140,7 +140,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:onClick="@{() -> UserActionListener.onOperationsClick()}"
-                                android:text="@{ViewModel.isOwnProfile || !ViewModel.isHaveAccount ? String.format(@string/txt_own_profile_thanks_count, ViewModel.profileInfo.sumThanksCount) : String.format(@string/txt_thanks_count, ViewModel.profileInfo.sumThanksCount, ViewModel.profileInfo.thanksCount)}"
+                                android:text="@{ViewModel.isOwnProfile || !ViewModel.isHaveAccount ? String.format(@string/txt_thanks_count, ViewModel.profileInfo.sumThanksCount) : String.format(@string/txt_sum_thanks_count_and_thanks_count, ViewModel.profileInfo.sumThanksCount, ViewModel.profileInfo.thanksCount)}"
                                 app:layout_constrainedWidth="true"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toStartOf="@id/fabThanks"

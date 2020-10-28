@@ -1,13 +1,16 @@
-package blagodarie.rating.ui.user.wishes;
+package blagodarie.rating.ui.people;
 
 import android.accounts.Account;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,36 +18,29 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Date;
 import java.util.UUID;
 
 import blagodarie.rating.AppExecutors;
 import blagodarie.rating.R;
-import blagodarie.rating.databinding.WishesFragmentBinding;
-import blagodarie.rating.model.IWish;
-import blagodarie.rating.model.entities.Wish;
+import blagodarie.rating.databinding.PeopleFragmentBinding;
 import blagodarie.rating.repository.AsyncRepository;
 import blagodarie.rating.repository.AsyncServerRepository;
-import blagodarie.rating.ui.user.profile.ProfileFragmentArgs;
-import blagodarie.rating.ui.wishes.EditWishActivity;
-import io.reactivex.disposables.CompositeDisposable;
+import blagodarie.rating.ui.user.wishes.WishesFragment;
 
-public final class WishesFragment
+public class PeopleFragment
         extends Fragment {
 
     public interface UserActionListener {
-        void onAddWishClick ();
+        void onSwipeRefresh ();
     }
 
     private static final String TAG = WishesFragment.class.getSimpleName();
 
-    private WishesViewModel mViewModel;
+    private PeopleViewModel mViewModel;
 
-    private WishesFragmentBinding mBinding;
+    private PeopleFragmentBinding mBinding;
 
-    private WishesAdapter mWishesAdapter;
+    private PeopleAdapter mPeopleAdapter;
 
     private Account mAccount;
 
@@ -56,9 +52,10 @@ public final class WishesFragment
     @NonNull
     private final UserActionListener mUserActionListener = new UserActionListener() {
         @Override
-        public void onAddWishClick () {
-            final Intent intent = EditWishActivity.createSelfIntent(requireContext(), new Wish(UUID.randomUUID(), mUserId, "", new Date()), mAccount);
-            startActivity(intent);
+        public void onSwipeRefresh () {
+            mViewModel.getDownloadInProgress().set(true);
+            refreshPeople();
+            mViewModel.getDownloadInProgress().set(false);
         }
     };
 
@@ -81,11 +78,6 @@ public final class WishesFragment
     ) {
         Log.d(TAG, "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
-
-        final ProfileFragmentArgs args = ProfileFragmentArgs.fromBundle(requireArguments());
-
-        mUserId = args.getUserId();
-        mAccount = args.getAccount();
     }
 
     @Override
@@ -102,7 +94,7 @@ public final class WishesFragment
     public void onStart () {
         Log.d(TAG, "onStart");
         super.onStart();
-        refreshWishes();
+        refreshPeople();
     }
 
     @Override
@@ -117,41 +109,51 @@ public final class WishesFragment
             @Nullable final ViewGroup container
     ) {
         Log.d(TAG, "initBinding");
-        mBinding = WishesFragmentBinding.inflate(inflater, container, false);
+        mBinding = PeopleFragmentBinding.inflate(inflater, container, false);
     }
 
     private void initViewModel () {
         Log.d(TAG, "initViewModel");
-        mViewModel = new ViewModelProvider(requireActivity()).get(WishesViewModel.class);
-        mViewModel.isOwnProfile().set(mAccount != null && mAccount.name.equals(mUserId.toString()));
+        mViewModel = new ViewModelProvider(requireActivity()).get(PeopleViewModel.class);
+        //mViewModel.isOwnProfile().set(mAccount != null && mAccount.name.equals(mUserId.toString()));
     }
 
-    private void refreshWishes () {
+    private void refreshPeople () {
         Log.d(TAG, "refreshWishes");
-        mViewModel.setWishes(mAsyncRepository.getLiveDataPagedListFromDataSource(new WishesDataSource.WishesDataSourceFactory(mUserId)));
-        mViewModel.getWishes().observe(requireActivity(), mWishesAdapter::submitList);
+        mViewModel.setPeople(mAsyncRepository.getLiveDataPagedListFromDataSource(new PeopleDataSource.UserOperationsDataSourceFactory(mBinding.etFilter.getText().toString())));
+        mViewModel.getPeople().observe(requireActivity(), mPeopleAdapter::submitList);
     }
 
     private void setupBinding () {
         mBinding.setViewModel(mViewModel);
         mBinding.setUserActionListener(mUserActionListener);
-        mBinding.rvWishes.setLayoutManager(new LinearLayoutManager(requireContext()));
-        mBinding.rvWishes.setAdapter(mWishesAdapter);
-        mBinding.srlRefreshProfileInfo.setOnRefreshListener(() -> {
-            mViewModel.getDownloadInProgress().set(true);
-            refreshWishes();
-            mViewModel.getDownloadInProgress().set(false);
+        mBinding.rvPeople.setLayoutManager(new LinearLayoutManager(requireContext()));
+        mBinding.rvPeople.setAdapter(mPeopleAdapter);
+        mBinding.etFilter.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged (CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged (CharSequence s, int start, int before, int count) {
+                refreshPeople();
+            }
+
+            @Override
+            public void afterTextChanged (Editable s) {
+
+            }
         });
     }
 
     private void initOperationsAdapter () {
-        mWishesAdapter = new WishesAdapter(this::onWishClick);
+        mPeopleAdapter = new PeopleAdapter(this::onProfileClick);
     }
 
-    private void onWishClick (@NonNull final IWish wish) {
+    private void onProfileClick (@NonNull final UUID userId) {
         final Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(getString(R.string.url_wish, wish.getId())));
+        i.setData(Uri.parse(getString(R.string.url_profile, userId)));
         startActivity(i);
     }
-
 }

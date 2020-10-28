@@ -3,12 +3,17 @@ package blagodarie.rating.model.entities;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import blagodarie.rating.model.IProfileInfo;
+import java.util.UUID;
 
-public final class ProfileInfo
-        implements IProfileInfo {
+import blagodarie.rating.model.IProfile;
 
-    public static final ProfileInfo EMPTY_PROFILE = new ProfileInfo("","", null, 0,0,0,0, null, null);
+public final class Profile
+        implements IProfile {
+
+    public static final Profile EMPTY_PROFILE = new Profile(UUID.fromString("00000000-0000-0000-0000-000000000000"), "", "", null, 0, 0, 0, 0, 0, null);
+
+    @NonNull
+    private final UUID mId;
 
     @NonNull
     private final String mFirstName;
@@ -27,13 +32,13 @@ public final class ProfileInfo
 
     private final int mSumThanksCount;
 
-    @Nullable
-    private final Integer mThanksCount;
+    private final int mThanksCount;
 
     @Nullable
     private final Boolean mIsTrust;
 
-    public ProfileInfo (
+    public Profile (
+            @NonNull final UUID id,
             @NonNull final String firstName,
             @NonNull final String lastName,
             @Nullable final String photo,
@@ -41,9 +46,10 @@ public final class ProfileInfo
             final int trustCount,
             final int mistrustCount,
             final int sumThanksCount,
-            @Nullable final Integer thanksCount,
+            final int thanksCount,
             @Nullable final Boolean isTrust
     ) {
+        mId = id;
         mPhoto = photo;
         mFirstName = firstName;
         mLastName = lastName;
@@ -53,6 +59,12 @@ public final class ProfileInfo
         mSumThanksCount = sumThanksCount;
         mThanksCount = thanksCount;
         mIsTrust = isTrust;
+    }
+
+    @NonNull
+    @Override
+    public UUID getId () {
+        return mId;
     }
 
     @NonNull
@@ -93,9 +105,8 @@ public final class ProfileInfo
         return mMistrustCount;
     }
 
-    @Nullable
     @Override
-    public Integer getThanksCount () {
+    public int getThanksCount () {
         return mThanksCount;
     }
 
