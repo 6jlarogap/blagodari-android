@@ -49,6 +49,9 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_profileFragment_to_peopleFragment"
+            app:destination="@id/peopleFragment" />
     </fragment>
     <fragment
         android:id="@+id/startFragment2"
@@ -181,4 +184,8 @@
             app:argType="blagodarie.rating.model.entities.Ability"
             app:nullable="true" />
     </fragment>
+    <fragment
+        android:id="@+id/peopleFragment"
+        android:name="blagodarie.rating.ui.people.PeopleFragment"
+        android:label="PeopleFragment" />
 </navigation>

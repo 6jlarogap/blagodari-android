@@ -46,7 +46,7 @@ public abstract class ServerApiRequest<ApiResponseType extends _ServerApiRespons
     ApiResponseType parseResponse (
             @NonNull final Response response
     ) throws JSONException, IOException, EmptyResponseException, HttpException {
-        Log.d(TAG, "parseOkResponse response=" + response.toString());
+        Log.d(TAG, "parseResponse response=" + response.toString());
         if (response.code() == 200) {
             if (response.body() != null) {
                 return parseOkResponse(response.body().string());

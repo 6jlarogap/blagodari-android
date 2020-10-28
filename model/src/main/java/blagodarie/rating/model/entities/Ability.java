@@ -38,7 +38,7 @@ public final class Ability
     }
 
     @NonNull
-    public final UUID getUuid () {
+    public final UUID getId () {
         return mUuid;
     }
 

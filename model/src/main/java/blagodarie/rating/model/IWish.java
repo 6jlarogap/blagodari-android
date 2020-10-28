@@ -5,10 +5,8 @@ import androidx.annotation.NonNull;
 import java.util.Date;
 import java.util.UUID;
 
-public interface IWish {
-
-    @NonNull
-    UUID getUuid ();
+public interface IWish
+        extends Identifiable<UUID> {
 
     @NonNull
     UUID getOwnerUuid ();

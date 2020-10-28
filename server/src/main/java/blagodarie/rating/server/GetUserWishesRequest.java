@@ -46,13 +46,13 @@ public final class GetUserWishesRequest
             @NonNull final String responseBody
     ) throws JSONException {
         Log.d(TAG, "parseOkResponse responseBody=" + responseBody);
-        final JSONArray json = new JSONObject(responseBody).getJSONArray("wishes");
+        final JSONArray jsonArray = new JSONObject(responseBody).getJSONArray("wishes");
         final List<IWish> wishes = new ArrayList<>();
-        for (int i = 0; i < json.length(); i++) {
-            final JSONObject operationJsonObject = json.getJSONObject(i);
-            final UUID id = UUID.fromString(operationJsonObject.getString("uuid"));
-            final String text = operationJsonObject.getString("text");
-            final Date lastEdit = new Date(operationJsonObject.getLong("last_edit"));
+        for (int i = 0; i < jsonArray.length(); i++) {
+            final JSONObject jsonArrayElement = jsonArray.getJSONObject(i);
+            final UUID id = UUID.fromString(jsonArrayElement.getString("uuid"));
+            final String text = jsonArrayElement.getString("text");
+            final Date lastEdit = new Date(jsonArrayElement.getLong("last_edit"));
             wishes.add(new Wish(id, mUserId, text, lastEdit));
         }
         return new GetUserWishesResponse(wishes);

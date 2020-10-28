@@ -27,14 +27,16 @@ import blagodarie.rating.model.IWish;
 import blagodarie.rating.model.entities.Wish;
 import blagodarie.rating.repository.AsyncRepository;
 import blagodarie.rating.repository.AsyncServerRepository;
-import blagodarie.rating.repository.Repository;
-import blagodarie.rating.repository.ServerRepository;
 import blagodarie.rating.ui.user.profile.ProfileFragmentArgs;
 import blagodarie.rating.ui.wishes.EditWishActivity;
 import io.reactivex.disposables.CompositeDisposable;
 
 public final class WishesFragment
         extends Fragment {
+
+    public interface UserActionListener {
+        void onAddWishClick ();
+    }
 
     private static final String TAG = WishesFragment.class.getSimpleName();
 
@@ -48,12 +50,19 @@ public final class WishesFragment
 
     private UUID mUserId;
 
-    private AsyncRepository mAsyncRepository = new AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread());
+    @NonNull
+    private final AsyncRepository mAsyncRepository = new AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread());
 
     @NonNull
-    private CompositeDisposable mDisposables = new CompositeDisposable();
+    private final UserActionListener mUserActionListener = new UserActionListener() {
+        @Override
+        public void onAddWishClick () {
+            final Intent intent = EditWishActivity.createSelfIntent(requireContext(), new Wish(UUID.randomUUID(), mUserId, "", new Date()), mAccount);
+            startActivity(intent);
+        }
+    };
 
-    @NotNull
+    @NonNull
     @Override
     public View onCreateView (
             @NonNull final LayoutInflater inflater,
@@ -100,7 +109,6 @@ public final class WishesFragment
     public void onDestroy () {
         Log.d(TAG, "onDestroy");
         super.onDestroy();
-        mDisposables.clear();
         mBinding = null;
     }
 
@@ -126,7 +134,7 @@ public final class WishesFragment
 
     private void setupBinding () {
         mBinding.setViewModel(mViewModel);
-        mBinding.setUserActionListener(this::onAddWishClick);
+        mBinding.setUserActionListener(mUserActionListener);
         mBinding.rvWishes.setLayoutManager(new LinearLayoutManager(requireContext()));
         mBinding.rvWishes.setAdapter(mWishesAdapter);
         mBinding.srlRefreshProfileInfo.setOnRefreshListener(() -> {
@@ -142,12 +150,8 @@ public final class WishesFragment
 
     private void onWishClick (@NonNull final IWish wish) {
         final Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(getString(R.string.url_wish, wish.getUuid())));
+        i.setData(Uri.parse(getString(R.string.url_wish, wish.getId())));
         startActivity(i);
     }
 
-    public void onAddWishClick () {
-        final Intent intent = EditWishActivity.createSelfIntent(requireContext(), new Wish(UUID.randomUUID(), mUserId, "", new Date()), mAccount);
-        startActivity(intent);
-    }
 }

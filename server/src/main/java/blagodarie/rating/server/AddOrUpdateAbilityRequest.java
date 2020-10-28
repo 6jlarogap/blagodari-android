@@ -44,6 +44,6 @@ public final class AddOrUpdateAbilityRequest
 
 
     private String createContent () {
-        return String.format(Locale.ENGLISH, "{\"uuid\":\"%s\",\"text\":\"%s\",\"last_edit\":\"%d\"}", mAbility.getUuid().toString(), mAbility.getText(), mAbility.getLastEdit().getTime());
+        return String.format(Locale.ENGLISH, "{\"uuid\":\"%s\",\"text\":\"%s\",\"last_edit\":\"%d\"}", mAbility.getId().toString(), mAbility.getText(), mAbility.getLastEdit().getTime());
     }
 }

@@ -5,10 +5,8 @@ import androidx.annotation.NonNull;
 import java.util.Date;
 import java.util.UUID;
 
-public interface IAbility {
-
-    @NonNull
-    UUID getUuid ();
+public interface IAbility
+        extends Identifiable<UUID> {
 
     @NonNull
     UUID getOwnerUuid ();

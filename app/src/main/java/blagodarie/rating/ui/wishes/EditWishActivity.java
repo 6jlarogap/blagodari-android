@@ -112,7 +112,7 @@ public final class EditWishActivity
             @NonNull final String authToken
     ) {
         Log.d(TAG, "downloadProfileData");
-        final String content = String.format(Locale.ENGLISH, "{\"uuid\":\"%s\",\"text\":\"%s\",\"last_edit\":%d}", mWish.getUuid().toString(), mWish.getText(), mWish.getLastEdit().getTime());
+        final String content = String.format(Locale.ENGLISH, "{\"uuid\":\"%s\",\"text\":\"%s\",\"last_edit\":%d}", mWish.getId().toString(), mWish.getText(), mWish.getLastEdit().getTime());
         mCompositeDisposable.add(
                 Observable.
                         fromCallable(() -> ServerConnector.sendAuthRequestAndGetResponse("addorupdatewish", authToken, content)).

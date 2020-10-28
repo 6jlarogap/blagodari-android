@@ -7,9 +7,9 @@ import androidx.annotation.NonNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
+import java.util.UUID;
 
-import blagodarie.rating.model.entities.ProfileInfo;
+import blagodarie.rating.model.entities.Profile;
 import okhttp3.Request;
 import okhttp3.Response;
 
@@ -18,10 +18,14 @@ public final class GetProfileInfoRequest
 
     private static final String TAG = GetProfileInfoRequest.class.getSimpleName();
 
+    @NonNull
+    private final UUID mUserId;
+
     public GetProfileInfoRequest (
-            @NonNull final String userId
+            @NonNull final UUID userId
     ) {
         super(String.format("getprofileinfo?uuid=%s", userId));
+        mUserId = userId;
     }
 
     @NonNull
@@ -44,11 +48,11 @@ public final class GetProfileInfoRequest
         final int sumThanksCount = json.getInt("sum_thanks_count");
         final int mistrustCount = json.getInt("trustless_count");
         final int trustCount = fame - mistrustCount;
-        Integer thanksCount;
+        int thanksCount;
         try {
             thanksCount = json.getInt("thanks_count");
         } catch (JSONException e) {
-            thanksCount = null;
+            thanksCount = 0;
         }
         Boolean isTrust;
         try {
@@ -57,7 +61,8 @@ public final class GetProfileInfoRequest
             isTrust = null;
         }
         return new GetProfileInfoResponse(
-                new ProfileInfo(
+                new Profile(
+                        mUserId,
                         firstName,
                         lastName,
                         photo,

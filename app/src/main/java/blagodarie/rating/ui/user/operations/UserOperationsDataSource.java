@@ -29,7 +29,10 @@ final class UserOperationsDataSource
     }
 
     @Override
-    public void loadInitial (@NonNull LoadInitialParams params, @NonNull LoadInitialCallback<IDisplayOperation> callback) {
+    public void loadInitial (
+            @NonNull final LoadInitialParams params,
+            @NonNull final LoadInitialCallback<IDisplayOperation> callback
+    ) {
         Log.d(TAG, "loadInitial from=" + params.requestedStartPosition + ", pageSize=" + params.pageSize);
         final ServerApiClient client = new ServerApiClient();
         final GetUserOperationsRequest request = new GetUserOperationsRequest(mUserId, params.requestedStartPosition, params.pageSize);
@@ -42,7 +45,10 @@ final class UserOperationsDataSource
     }
 
     @Override
-    public void loadRange (@NonNull LoadRangeParams params, @NonNull LoadRangeCallback<IDisplayOperation> callback) {
+    public void loadRange (
+            @NonNull final LoadRangeParams params,
+            @NonNull final LoadRangeCallback<IDisplayOperation> callback
+    ) {
         Log.d(TAG, "loadRange startPosition=" + params.startPosition + ", loadSize=" + params.loadSize);
         final ServerApiClient client = new ServerApiClient();
         final GetUserOperationsRequest request = new GetUserOperationsRequest(mUserId, params.startPosition, params.loadSize);

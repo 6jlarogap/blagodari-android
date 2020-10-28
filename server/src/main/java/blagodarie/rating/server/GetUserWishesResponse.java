@@ -14,7 +14,7 @@ public final class GetUserWishesResponse
     @NonNull
     private final List<IWish> mWishes;
 
-    public GetUserWishesResponse (
+    GetUserWishesResponse (
             @NonNull final List<IWish> wishes
     ) {
         mWishes = Collections.unmodifiableList(wishes);

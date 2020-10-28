@@ -1,6 +1,7 @@
 package blagodarie.rating.ui.user.keys;
 
 import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,35 +13,30 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.paging.LivePagedListBuilder;
-import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.util.Locale;
 import java.util.UUID;
-import java.util.concurrent.Executors;
 
+import blagodarie.rating.AppExecutors;
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.KeysFragmentBinding;
-import blagodarie.rating.server.ServerApiResponse;
-import blagodarie.rating.server.ServerConnector;
+import blagodarie.rating.model.IKey;
+import blagodarie.rating.repository.AsyncServerRepository;
+import blagodarie.rating.server.BadAuthorizationTokenException;
 import blagodarie.rating.ui.AccountProvider;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 
 public final class KeysFragment
         extends Fragment
-        implements KeysUserActionListener,
-        KeysAdapter.AdapterCommunicator {
+        implements KeysAdapter.AdapterCommunicator {
 
     public interface FragmentCommunicator {
         void toAddKey ();
+    }
+
+    public interface UserActionListener {
+        void onAddKeyClick ();
     }
 
     private static final String TAG = KeysFragment.class.getSimpleName();
@@ -55,10 +51,16 @@ public final class KeysFragment
 
     private UUID mUserId;
 
-    @NonNull
-    private CompositeDisposable mDisposables = new CompositeDisposable();
-
     private FragmentCommunicator mFragmentCommunicator;
+
+    private final AsyncServerRepository mAsyncRepository = new AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread());
+
+    private final UserActionListener mUserActionListener = new UserActionListener() {
+        @Override
+        public void onAddKeyClick () {
+            mFragmentCommunicator.toAddKey();
+        }
+    };
 
     @NotNull
     @Override
@@ -112,7 +114,6 @@ public final class KeysFragment
     public void onDestroy () {
         Log.d(TAG, "onDestroy");
         super.onDestroy();
-        mDisposables.clear();
         mBinding = null;
     }
 
@@ -139,7 +140,7 @@ public final class KeysFragment
     private void setupBinding () {
         Log.d(TAG, "setupBinding");
         mBinding.setViewModel(mViewModel);
-        mBinding.setUserActionListener(this);
+        mBinding.setUserActionListener(mUserActionListener);
         mBinding.rvKeys.setLayoutManager(new LinearLayoutManager(requireContext()));
         mBinding.rvKeys.setAdapter(mKeysAdapter);
         mBinding.srlRefreshProfileInfo.setOnRefreshListener(() -> {
@@ -151,105 +152,82 @@ public final class KeysFragment
 
     private void refreshKeys () {
         Log.d(TAG, "refreshKeys");
-        final KeysDataSource.KeysDataSourceFactory sourceFactory = new KeysDataSource.KeysDataSourceFactory(mUserId);
-
-        final PagedList.Config config = new PagedList.Config.Builder()
-                .setEnablePlaceholders(false)
-                .setPageSize(10)
-                .build();
-
-        mViewModel.setOperations(
-                new LivePagedListBuilder<>(sourceFactory, config).
-                        setFetchExecutor(Executors.newSingleThreadExecutor()).
-                        build()
-        );
+        mViewModel.setOperations(mAsyncRepository.getLiveDataPagedListFromDataSource(new KeysDataSource.KeysDataSourceFactory(mUserId)));
         mViewModel.getKeys().observe(requireActivity(), mKeysAdapter::submitList);
     }
 
     @Override
-    public void onAddKey () {
-        mFragmentCommunicator.toAddKey();
+    public void onEditKey (@NonNull final IKey key) {
+        attemptToEditKey(key);
     }
 
-
     @Override
-    public void onEditKey (@NonNull final Key key) {
+    public void onDeleteKey (@NonNull final IKey key) {
+        attemptToDeleteKey(key);
+    }
+
+    private void attemptToEditKey (
+            @NonNull final IKey key
+    ) {
         AccountProvider.getAuthToken(requireActivity(), mAccount, authToken -> editKey(authToken, key));
     }
 
-    @Override
-    public void onDeleteKey (@NonNull final Key key) {
+    private void attemptToDeleteKey (
+            @NonNull final IKey key
+    ) {
         AccountProvider.getAuthToken(requireActivity(), mAccount, authToken -> deleteKey(authToken, key));
     }
 
-    public void editKey (@Nullable final String authToken, @NonNull final Key key) {
-        if (authToken != null) {
-            final String content = String.format(Locale.ENGLISH, "{\"id\":%d,\"value\":\"%s\",\"type_id\":%d}", key.getId(), key.getValue(), key.getKeyType().getId());
-            mDisposables.add(
-                    Observable.
-                            fromCallable(() -> ServerConnector.sendAuthRequestAndGetResponse("updatekey", authToken, content)).
-                            subscribeOn(Schedulers.io()).
-                            observeOn(AndroidSchedulers.mainThread()).
-                            subscribe(
-                                    this::onUpdateKeyComplete,
-                                    throwable -> Toast.makeText(requireContext(), throwable.getMessage(), Toast.LENGTH_LONG).show()
-                            )
-            );
-        }
-    }
-
-    public void deleteKey (@Nullable final String authToken, @NonNull final Key key) {
-        if (authToken != null) {
-            mDisposables.add(
-                    Observable.
-                            fromCallable(() -> ServerConnector.sendAuthRequestAndGetResponse(String.format(Locale.ENGLISH, "deletekey?id=%d", key.getId()), authToken)).
-                            subscribeOn(Schedulers.io()).
-                            observeOn(AndroidSchedulers.mainThread()).
-                            subscribe(
-                                    this::onDeleteKeyComplete,
-                                    throwable -> Toast.makeText(requireContext(), throwable.getMessage(), Toast.LENGTH_LONG).show()
-                            )
-            );
-        }
-    }
-
-    private void onUpdateKeyComplete (
-            @NonNull final ServerApiResponse serverApiResponse
+    public void editKey (
+            @Nullable final String authToken,
+            @NonNull final IKey key
     ) {
-        Log.d(TAG, "extractDataFromServerApiResponse");
-        if (serverApiResponse.getCode() == 200) {
-            Toast.makeText(requireContext(), R.string.info_msg_key_saved, Toast.LENGTH_LONG).show();
-            refreshKeys();
+        if (authToken != null) {
+            mAsyncRepository.setAuthToken(authToken);
+            mAsyncRepository.updateKey(
+                    key,
+                    () -> {
+                        Toast.makeText(requireContext(), R.string.info_msg_key_saved, Toast.LENGTH_LONG).show();
+                        refreshKeys();
+                    },
+                    throwable -> {
+                        if (throwable instanceof BadAuthorizationTokenException) {
+                            AccountManager.get(requireContext()).invalidateAuthToken(getString(R.string.account_type), authToken);
+                            attemptToEditKey(key);
+                        } else {
+                            Log.e(TAG, Log.getStackTraceString(throwable));
+                            Toast.makeText(requireContext(), throwable.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
         } else {
-            if (serverApiResponse.getBody() != null) {
-                try {
-                    final JSONObject jsonObject = new JSONObject(serverApiResponse.getBody());
-                    String errorMessage = jsonObject.getString("message");
-                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show();
-                } catch (JSONException e) {
-                    Toast.makeText(requireContext(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-                }
-            }
+            Toast.makeText(requireContext(), R.string.info_msg_need_log_in, Toast.LENGTH_LONG).show();
         }
     }
 
-    private void onDeleteKeyComplete (
-            @NonNull final ServerApiResponse serverApiResponse
+    private void deleteKey (
+            @Nullable final String authToken,
+            @NonNull final IKey key
     ) {
-        Log.d(TAG, "extractDataFromServerApiResponse");
-        if (serverApiResponse.getCode() == 200) {
-            Toast.makeText(requireContext(), R.string.info_msg_key_deleted, Toast.LENGTH_LONG).show();
-            refreshKeys();
+        if (authToken != null) {
+            mAsyncRepository.setAuthToken(authToken);
+            mAsyncRepository.deleteKey(
+                    key,
+                    () -> {
+                        Toast.makeText(requireContext(), R.string.info_msg_key_deleted, Toast.LENGTH_LONG).show();
+                        refreshKeys();
+                    },
+                    throwable -> {
+                        if (throwable instanceof BadAuthorizationTokenException) {
+                            AccountManager.get(requireContext()).invalidateAuthToken(getString(R.string.account_type), authToken);
+                            attemptToEditKey(key);
+                        } else {
+                            Log.e(TAG, Log.getStackTraceString(throwable));
+                            Toast.makeText(requireContext(), throwable.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
         } else {
-            if (serverApiResponse.getBody() != null) {
-                try {
-                    final JSONObject jsonObject = new JSONObject(serverApiResponse.getBody());
-                    String errorMessage = jsonObject.getString("message");
-                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show();
-                } catch (JSONException e) {
-                    Toast.makeText(requireContext(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-                }
-            }
+            Toast.makeText(requireContext(), R.string.info_msg_need_log_in, Toast.LENGTH_LONG).show();
         }
     }
+
 }

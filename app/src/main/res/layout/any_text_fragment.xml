@@ -44,7 +44,8 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:gravity="center_horizontal"
-                        android:text='@{ViewModel.anyText}' />
+                        android:text="@{ViewModel.anyText}"
+                        android:autoLink="web"/>
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/ivQRCode"
@@ -114,7 +115,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:onClick="@{() -> UserActionListener.onOperationsClick()}"
-                            android:text="@{!ViewModel.isHaveAccount ? String.format(@string/txt_own_profile_thanks_count, ViewModel.anyTextInfo.sumThanksCount) : String.format(@string/txt_thanks_count, ViewModel.anyTextInfo.sumThanksCount, ViewModel.anyTextInfo.thanksCount)}"
+                            android:text="@{!ViewModel.isHaveAccount ? String.format(@string/txt_thanks_count, ViewModel.anyTextInfo.sumThanksCount) : String.format(@string/txt_sum_thanks_count_and_thanks_count, ViewModel.anyTextInfo.sumThanksCount, ViewModel.anyTextInfo.thanksCount)}"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toStartOf="@id/fabThanks"
                             app:layout_constraintStart_toStartOf="parent"

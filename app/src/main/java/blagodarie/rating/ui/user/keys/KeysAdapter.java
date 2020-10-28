@@ -5,7 +5,6 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -20,14 +19,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.KeyItemBinding;
+import blagodarie.rating.model.IKey;
+import blagodarie.rating.model.entities.Key;
 
 public final class KeysAdapter
-        extends PagedListAdapter<Key, KeysAdapter.KeyViewHolder> {
+        extends PagedListAdapter<IKey, KeysAdapter.KeyViewHolder> {
 
     public interface AdapterCommunicator {
-        void onEditKey (@NonNull final Key key);
+        void onEditKey (@NonNull final IKey key);
 
-        void onDeleteKey (@NonNull final Key key);
+        void onDeleteKey (@NonNull final IKey key);
     }
 
     public interface UserActionListener {
@@ -55,8 +56,9 @@ public final class KeysAdapter
     @NonNull
     @Override
     public KeysAdapter.KeyViewHolder onCreateViewHolder (
-            @NonNull ViewGroup parent,
-            int viewType) {
+            @NonNull final ViewGroup parent,
+            final int viewType
+    ) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         final KeyItemBinding binding = DataBindingUtil.inflate(inflater, R.layout.key_item, parent, false);
         return new KeysAdapter.KeyViewHolder(mIsOwnProfile, binding);
@@ -68,7 +70,7 @@ public final class KeysAdapter
             @NonNull KeysAdapter.KeyViewHolder holder,
             int position
     ) {
-        final Key key = getItem(position);
+        final IKey key = getItem(position);
         if (key != null) {
             holder.bind(key, mAdapterCommunicator);
         }
@@ -92,7 +94,7 @@ public final class KeysAdapter
         }
 
         void bind (
-                @NonNull final Key key,
+                @NonNull final IKey key,
                 @NonNull final AdapterCommunicator adapterCommunicator
         ) {
             mBinding.setIsOwnProfile(mIsOwnProfile);
@@ -150,9 +152,7 @@ public final class KeysAdapter
                     new AlertDialog.
                             Builder(context).
                             setMessage(R.string.qstn_delete_key).
-                            setPositiveButton(R.string.btn_yes, (dialogInterface, i) -> {
-                                adapterCommunicator.onDeleteKey(key);
-                            }).
+                            setPositiveButton(R.string.btn_yes, (dialogInterface, i) -> adapterCommunicator.onDeleteKey(key)).
                             setNegativeButton(R.string.btn_no, null).
                             create().
                             show();
@@ -161,21 +161,21 @@ public final class KeysAdapter
         }
     }
 
-    private static DiffUtil.ItemCallback<Key> DIFF_CALLBACK =
-            new DiffUtil.ItemCallback<Key>() {
+    private static DiffUtil.ItemCallback<IKey> DIFF_CALLBACK =
+            new DiffUtil.ItemCallback<IKey>() {
 
                 @Override
                 public boolean areItemsTheSame (
-                        Key oldKey,
-                        Key newKey
+                        IKey oldItem,
+                        IKey newItem
                 ) {
                     return false;
                 }
 
                 @Override
                 public boolean areContentsTheSame (
-                        Key oldKey,
-                        Key newKey
+                        IKey oldItem,
+                        IKey newItem
                 ) {
                     return false;
                 }

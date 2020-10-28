@@ -13,7 +13,7 @@ import blagodarie.rating.server.GetUserWishesRequest;
 import blagodarie.rating.server.GetUserWishesResponse;
 import blagodarie.rating.server.ServerApiClient;
 
-class WishesDataSource
+final class WishesDataSource
         extends PositionalDataSource<IWish> {
 
     private static final String TAG = WishesDataSource.class.getSimpleName();

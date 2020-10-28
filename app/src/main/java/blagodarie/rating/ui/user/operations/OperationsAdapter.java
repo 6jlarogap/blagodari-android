@@ -16,29 +16,28 @@ import java.util.UUID;
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.OperationItemBinding;
 import blagodarie.rating.model.IDisplayOperation;
-import blagodarie.rating.model.entities.DisplayOperation;
 
 final class OperationsAdapter
         extends PagedListAdapter<IDisplayOperation, OperationsAdapter.OperationViewHolder> {
 
-    interface OnItemClickListener {
+    interface UserActionListener {
         void onOperationClick (@NonNull final UUID userId);
 
         void onThanksClick (@NonNull final UUID userIdTo);
     }
 
     @NonNull
-    private final OnItemClickListener mOnItemClickListener;
+    private final UserActionListener mUserActionListener;
 
     @NonNull
     private final OperationsViewModel mOperationsViewModel;
 
     protected OperationsAdapter (
-            @NonNull final OnItemClickListener onItemClickListener,
+            @NonNull final UserActionListener userActionListener,
             @NonNull final OperationsViewModel operationsViewModel
     ) {
         super(DIFF_CALLBACK);
-        mOnItemClickListener = onItemClickListener;
+        mUserActionListener = userActionListener;
         mOperationsViewModel = operationsViewModel;
     }
 
@@ -60,7 +59,7 @@ final class OperationsAdapter
     ) {
         final IDisplayOperation operation = getItem(position);
         if (operation != null) {
-            holder.bind(operation, mOnItemClickListener, mOperationsViewModel);
+            holder.bind(operation, mUserActionListener, mOperationsViewModel);
         }
     }
 
@@ -77,14 +76,14 @@ final class OperationsAdapter
 
         void bind (
                 @NonNull final IDisplayOperation operation,
-                @NonNull final OnItemClickListener onItemClickListener,
+                @NonNull final UserActionListener userActionListener,
                 @NonNull final OperationsViewModel viewModel
         ) {
-            itemView.setOnClickListener(view -> onItemClickListener.onOperationClick(operation.getUserIdFrom()));
+            itemView.setOnClickListener(view -> userActionListener.onOperationClick(operation.getUserIdFrom()));
             mBinding.setViewModel(viewModel);
             mBinding.setOperation(operation);
             mBinding.setOperationName(mBinding.getRoot().getContext().getString(operation.getOperationType().getNameResId()));
-            mBinding.fabThanks.setOnClickListener(view -> onItemClickListener.onThanksClick(operation.getUserIdFrom()));
+            mBinding.fabThanks.setOnClickListener(view -> userActionListener.onThanksClick(operation.getUserIdFrom()));
             Picasso.get().load(operation.getPhoto()).into(mBinding.ivPhoto);
         }
     }

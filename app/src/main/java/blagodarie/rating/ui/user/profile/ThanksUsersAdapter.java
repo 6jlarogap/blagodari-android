@@ -18,7 +18,7 @@ import blagodarie.rating.R;
 import blagodarie.rating.databinding.ThanksUserItemBinding;
 import blagodarie.rating.server.GetThanksUsersResponse;
 
-public class ThanksUsersAdapter
+public final class ThanksUsersAdapter
         extends PagedListAdapter<GetThanksUsersResponse.ThanksUser, ThanksUsersAdapter.ThanksUsersViewHolder> {
 
     private static final String TAG = ThanksUsersAdapter.class.getSimpleName();
@@ -40,8 +40,8 @@ public class ThanksUsersAdapter
     @NonNull
     @Override
     public ThanksUsersViewHolder onCreateViewHolder (
-            @NonNull ViewGroup parent,
-            int viewType
+            @NonNull final ViewGroup parent,
+            final int viewType
     ) {
         Log.d(TAG, "onCreateViewHolder");
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
@@ -52,8 +52,8 @@ public class ThanksUsersAdapter
 
     @Override
     public void onBindViewHolder (
-            @NonNull ThanksUsersAdapter.ThanksUsersViewHolder holder,
-            int position
+            @NonNull final ThanksUsersAdapter.ThanksUsersViewHolder holder,
+            final int position
     ) {
         Log.d(TAG, "onBindViewHolder");
         final GetThanksUsersResponse.ThanksUser thanksUser = getItem(position);

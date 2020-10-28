@@ -9,7 +9,7 @@ public final class ServerApiResponse {
     @Nullable
     private final String mBody;
 
-    public ServerApiResponse (
+    ServerApiResponse (
             final int code,
             @Nullable final String body
     ) {

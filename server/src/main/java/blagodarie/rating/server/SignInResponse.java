@@ -8,7 +8,7 @@ public final class SignInResponse
     @NonNull
     private final String mAuthToken;
 
-    public SignInResponse (
+    SignInResponse (
             @NonNull final String authToken
     ) {
         mAuthToken = authToken;

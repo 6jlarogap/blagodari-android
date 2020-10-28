@@ -58,20 +58,20 @@ public final class GetUserOperationsRequest
         final JSONArray json = new JSONObject(responseBody).getJSONArray("operations");
         final List<IDisplayOperation> operations = new ArrayList<>();
         for (int i = 0; i < json.length(); i++) {
-            final JSONObject operationJsonObject = json.getJSONObject(i);
-            final UUID userIdFrom = UUID.fromString(operationJsonObject.getString("user_id_from"));
-            final int operationTypeId = operationJsonObject.getInt("operation_type_id");
-            final Date timestamp = new Date(operationJsonObject.getLong("timestamp"));
-            String comment = operationJsonObject.getString("comment");
+            final JSONObject jsonArrayElement = json.getJSONObject(i);
+            final UUID userIdFrom = UUID.fromString(jsonArrayElement.getString("user_id_from"));
+            final int operationTypeId = jsonArrayElement.getInt("operation_type_id");
+            final Date timestamp = new Date(jsonArrayElement.getLong("timestamp"));
+            String comment = jsonArrayElement.getString("comment");
             if (comment.equals("null")) {
                 comment = null;
             }
-            String photo = operationJsonObject.getString("photo");
+            String photo = jsonArrayElement.getString("photo");
             if (photo.equals("null")) {
                 photo = null;
             }
-            final String lastName = operationJsonObject.getString("last_name");
-            final String firstName = operationJsonObject.getString("first_name");
+            final String lastName = jsonArrayElement.getString("last_name");
+            final String firstName = jsonArrayElement.getString("first_name");
             final OperationType operationType = OperationType.getById(operationTypeId);
             if (operationType != null) {
                 operations.add(new DisplayOperation(userIdFrom, mUserId, photo, lastName, firstName, operationType, comment, timestamp));

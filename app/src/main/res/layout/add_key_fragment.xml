@@ -20,7 +20,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/rqst_enter_key"
-                    android:inputType="text"/>
+                    android:inputType="text" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -59,16 +59,25 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btnSave"
-            app:backgroundTint="@color/colorPrimary"
-            app:borderWidth="0dp"
-            app:elevation="6dp"
-            app:fabSize="normal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/fab_margin"
-            android:src="@drawable/content_save" />
+            android:onClick="@{() -> UserActionListener.onSaveClick()}"
+            android:src="@drawable/content_save"
+            app:backgroundTint="@color/colorPrimary"
+            app:borderWidth="0dp"
+            app:elevation="6dp"
+            app:fabSize="normal" />
 
     </FrameLayout>
+
+    <data>
+
+        <variable
+            name="UserActionListener"
+            type="blagodarie.rating.ui.user.keys.AddKeyFragment.UserActionListener" />
+
+    </data>
 
 </layout>

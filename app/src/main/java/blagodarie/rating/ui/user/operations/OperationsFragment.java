@@ -33,9 +33,11 @@ import blagodarie.rating.ui.AccountProvider;
 import io.reactivex.disposables.CompositeDisposable;
 
 public final class OperationsFragment
-        extends Fragment
-        implements OperationsUserActionListener {
+        extends Fragment {
 
+    public interface UserActionListener {
+        void onThanksClick ();
+    }
     private static final String TAG = OperationsFragment.class.getSimpleName();
 
     private OperationsViewModel mViewModel;
@@ -57,7 +59,15 @@ public final class OperationsFragment
     private final AsyncServerRepository mAsyncRepository = new AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread());
 
     @NonNull
-    private final OperationsAdapter.OnItemClickListener mOnOperationClickListener = new OperationsAdapter.OnItemClickListener() {
+    private final UserActionListener mUserActionListener = new UserActionListener() {
+        @Override
+        public void onThanksClick () {
+            attemptToAddOperation(OperationType.THANKS, mUserId);
+        }
+    };
+
+    @NonNull
+    private final OperationsAdapter.UserActionListener mOnOperationClickListener = new OperationsAdapter.UserActionListener() {
         @Override
         public void onOperationClick (@NonNull final UUID userId) {
             final Intent i = new Intent(Intent.ACTION_VIEW);
@@ -142,7 +152,7 @@ public final class OperationsFragment
 
     private void setupBinding () {
         mBinding.setViewModel(mViewModel);
-        mBinding.setUserActionsListener(this);
+        mBinding.setUserActionsListener(mUserActionListener);
         mBinding.rvOperations.setLayoutManager(new LinearLayoutManager(requireContext()));
         mBinding.rvOperations.setAdapter(mOperationsAdapter);
         mBinding.srlRefreshProfileInfo.setOnRefreshListener(() -> {
@@ -160,11 +170,6 @@ public final class OperationsFragment
                         mAsyncRepository.getLiveDataPagedListFromDataSource(new AnyTextOperationsDataSource.AnyTextOperationsDataSourceFactory(mAnyTextId))
         );
         mViewModel.getOperations().observe(requireActivity(), mOperationsAdapter::submitList);
-    }
-
-    @Override
-    public void onThanksClick () {
-        attemptToAddOperation(OperationType.THANKS, mUserId);
     }
 
     private void attemptToAddOperation (

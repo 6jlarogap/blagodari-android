@@ -3,4 +3,9 @@
     <string name="operation_type_name_thanks">Благодарность</string>
     <string name="operation_type_name_mistrust">Недоверие</string>
     <string name="operation_type_name_trust">Доверие</string>
+
+    <string name="key_type_phone">Телефон</string>
+    <string name="key_type_email">Емэйл</string>
+    <string name="key_type_credit_card">Номер карты</string>
+    <string name="key_type_link">Ссылка</string>
 </resources>

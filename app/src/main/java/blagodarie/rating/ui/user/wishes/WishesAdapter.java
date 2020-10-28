@@ -17,12 +17,18 @@ import blagodarie.rating.model.IWish;
 final class WishesAdapter
         extends PagedListAdapter<IWish, WishesAdapter.WishViewHolder> {
 
-    @NonNull
-    private final OnWishClickListener mOnWishClickListener;
+    interface UserActionListener {
+        void onClick (@NonNull final IWish wish);
+    }
 
-    protected WishesAdapter (@NonNull final OnWishClickListener mOnWishClickListener) {
+    @NonNull
+    private final UserActionListener mUserActionListener;
+
+    protected WishesAdapter (
+            @NonNull final UserActionListener userActionListener
+    ) {
         super(DIFF_CALLBACK);
-        this.mOnWishClickListener = mOnWishClickListener;
+        mUserActionListener = userActionListener;
     }
 
     @NonNull
@@ -43,7 +49,7 @@ final class WishesAdapter
     ) {
         final IWish wish = getItem(position);
         if (wish != null) {
-            holder.bind(wish, view -> mOnWishClickListener.onClick(wish));
+            holder.bind(wish, view -> mUserActionListener.onClick(wish));
         }
     }
 
