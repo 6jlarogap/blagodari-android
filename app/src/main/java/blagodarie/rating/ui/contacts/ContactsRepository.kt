@@ -47,7 +47,7 @@ class ContactsRepository : IContactsRepository {
                 while (phoneCursor.moveToNext()) {
                     val value = phoneCursor
                             .getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
-                            .replace("[^0-9#*]".toRegex(), "")
+                            .replace("[^0-9#*+]".toRegex(), "")
                     if (!value.isEmpty()) {
                         val phone = KeyPair(
                                 value,
