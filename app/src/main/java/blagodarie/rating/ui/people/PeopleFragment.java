@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -119,8 +118,8 @@ public class PeopleFragment
     }
 
     private void refreshPeople () {
-        Log.d(TAG, "refreshWishes");
-        mViewModel.setPeople(mAsyncRepository.getLiveDataPagedListFromDataSource(new PeopleDataSource.UserOperationsDataSourceFactory(mBinding.etFilter.getText().toString())));
+        Log.d(TAG, "refreshPeople");
+        mViewModel.setPeople(mAsyncRepository.getLiveDataPagedListFromDataSource(new PeopleDataSource.PeopleDataSourceFactory(mBinding.etFilter.getText().toString())));
         mViewModel.getPeople().observe(requireActivity(), mPeopleAdapter::submitList);
     }
 

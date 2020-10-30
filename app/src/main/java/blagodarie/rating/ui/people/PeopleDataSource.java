@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.paging.DataSource;
 import androidx.paging.PositionalDataSource;
 
+import java.util.Collections;
+
 import blagodarie.rating.model.IProfile;
 import blagodarie.rating.server.GetUsersRequest;
 import blagodarie.rating.server.GetUsersResponse;
@@ -33,7 +35,7 @@ public class PeopleDataSource
     ) {
         Log.d(TAG, "loadInitial from=" + params.requestedStartPosition + ", pageSize=" + params.pageSize);
         final ServerApiClient client = new ServerApiClient();
-        final GetUsersRequest request = new GetUsersRequest(mFilter, params.requestedStartPosition, params.pageSize);
+        final GetUsersRequest request = new GetUsersRequest(mFilter, Collections.emptyList(), params.requestedStartPosition, params.pageSize);
         try {
             final GetUsersResponse response = client.execute(request);
             callback.onResult(response.getUsers(), 0);
@@ -49,7 +51,7 @@ public class PeopleDataSource
     ) {
         Log.d(TAG, "loadInitial from=" + params.startPosition + ", pageSize=" + params.loadSize);
         final ServerApiClient client = new ServerApiClient();
-        final GetUsersRequest request = new GetUsersRequest(mFilter, params.startPosition, params.loadSize);
+        final GetUsersRequest request = new GetUsersRequest(mFilter, Collections.emptyList(), params.startPosition, params.loadSize);
         try {
             final GetUsersResponse response = client.execute(request);
             callback.onResult(response.getUsers());
@@ -58,13 +60,13 @@ public class PeopleDataSource
         }
     }
 
-    static class UserOperationsDataSourceFactory
+    static class PeopleDataSourceFactory
             extends Factory<Integer, IProfile> {
 
         @NonNull
         private final String mFilter;
 
-        UserOperationsDataSourceFactory (
+        PeopleDataSourceFactory (
                 @NonNull final String filter
         ) {
             mFilter = filter;

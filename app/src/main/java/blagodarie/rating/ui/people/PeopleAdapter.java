@@ -18,14 +18,14 @@ import blagodarie.rating.model.IProfile;
 public class PeopleAdapter
         extends PagedListAdapter<IProfile, PeopleAdapter.UserViewHolder> {
 
-    interface UserActionListener {
+    public interface UserActionListener {
         void onUserClick (@NonNull final UUID userId);
     }
 
     @NonNull
     private final UserActionListener mUserActionListener;
 
-    protected PeopleAdapter (
+    public PeopleAdapter (
             @NonNull final UserActionListener userActionListener
     ) {
         super(DIFF_CALLBACK);

@@ -87,7 +87,7 @@ public final class UserActivity
 
     private CompositeDisposable mDisposables = new CompositeDisposable();
 
-    private UpdateManager mUpdateManger;
+    private UpdateManager mUpdateManager;
 
     @Override
     protected void onCreate (@Nullable final Bundle savedInstanceState) {
@@ -120,9 +120,9 @@ public final class UserActivity
                     this,
                     this::onAccountSelected
             );
-            mUpdateManger = new UpdateManager(getString(R.string.file_provider_authorities));
+            mUpdateManager = new UpdateManager(getString(R.string.file_provider_authorities));
             mDisposables.add(
-                    mUpdateManger.checkUpdate(
+                    mUpdateManager.checkUpdate(
                             this,
                             BuildConfig.VERSION_CODE,
                             this,
@@ -211,8 +211,12 @@ public final class UserActivity
 
     void toPeople () {
         Log.d(TAG, "toPeople");
-        final NavDirections action = ProfileFragmentDirections.actionProfileFragmentToPeopleFragment();
-        mNavController.navigate(action);
+        mNavController.navigate(R.id.peopleFragment);
+    }
+
+    void toContacts () {
+        Log.d(TAG, "toContacts");
+        mNavController.navigate(R.id.contactsFragment);
     }
 
     private void initViewModel () {
@@ -282,9 +286,14 @@ public final class UserActivity
                     logout();
                     break;
                 case R.id.miUpdate:
-                    mUpdateManger.toUpdate(this);
+                    mUpdateManager.toUpdate(this);
+                    break;
                 case R.id.miPeople:
                     toPeople();
+                    break;
+                case R.id.miContacts:
+                    toContacts();
+                    break;
                 default:
                     break;
             }

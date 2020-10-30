@@ -5,11 +5,16 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
+import blagodarie.rating.model.IKeyPair;
 import blagodarie.rating.model.entities.OperationType;
 import blagodarie.rating.repository.AsyncRepository;
+import blagodarie.rating.ui.contacts.IContactsRepository;
 
 public final class OperationToUserManager
         extends OperationManager {
