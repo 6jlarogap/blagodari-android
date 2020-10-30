@@ -9,6 +9,12 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/miContacts"
+        android:icon="@drawable/card_account_phone"
+        android:title="@string/txt_contacts"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/miUpdate"
         android:icon="@drawable/cellphone_arrow_down"
         android:title="@string/txt_update"

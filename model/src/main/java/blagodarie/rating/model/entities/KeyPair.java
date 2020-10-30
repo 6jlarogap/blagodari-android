@@ -30,4 +30,13 @@ public class KeyPair
     public final KeyType getKeyType () {
         return mKeyType;
     }
+
+    @NonNull
+    @Override
+    public String toString () {
+        return "KeyPair{" +
+                "mValue='" + mValue + '\'' +
+                ", mKeyType=" + mKeyType +
+                '}';
+    }
 }

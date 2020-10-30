@@ -38,6 +38,7 @@
     <string name="btn_cancel">Отмена</string>
     <string name="btn_yes">Да</string>
     <string name="btn_no">Нет</string>
+    <string name="btn_settings">Настройки</string>
 
     <string name="rqst_choose_account">Выберите аккаунт</string>
     <string name="rqst_scan_qr_code">Отсканируйте QR-код</string>
@@ -54,6 +55,7 @@
     <string name="info_msg_cant_add_operation_to_own_profile">Нельзя выполнить эту операцию для собственного профиля.</string>
     <string name="info_msg_need_log_in">Необходимо авторизоваться</string>
     <string name="info_msg_missing_profile">Такого профиля не существует</string>
+    <string name="info_msg_need_read_contacts_permission">Необходимо разрешение на чтение контактов</string>
 
     <string name="qstn_want_load_new_version">Желаете загрузить новую версию %d?</string>
     <string name="qstn_delete_key">Удалить ключ?</string>
@@ -84,6 +86,7 @@
     <string name="txt_logout">Выйти из аккаунта</string>
     <string name="txt_update">Обновить</string>
     <string name="txt_people">Люди</string>
+    <string name="txt_contacts">Контакты</string>
     <string name="txt_qr_code_scan">Сканировать QR-код</string>
     <string name="txt_comment">Комментарий</string>
     <string name="txt_key">%s: %s</string>

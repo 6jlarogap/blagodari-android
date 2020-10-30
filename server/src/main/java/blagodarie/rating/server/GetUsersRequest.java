@@ -9,10 +9,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+import blagodarie.rating.model.IKeyPair;
 import blagodarie.rating.model.IProfile;
 import blagodarie.rating.model.entities.Profile;
 import okhttp3.Request;
@@ -26,17 +28,22 @@ public class GetUsersRequest
     @NonNull
     private final String mFilter;
 
+    @NonNull
+    private final List<IKeyPair> mKeys;
+
     private final int mFrom;
 
     private final int mCount;
 
     public GetUsersRequest (
             @NonNull final String filter,
+            @NonNull final List<IKeyPair> keys,
             final int from,
             final int count
     ) {
         super("getusers");
         mFilter = filter;
+        mKeys = keys;
         mFrom = from;
         mCount = count;
     }
@@ -72,6 +79,13 @@ public class GetUsersRequest
 
 
     private String createContent () {
-        return String.format(Locale.ENGLISH, "{\"filter\":{\"text\":\"%s\"},\"from\":%d,\"count\":%d}", mFilter, mFrom, mCount);
+        final StringBuilder keysJson = new StringBuilder();
+        for (IKeyPair key : mKeys) {
+            if (keysJson.length() > 0) {
+                keysJson.append(',');
+            }
+            keysJson.append(String.format(Locale.ENGLISH, "{\"type_id\":%d,\"value\":\"%s\"}", key.getKeyType().getId(), key.getValue()));
+        }
+        return String.format(Locale.ENGLISH, "{\"filter\":{\"text\":\"%s\",\"keys\":[%s]},\"from\":%d,\"count\":%d}", mFilter, keysJson, mFrom, mCount);
     }
 }
