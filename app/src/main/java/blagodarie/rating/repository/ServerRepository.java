@@ -21,6 +21,7 @@ import blagodarie.rating.server.AddKeyRequest;
 import blagodarie.rating.server.AddOrUpdateAbilityRequest;
 import blagodarie.rating.server.AddOrUpdateWishRequest;
 import blagodarie.rating.server.DeleteKeyRequest;
+import blagodarie.rating.server.DeleteWishRequest;
 import blagodarie.rating.server.GetAnyTextInfoRequest;
 import blagodarie.rating.server.GetProfileInfoRequest;
 import blagodarie.rating.server.GetWishInfoRequest;
@@ -133,6 +134,15 @@ public final class ServerRepository
     ) throws JSONException, IOException, HttpException {
         final ServerApiClient client = new ServerApiClient(mAuthToken);
         final DeleteKeyRequest request = new DeleteKeyRequest(key);
+        client.execute(request);
+    }
+
+    @Override
+    public void deleteWish (
+            @NonNull final UUID wishId
+    ) throws JSONException, IOException, HttpException {
+        final ServerApiClient client = new ServerApiClient(mAuthToken);
+        final DeleteWishRequest request = new DeleteWishRequest(wishId);
         client.execute(request);
     }
 }

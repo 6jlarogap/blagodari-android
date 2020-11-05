@@ -63,9 +63,19 @@
     <string name="info_msg_need_read_contacts_permission">Необходимо разрешение на чтение контактов</string>
     <string name="info_msg_need_camera_permission">Для сканирования QR необходим доступ к камере</string>
     <string name="info_msg_list_is_empty">Список пуст</string>
+    <string name="info_msg_add_thanks_complete">Благодарность добавлена</string>
+    <string name="info_msg_wish_saved">Желание сохранено</string>
+    <string name="info_msg_ability_saved">Возможность сохранена</string>
+    <string name="info_msg_key_saved">Ключ сохранен</string>
+    <string name="info_msg_key_deleted">Ключ удален</string>
+    <string name="info_msg_wish_deleted">Желание удалено</string>
+    <string name="info_msg_trust_is_lost">Доверие утрачено</string>
+    <string name="info_msg_trust_restored">Доверие восстановлено</string>
+    <string name="info_msg_in_developing">Функция в разработке</string>
 
     <string name="qstn_want_load_new_version">Желаете загрузить новую версию %d?</string>
     <string name="qstn_delete_key">Удалить ключ?</string>
+    <string name="qstn_delete_wish">Удалить желание?</string>
 
     <string name="err_msg_account_not_created">Аккаунт не был создан</string>
     <string name="err_msg_authentication_error">Ошибка аутентификации</string>

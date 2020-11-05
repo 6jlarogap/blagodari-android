@@ -64,4 +64,8 @@ public interface Repository {
     void deleteKey (
             @NonNull final IKey key
     ) throws JSONException, IOException, HttpException;
+
+    void deleteWish (
+            @NonNull final UUID wishId
+    ) throws JSONException, IOException, HttpException;
 }

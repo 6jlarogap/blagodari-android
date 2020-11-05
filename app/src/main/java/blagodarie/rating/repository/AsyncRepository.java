@@ -96,6 +96,12 @@ public interface AsyncRepository {
             @NonNull final OnErrorListener onErrorListener
     );
 
+    void deleteWish (
+            @NonNull final UUID wishId,
+            @NonNull final OnCompleteListener onCompleteListener,
+            @NonNull final OnErrorListener onErrorListener
+    );
+
     <T> LiveData<PagedList<T>> getLiveDataPagedListFromDataSource (
             @NonNull final DataSource.Factory<Integer, T> dataSourceFactory
     );

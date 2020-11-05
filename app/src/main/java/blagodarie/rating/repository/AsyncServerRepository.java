@@ -7,9 +7,6 @@ import androidx.paging.DataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 
-import org.json.JSONException;
-
-import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 
@@ -21,7 +18,6 @@ import blagodarie.rating.model.IProfile;
 import blagodarie.rating.model.IWish;
 import blagodarie.rating.model.entities.OperationToAnyText;
 import blagodarie.rating.model.entities.OperationToUser;
-import blagodarie.rating.server.HttpException;
 
 public final class AsyncServerRepository
         implements AsyncRepository,
@@ -203,6 +199,22 @@ public final class AsyncServerRepository
         mExecutor.execute(() -> {
             try {
                 mServerRepository.deleteKey(key);
+                mMainThreadExecutor.execute(onCompleteListener::onComplete);
+            } catch (Throwable throwable) {
+                mMainThreadExecutor.execute(() -> onErrorListener.onError(throwable));
+            }
+        });
+    }
+
+    @Override
+    public void deleteWish (
+            @NonNull final UUID wishId,
+            @NonNull final OnCompleteListener onCompleteListener,
+            @NonNull final OnErrorListener onErrorListener
+    ) {
+        mExecutor.execute(() -> {
+            try {
+                mServerRepository.deleteWish(wishId);
                 mMainThreadExecutor.execute(onCompleteListener::onComplete);
             } catch (Throwable throwable) {
                 mMainThreadExecutor.execute(() -> onErrorListener.onError(throwable));

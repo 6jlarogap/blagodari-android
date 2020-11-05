@@ -13,7 +13,14 @@ import blagodarie.rating.databinding.WishItemBinding
 import blagodarie.rating.model.IWish
 import blagodarie.rating.model.entities.Wish
 
-class WishesAdapter(val isOwn: ObservableBoolean) : PagedListAdapter<IWish, WishesAdapter.WishViewHolder>(DIFF_CALLBACK) {
+class WishesAdapter(
+        val isOwn: ObservableBoolean,
+        private val adapterCommunicator: AdapterCommunicator
+) : PagedListAdapter<IWish, WishesAdapter.WishViewHolder>(DIFF_CALLBACK) {
+
+    interface AdapterCommunicator {
+        fun onDeleteClick(wish: IWish)
+    }
 
     companion object {
         private val DIFF_CALLBACK: DiffUtil.ItemCallback<IWish> = object : DiffUtil.ItemCallback<IWish>() {
@@ -45,7 +52,7 @@ class WishesAdapter(val isOwn: ObservableBoolean) : PagedListAdapter<IWish, Wish
     override fun onBindViewHolder(holder: WishViewHolder, position: Int) {
         val wish = getItem(position)
         if (wish != null) {
-            holder.bind(wish, isOwn)
+            holder.bind(wish, isOwn, adapterCommunicator)
         }
     }
 
@@ -55,7 +62,8 @@ class WishesAdapter(val isOwn: ObservableBoolean) : PagedListAdapter<IWish, Wish
 
         fun bind(
                 wish: IWish,
-                isOwn: ObservableBoolean
+                isOwn: ObservableBoolean,
+                adapterCommunicator: AdapterCommunicator
         ) {
             itemView.setOnClickListener {
                 val action = WishesFragmentDirections.actionWishesFragmentToWishFragment(wish.id.toString())
@@ -66,6 +74,9 @@ class WishesAdapter(val isOwn: ObservableBoolean) : PagedListAdapter<IWish, Wish
             binding.btnEdit.setOnClickListener {
                 val action = WishesFragmentDirections.actionWishesFragmentToEditWishFragment(wish as Wish)
                 Navigation.findNavController(itemView).navigate(action)
+            }
+            binding.btnDelete.setOnClickListener {
+                adapterCommunicator.onDeleteClick(wish)
             }
         }
     }

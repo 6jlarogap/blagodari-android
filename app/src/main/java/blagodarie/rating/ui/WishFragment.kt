@@ -1,5 +1,9 @@
 package blagodarie.rating.ui
 
+import android.accounts.Account
+import android.accounts.AccountManager
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
@@ -7,10 +11,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.Observable
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import blagodarie.rating.AppExecutors
@@ -18,6 +22,7 @@ import blagodarie.rating.R
 import blagodarie.rating.databinding.WishFragmentBinding
 import blagodarie.rating.model.entities.Wish
 import blagodarie.rating.repository.AsyncServerRepository
+import blagodarie.rating.server.BadAuthorizationTokenException
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.WriterException
@@ -109,9 +114,63 @@ class WishFragment : Fragment() {
         mBinding.refreshListener = SwipeRefreshLayout.OnRefreshListener {
             downloadWish()
         }
-        mBinding.btnEdit.setOnClickListener{
+        mBinding.btnEdit.setOnClickListener {
             val action = WishFragmentDirections.actionWishFragmentToEditWishFragment(mViewModel.wish.get() as Wish)
             NavHostFragment.findNavController(this).navigate(action)
+        }
+        mBinding.btnDelete.setOnClickListener {
+            showDeleteWishConfirmDialog()
+        }
+    }
+
+    private fun showDeleteWishConfirmDialog() {
+        AlertDialog.Builder(requireContext()).setMessage(R.string.qstn_delete_wish).setPositiveButton(
+                R.string.btn_delete
+        ) { dialogInterface: DialogInterface, i: Int ->
+            attemptToDeleteWish()
+        }.setNegativeButton(
+                R.string.btn_cancel,
+                null).show()
+    }
+
+    private fun attemptToDeleteWish() {
+        AccountSource.getAccount(
+                requireActivity(),
+                true
+        ) { account: Account? ->
+            if (account != null) {
+                AccountProvider.getAuthToken(
+                        requireActivity(),
+                        account
+                ) { authToken: String? ->
+                    if (authToken != null) {
+                        deleteWish(authToken)
+                    } else {
+                        Toast.makeText(requireContext(), R.string.info_msg_need_log_in, Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun deleteWish(
+            authToken: String
+    ) {
+        mAsyncRepository.setAuthToken(authToken)
+        mAsyncRepository.deleteWish(
+                mWishId,
+                {
+                    Toast.makeText(requireContext(), R.string.info_msg_wish_deleted, Toast.LENGTH_LONG).show()
+                    requireActivity().onBackPressed()
+                }
+        ) { throwable: Throwable ->
+            if (throwable is BadAuthorizationTokenException) {
+                AccountManager.get(requireContext()).invalidateAuthToken(getString(R.string.account_type), authToken)
+                attemptToDeleteWish()
+            } else {
+                Log.e(TAG, Log.getStackTraceString(throwable))
+                Toast.makeText(requireContext(), throwable.message, Toast.LENGTH_LONG).show()
+            }
         }
     }
 
