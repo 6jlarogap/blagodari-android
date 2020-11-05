@@ -70,7 +70,7 @@ class AbilitiesFragment : Fragment() {
     override fun onResume() {
         Log.d(TAG, "onResume")
         super.onResume()
-        refreshOwnOperations()
+        refreshAbilities()
         AccountSource.getAccount(
                 requireActivity(),
                 false
@@ -102,7 +102,7 @@ class AbilitiesFragment : Fragment() {
         mBinding.viewModel = mViewModel
         mBinding.list.recyclerView.adapter = mAbilitiesAdapter
         mBinding.refreshListener = SwipeRefreshLayout.OnRefreshListener {
-            refreshOwnOperations()
+            refreshAbilities()
         }
         mBinding.userActionListener = object : UserActionListener {
             override fun onAddAbilityClick() {
@@ -112,8 +112,8 @@ class AbilitiesFragment : Fragment() {
         }
     }
 
-    private fun refreshOwnOperations() {
-        Log.d(TAG, "refreshOperations")
+    private fun refreshAbilities() {
+        Log.d(TAG, "refreshAbilities")
         mViewModel.downloadInProgress.set(true)
         mViewModel.abilities = mAsyncRepository.getLiveDataPagedListFromDataSource(AbilitiesDataSource.AbilitiesDataSourceFactory(mUserId))
         mViewModel.abilities?.observe(requireActivity()) { pagedList: PagedList<IAbility?>? ->

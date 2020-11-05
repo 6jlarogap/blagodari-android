@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
@@ -33,9 +32,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import blagodarie.rating.AppExecutors;
+import blagodarie.rating.MainActivityDirections;
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.AnyTextFragmentBinding;
-import blagodarie.rating.databinding.ThanksUserItemBinding;
 import blagodarie.rating.model.entities.AnyTextInfo;
 import blagodarie.rating.model.entities.OperationType;
 import blagodarie.rating.operations.OperationToAnyTextManager;
@@ -44,7 +43,7 @@ import blagodarie.rating.server.BadAuthorizationTokenException;
 import blagodarie.rating.ui.AccountProvider;
 import blagodarie.rating.ui.AccountSource;
 import blagodarie.rating.ui.user.GridAutofitLayoutManager;
-import blagodarie.rating.ui.user.ThanksUserAdapter;
+import blagodarie.rating.ui.user.profile.ThanksUsersAdapter;
 
 public final class AnyTextFragment
         extends Fragment
@@ -56,7 +55,7 @@ public final class AnyTextFragment
 
     private AnyTextFragmentBinding mBinding;
 
-    private ThanksUserAdapter mThanksUserAdapter;
+    private ThanksUsersAdapter mThanksUserAdapter;
 
     private String mAnyText;
 
@@ -119,25 +118,19 @@ public final class AnyTextFragment
 
     private void initThanksUserAdapter () {
         Log.d(TAG, "initThanksUserAdapter");
-        mThanksUserAdapter = new ThanksUserAdapter(this::onThanksUserClick);
+        mThanksUserAdapter = new ThanksUsersAdapter(this::onThanksUserClick);
     }
 
-    private void onThanksUserClick (@NonNull final View view) {
+
+    private void onThanksUserClick (@NonNull final UUID userId) {
         Log.d(TAG, "onThanksUserClick");
-        final ThanksUserItemBinding thanksUserItemBinding = DataBindingUtil.findBinding(view);
-        if (thanksUserItemBinding != null) {
-            final String userId = thanksUserItemBinding.getThanksUser().getUserId().toString();
-            final Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(getString(R.string.url_profile, userId)));
-            startActivity(i);
-        }
+        NavHostFragment.findNavController(this).navigate(Uri.parse(getString(R.string.url_profile, userId)));
     }
 
     private void initViewModel () {
         Log.d(TAG, "initViewModel");
         mViewModel = new ViewModelProvider(requireActivity()).get(AnyTextViewModel.class);
         mViewModel.getAnyText().set(mAnyText);
-        mViewModel.getThanksUsers().observe(requireActivity(), mThanksUserAdapter::setData);
         mViewModel.getQrCode().set(createQrCodeBitmap());
     }
 
@@ -215,6 +208,13 @@ public final class AnyTextFragment
                     mViewModel.getDownloadInProgress().set(false);
                     Toast.makeText(requireActivity(), throwable.getMessage(), Toast.LENGTH_LONG).show();
                 });
+        refreshThanksUsers();
+    }
+
+    private void refreshThanksUsers () {
+        Log.d(TAG, "refreshThanksUsers");
+        mViewModel.setThanksUsers(mAsyncRepository.getLiveDataPagedListFromDataSource(new ThanksUsersForAnyTextDataSource.ThanksUserForAnyTextDataSourceFactory(mAnyText)));
+        mViewModel.getThanksUsers().observe(requireActivity(), mThanksUserAdapter::submitList);
     }
 
     @Override
@@ -283,7 +283,7 @@ public final class AnyTextFragment
 
     @Override
     public void onOperationsClick () {
-        final NavDirections action = AnyTextFragmentDirections.actionAnyTextFragment2ToOperationsFragment2(mAnyTextId, null);
+        final NavDirections action = MainActivityDirections.actionGlobalOperationsFragment().setAnyTextId(mAnyTextId);
         NavHostFragment.findNavController(this).navigate(action);
     }
 

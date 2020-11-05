@@ -13,7 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -28,6 +27,7 @@ import blagodarie.rating.operations.OperationToUserManager;
 import blagodarie.rating.repository.AsyncServerRepository;
 import blagodarie.rating.server.BadAuthorizationTokenException;
 import blagodarie.rating.ui.AccountProvider;
+import blagodarie.rating.ui.OperationsFragmentArgs;
 
 public final class OperationsFragment
         extends Fragment {
@@ -129,11 +129,11 @@ public final class OperationsFragment
     }
 
     private void setupBinding () {
-        mBinding.setViewModel(mViewModel);
+        /*mBinding.setViewModel(mViewModel);
         mBinding.setUserActionsListener(mUserActionListener);
         mBinding.rvOperations.setLayoutManager(new LinearLayoutManager(requireContext()));
         mBinding.rvOperations.setAdapter(mOperationsAdapter);
-        mBinding.srlRefreshProfileInfo.setOnRefreshListener(this::refreshOperations);
+        mBinding.srlRefreshProfileInfo.setOnRefreshListener(this::refreshOperations);*/
     }
 
     private void refreshOperations () {

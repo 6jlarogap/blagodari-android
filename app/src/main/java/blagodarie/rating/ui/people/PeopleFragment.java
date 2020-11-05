@@ -145,7 +145,7 @@ public final class PeopleFragment
     }
 
     private void onProfileClick (@NonNull final UUID userId) {
-        final NavDirections action = PeopleFragmentDirections.actionPeopleFragmentToProfileFragment().setUserId(userId);
+        final NavDirections action = PeopleFragmentDirections.actionPeopleFragmentToProfileFragment(userId.toString());
         NavHostFragment.findNavController(this).navigate(action);
     }
 }

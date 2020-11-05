@@ -39,15 +39,12 @@ import blagodarie.rating.databinding.UserActivityBinding;
 import blagodarie.rating.ui.AccountProvider;
 import blagodarie.rating.ui.splash.SplashActivity;
 import blagodarie.rating.ui.user.keys.AddKeyFragment;
-import blagodarie.rating.ui.user.keys.KeysFragment;
 import blagodarie.rating.update.UpdateManager;
 import io.reactivex.disposables.CompositeDisposable;
 
 public final class UserActivity
         extends AppCompatActivity
-        implements UpdateManager.OnCheckUpdateListener,
-        KeysFragment.FragmentCommunicator,
-        AddKeyFragment.FragmentCommunicator {
+        implements UpdateManager.OnCheckUpdateListener {
 
     private static final String TAG = UserActivity.class.getSimpleName();
 
@@ -419,14 +416,12 @@ public final class UserActivity
         mDisposables.clear();
     }
 
-    @Override
     public void toAddKey () {
         Log.d(TAG, "toAddKey");
         /*final NavDirections action = KeysFragmentDirections.actionKeysFragmentToAddKeyFragment(mAccount);
         mNavController.navigate(action);*/
     }
 
-    @Override
     public void onKeySaved () {
         Log.d(TAG, "onKeySaved");
         onBackPressed();

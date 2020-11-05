@@ -5,8 +5,10 @@ import android.graphics.Bitmap;
 import androidx.annotation.NonNull;
 import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableField;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.paging.PagedList;
 
 import java.util.List;
 
@@ -32,8 +34,7 @@ public final class AnyTextViewModel
     @NonNull
     private final ObservableBoolean mHaveAccount = new ObservableBoolean(false);
 
-    @NonNull
-    private final MutableLiveData<List<GetThanksUsersResponse.ThanksUser>> mThanksUsers = new MutableLiveData<>();
+    private LiveData<PagedList<GetThanksUsersResponse.ThanksUser>> mThanksUsers;
 
     @NonNull
     public final ObservableField<IAnyTextInfo> getAnyTextInfo () {
@@ -60,7 +61,15 @@ public final class AnyTextViewModel
     }
 
     @NonNull
-    public MutableLiveData<List<GetThanksUsersResponse.ThanksUser>> getThanksUsers () {
+    public LiveData<PagedList<GetThanksUsersResponse.ThanksUser>> getThanksUsers () {
         return mThanksUsers;
     }
+
+    public void setThanksUsers (
+            @NonNull final LiveData<PagedList<GetThanksUsersResponse.ThanksUser>> thanksUsers
+    ) {
+        mThanksUsers = thanksUsers;
+    }
+
+
 }

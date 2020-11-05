@@ -6,25 +6,12 @@ import androidx.annotation.NonNull;
 import androidx.paging.DataSource;
 import androidx.paging.PositionalDataSource;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 import blagodarie.rating.model.IKey;
-import blagodarie.rating.model.entities.Key;
 import blagodarie.rating.server.GetUserKeysRequest;
 import blagodarie.rating.server.GetUserKeysResponse;
-import blagodarie.rating.server.GetUserWishesRequest;
-import blagodarie.rating.server.GetUserWishesResponse;
 import blagodarie.rating.server.ServerApiClient;
-import blagodarie.rating.server.ServerApiResponse;
-import blagodarie.rating.server.ServerConnector;
 
 public final class KeysDataSource
         extends PositionalDataSource<IKey> {
@@ -74,13 +61,13 @@ public final class KeysDataSource
     }
 
 
-    static class KeysDataSourceFactory
+    public static class KeysDataSourceFactory
             extends DataSource.Factory<Integer, IKey> {
 
         @NonNull
         private final UUID mUserId;
 
-        KeysDataSourceFactory (@NonNull final UUID userId) {
+        public KeysDataSourceFactory (@NonNull final UUID userId) {
             mUserId = userId;
         }
 

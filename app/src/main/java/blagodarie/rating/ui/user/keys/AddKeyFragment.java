@@ -1,6 +1,5 @@
 package blagodarie.rating.ui.user.keys;
 
-import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,13 +22,11 @@ import blagodarie.rating.model.entities.KeyType;
 import blagodarie.rating.repository.AsyncServerRepository;
 import blagodarie.rating.server.BadAuthorizationTokenException;
 import blagodarie.rating.ui.AccountProvider;
+import blagodarie.rating.ui.AccountSource;
 
 public final class AddKeyFragment
         extends Fragment {
 
-    public interface FragmentCommunicator {
-        void onKeySaved ();
-    }
 
     public interface UserActionListener {
         void onSaveClick ();
@@ -38,10 +35,6 @@ public final class AddKeyFragment
     private static final String TAG = AddKeyFragment.class.getSimpleName();
 
     private AddKeyFragmentBinding mBinding;
-
-    private Account mAccount;
-
-    private FragmentCommunicator mFragmentCommunicator;
 
     private final AsyncServerRepository mAsyncRepository = new AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread());
 
@@ -85,16 +78,6 @@ public final class AddKeyFragment
     ) {
         Log.d(TAG, "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
-        try {
-            mFragmentCommunicator = (FragmentCommunicator) requireActivity();
-        } catch (ClassCastException e) {
-            Log.e(TAG, requireActivity().getClass().getName() + " must implement " + FragmentCommunicator.class.getName());
-            throw new ClassCastException(requireActivity().getClass().getName() + " must implement " + FragmentCommunicator.class.getName());
-        }
-
-        /*final AddKeyFragmentArgs args = AddKeyFragmentArgs.fromBundle(requireArguments());
-
-        mAccount = args.getAccount();*/
     }
 
     @Override
@@ -125,7 +108,13 @@ public final class AddKeyFragment
     }
 
     private void attemptToInsertKey (@NonNull final KeyPair keyPair) {
-        AccountProvider.getAuthToken(requireActivity(), mAccount, authToken -> insertKey(authToken, keyPair));
+        AccountSource.INSTANCE.getAccount(
+                requireActivity(),
+                true,
+                account -> {
+                    AccountProvider.getAuthToken(requireActivity(), account, authToken -> insertKey(authToken, keyPair));
+                }
+        );
     }
 
     private void insertKey (
@@ -138,7 +127,7 @@ public final class AddKeyFragment
                     keyPair,
                     () -> {
                         Toast.makeText(requireContext(), R.string.info_msg_key_saved, Toast.LENGTH_LONG).show();
-                        mFragmentCommunicator.onKeySaved();
+                        requireActivity().onBackPressed();
                     },
                     throwable -> {
                         if (throwable instanceof BadAuthorizationTokenException) {

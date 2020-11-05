@@ -58,7 +58,7 @@ class WishesAdapter(val isOwn: ObservableBoolean) : PagedListAdapter<IWish, Wish
                 isOwn: ObservableBoolean
         ) {
             itemView.setOnClickListener {
-                val action = WishesFragmentDirections.actionWishesFragmentToWishFragment(wish.id.toString()).setWishId(wish.id)
+                val action = WishesFragmentDirections.actionWishesFragmentToWishFragment(wish.id.toString())
                 Navigation.findNavController(itemView).navigate(action)
             }
             binding.wish = wish

@@ -109,14 +109,7 @@ public final class ProfileFragment
     private void initUserId () {
         Log.d(TAG, "initUserId");
         final ProfileFragmentArgs args = ProfileFragmentArgs.fromBundle(requireArguments());
-        mUserId = args.getUserId();
-
-        if (mUserId == null) {
-            mUserId = UUID.fromString(args.getUserUuid());
-        }
-        if (mUserId == null) {
-            throw new IllegalArgumentException("UserId must not be null");
-        }
+        mUserId = UUID.fromString(args.getUserUuid());
     }
 
     @Override
@@ -317,7 +310,7 @@ public final class ProfileFragment
     @Override
     public void onOperationsClick () {
         Log.d(TAG, "onOperationsClick");
-        final NavDirections action = ProfileFragmentDirections.actionProfileFragmentToOperationsFragment(mUserId, null);
+        final NavDirections action = MainActivityDirections.actionGlobalOperationsFragment().setUserId(mUserId);
         NavHostFragment.findNavController(this).navigate(action);
     }
 
@@ -338,14 +331,14 @@ public final class ProfileFragment
     @Override
     public void onKeysClick () {
         Log.d(TAG, "onKeysClick");
-        final NavDirections action = ProfileFragmentDirections.actionProfileFragmentToKeysFragment(mUserId);
+        final NavDirections action = MainActivityDirections.actionGlobalKeysFragment(mUserId);
         NavHostFragment.findNavController(this).navigate(action);
     }
 
     @Override
     public void onSocialGraphClick () {
         Log.d(TAG, "onSocialGraphClick");
-        final NavDirections action = ProfileFragmentDirections.actionProfileFragmentToGraphFragment().setUserId(mUserId);
+        final NavDirections action = ProfileFragmentDirections.actionGlobalGraphFragment().setUserId(mUserId);
         NavHostFragment.findNavController(this).navigate(action);
     }
 

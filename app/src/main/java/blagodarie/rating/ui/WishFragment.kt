@@ -59,7 +59,7 @@ class WishFragment : Fragment() {
 
     private fun initWishId() {
         val args = WishFragmentArgs.fromBundle(requireArguments())
-        mWishId = args.wishId ?: UUID.fromString(args.wishUuid)
+        mWishId = UUID.fromString(args.wishUuid)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

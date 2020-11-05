@@ -17,7 +17,6 @@ import androidx.navigation.NavDirections
 import androidx.navigation.fragment.NavHostFragment
 import androidx.paging.PagedList
 import blagodarie.rating.AppExecutors
-import blagodarie.rating.MainActivityDirections
 import blagodarie.rating.R
 import blagodarie.rating.databinding.OwnProfileFragmentBinding
 import blagodarie.rating.model.IProfile
@@ -67,28 +66,32 @@ class OwnProfileFragment : Fragment() {
 
         override fun onOperationsClick() {
             Log.d(TAG, "onOperationsClick")
-            val action: NavDirections = OwnProfileFragmentDirections.actionOwnProfileFragmentToOwnOperationsFragment(UUID.fromString(mViewModel.account.get()?.name))
+            val action: NavDirections = OwnProfileFragmentDirections.actionGlobalOperationsFragment().setUserId(UUID.fromString(mViewModel.account.get()?.name))
             NavHostFragment.findNavController(this@OwnProfileFragment).navigate(action)
         }
 
         override fun onWishesClick() {
             Log.d(TAG, "onAbilitiesClick")
-            val action: NavDirections = MainActivityDirections.actionGlobalWishesFragment(UUID.fromString(mViewModel.account.get()?.name))
+            val action: NavDirections = OwnProfileFragmentDirections.actionGlobalWishesFragment(UUID.fromString(mViewModel.account.get()?.name))
             NavHostFragment.findNavController(this@OwnProfileFragment).navigate(action)
         }
 
         override fun onAbilitiesClick() {
             Log.d(TAG, "onAbilitiesClick")
-            val action: NavDirections = MainActivityDirections.actionGlobalAbilitiesFragment(UUID.fromString(mViewModel.account.get()?.name))
+            val action: NavDirections = OwnProfileFragmentDirections.actionGlobalAbilitiesFragment(UUID.fromString(mViewModel.account.get()?.name))
             NavHostFragment.findNavController(this@OwnProfileFragment).navigate(action)
         }
 
         override fun onKeysClick() {
-            TODO("Not yet implemented")
+            Log.d(TAG, "onKeysClick")
+            val action: NavDirections = OwnProfileFragmentDirections.actionGlobalKeysFragment(UUID.fromString(mViewModel.account.get()?.name))
+            NavHostFragment.findNavController(this@OwnProfileFragment).navigate(action)
         }
 
         override fun onSocialGraphClick() {
-            TODO("Not yet implemented")
+            Log.d(TAG, "onSocialGraphClick")
+            val action: NavDirections = OwnProfileFragmentDirections.actionGlobalGraphFragment().setUserId(UUID.fromString(mViewModel.account.get()?.name))
+            NavHostFragment.findNavController(this@OwnProfileFragment).navigate(action)
         }
     }
 
@@ -106,10 +109,9 @@ class OwnProfileFragment : Fragment() {
         Log.d(TAG, "onActivityCreated")
         super.onActivityCreated(savedInstanceState)
 
-        initThanksUserAdapter()
         initViewModel()
+        initThanksUserAdapter()
         setupBinding()
-        refreshProfileData()
     }
 
     override fun onResume() {
@@ -139,6 +141,7 @@ class OwnProfileFragment : Fragment() {
     private fun initThanksUserAdapter() {
         Log.d(TAG, "initThanksUserAdapter")
         mThanksUsersAdapter = ThanksUsersAdapter { userId: UUID -> onThanksUserClick(userId) }
+        mThanksUsersAdapter.submitList(mViewModel.thanksUsers?.value)
     }
 
     private fun onThanksUserClick(userId: UUID) {

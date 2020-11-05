@@ -4,16 +4,20 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.databinding.ObservableBoolean
 import androidx.navigation.Navigation
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import blagodarie.rating.R
-import blagodarie.rating.databinding.OwnOperationItemBinding
+import blagodarie.rating.databinding.OperationItemBinding
 import blagodarie.rating.model.IDisplayOperation
 import java.util.*
 
-class OwnOperationsAdapter(val onThanksClickListener: OnThanksClickListener) : PagedListAdapter<IDisplayOperation, OwnOperationsAdapter.OwnOperationViewHolder>(DIFF_CALLBACK) {
+class OperationsAdapter(
+        val isOwn: ObservableBoolean,
+        private val onThanksClickListener: OnThanksClickListener
+) : PagedListAdapter<IDisplayOperation, OperationsAdapter.OperationViewHolder>(DIFF_CALLBACK) {
 
     fun interface OnThanksClickListener {
         fun onThanksClick(userId: UUID)
@@ -40,21 +44,22 @@ class OwnOperationsAdapter(val onThanksClickListener: OnThanksClickListener) : P
     override fun onCreateViewHolder(
             parent: ViewGroup,
             viewType: Int
-    ): OwnOperationViewHolder {
+    ): OperationViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding: OwnOperationItemBinding = DataBindingUtil.inflate(inflater, R.layout.own_operation_item, parent, false)
-        return OwnOperationViewHolder(binding, onThanksClickListener)
+        val binding: OperationItemBinding = DataBindingUtil.inflate(inflater, R.layout.operation_item, parent, false)
+        return OperationViewHolder(binding, isOwn, onThanksClickListener)
     }
 
-    override fun onBindViewHolder(holder: OwnOperationViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: OperationViewHolder, position: Int) {
         val operation = getItem(position)
         if (operation != null) {
             holder.bind(operation)
         }
     }
 
-    class OwnOperationViewHolder(
-            val binding: OwnOperationItemBinding,
+    class OperationViewHolder(
+            val binding: OperationItemBinding,
+            private val isOwn: ObservableBoolean,
             private val onThanksClickListener: OnThanksClickListener
     ) : RecyclerView.ViewHolder(binding.root) {
 
@@ -65,6 +70,7 @@ class OwnOperationsAdapter(val onThanksClickListener: OnThanksClickListener) : P
             binding.operation = operation
             binding.operationName = binding.root.context.getString(operation.operationType.nameResId)
             binding.photoUrl = operation.photo
+            binding.isOwn = isOwn
             binding.fabThanks.setOnClickListener {
                 onThanksClickListener.onThanksClick(operation.userIdFrom)
             }

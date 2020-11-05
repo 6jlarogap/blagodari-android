@@ -69,4 +69,5 @@ public final class GraphFragment
         Log.d(TAG, "initBinding");
         mBinding = GraphFragmentBinding.inflate(inflater, container, false);
     }
+
 }

@@ -15,13 +15,13 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/qr_scan"
+        android:id="@+id/qrScan"
         android:icon="@drawable/qrcode_scan"
         android:title="@string/txt_qr_scan"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/own_profile"
+        android:id="@+id/ownProfileFragment"
         android:icon="@drawable/account_circle"
         android:title="@string/txt_profile"
         app:showAsAction="ifRoom" />

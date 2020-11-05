@@ -33,7 +33,7 @@
                     android:layout_gravity="center_vertical"
                     android:onClick="@{() -> UserActionListener.onDeleteClick()}"
                     android:src="@drawable/delete"
-                    android:visibility="@{IsOwnProfile ? View.VISIBLE : View.GONE}" />
+                    android:visibility="@{isOwn ? View.VISIBLE : View.GONE}" />
 
                 <androidx.appcompat.widget.AppCompatImageButton
                     android:layout_width="wrap_content"
@@ -41,7 +41,7 @@
                     android:layout_gravity="center_vertical"
                     android:onClick="@{() -> UserActionListener.onEditClick()}"
                     android:src="@drawable/pencil"
-                    android:visibility="@{IsOwnProfile ? View.VISIBLE : View.GONE}" />
+                    android:visibility="@{isOwn ? View.VISIBLE : View.GONE}" />
 
                 <androidx.appcompat.widget.AppCompatImageButton
                     android:layout_width="wrap_content"
@@ -62,7 +62,7 @@
 
         <variable
             name="UserActionListener"
-            type="blagodarie.rating.ui.user.keys.KeysAdapter.UserActionListener" />
+            type="blagodarie.rating.ui.KeysAdapter.UserActionListener" />
 
         <variable
             name="Key"
@@ -73,8 +73,8 @@
             type="String" />
 
         <variable
-            name="IsOwnProfile"
-            type="Boolean" />
+            name="isOwn"
+            type="androidx.databinding.ObservableBoolean" />
 
     </data>
 
