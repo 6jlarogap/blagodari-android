@@ -28,7 +28,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".ui.splash._SplashActivity"
+            android:name=".ui.splash.SplashActivity"
             android:noHistory="true"
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
@@ -49,33 +49,9 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".ui.wishes.EditWishActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-
-        <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
             tools:replace="screenOrientation" />
-
-        <activity
-            android:name=".ui.user.UserActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize">
-            <intent-filter
-                android:autoVerify="true"
-                tools:targetApi="m">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="${hostName}"
-                    android:pathPrefix="/profile_"
-                    android:scheme="https" />
-            </intent-filter>
-        </activity>
 
         <service
             android:name=".auth.AuthenticatorService"

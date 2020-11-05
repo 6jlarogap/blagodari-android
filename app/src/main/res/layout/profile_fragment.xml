@@ -218,11 +218,11 @@
 
         <variable
             name="ViewModel"
-            type="blagodarie.rating.ui.user.profile.ProfileViewModel" />
+            type="blagodarie.rating.ui.profile.ProfileViewModel" />
 
         <variable
             name="UserActionListener"
-            type="blagodarie.rating.ui.user.profile.ProfileUserActionListener" />
+            type="blagodarie.rating.ui.profile.ProfileUserActionListener" />
 
     </data>
 

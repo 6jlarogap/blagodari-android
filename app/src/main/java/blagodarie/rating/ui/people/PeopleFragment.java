@@ -22,7 +22,6 @@ import blagodarie.rating.AppExecutors;
 import blagodarie.rating.databinding.PeopleFragmentBinding;
 import blagodarie.rating.repository.AsyncRepository;
 import blagodarie.rating.repository.AsyncServerRepository;
-import blagodarie.rating.ui.user.wishes.WishesFragment;
 
 public final class PeopleFragment
         extends Fragment {
@@ -31,7 +30,7 @@ public final class PeopleFragment
         void onSwipeRefresh ();
     }
 
-    private static final String TAG = WishesFragment.class.getSimpleName();
+    private static final String TAG = PeopleFragment.class.getSimpleName();
 
     private PeopleViewModel mViewModel;
 

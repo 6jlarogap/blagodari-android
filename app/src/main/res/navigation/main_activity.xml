@@ -10,7 +10,7 @@
 
     <fragment
         android:id="@+id/graphFragment"
-        android:name="blagodarie.rating.ui.user.graph.GraphFragment"
+        android:name="blagodarie.rating.ui.graph.GraphFragment"
         android:label="GraphFragment">
         <argument
             android:name="userId"
@@ -33,7 +33,7 @@
 
         <fragment
             android:id="@+id/profileFragment"
-            android:name="blagodarie.rating.ui.user.profile.ProfileFragment"
+            android:name="blagodarie.rating.ui.profile.ProfileFragment"
             android:label="ProfileFragment">
             <deepLink
                 android:id="@+id/deepLinkToProfile"
@@ -53,7 +53,7 @@
 
         <fragment
             android:id="@+id/qrScanFragment2"
-            android:name="blagodarie.rating.ui.QrScanFragment"
+            android:name="blagodarie.rating.ui.qrscan.QrScanFragment"
             android:label="QrScanFragment" >
             <action
                 android:id="@+id/action_qrScanFragment2_to_anyTextFragment2"
@@ -61,7 +61,7 @@
         </fragment>
         <fragment
             android:id="@+id/anyTextFragment2"
-            android:name="blagodarie.rating.ui.user.anytext.AnyTextFragment"
+            android:name="blagodarie.rating.ui.anytext.AnyTextFragment"
             android:label="AnyTextFragment">
             <argument
                 android:name="any_text"
@@ -74,11 +74,11 @@
         android:label="UpdateFragment" />
     <fragment
         android:id="@+id/ownProfileFragment"
-        android:name="blagodarie.rating.ui.OwnProfileFragment"
+        android:name="blagodarie.rating.ui.profile.OwnProfileFragment"
         android:label="OwnProfileFragment" />
     <fragment
         android:id="@+id/abilitiesFragment"
-        android:name="blagodarie.rating.ui.AbilitiesFragment"
+        android:name="blagodarie.rating.ui.abilities.AbilitiesFragment"
         android:label="AbilitiesFragment" >
         <argument
             android:name="user_id"
@@ -93,11 +93,11 @@
     <action android:id="@+id/action_global_abilitiesFragment" app:destination="@id/abilitiesFragment" />
     <fragment
         android:id="@+id/addAbilityFragment"
-        android:name="blagodarie.rating.ui.AddAbilityFragment"
+        android:name="blagodarie.rating.ui.abilities.AddAbilityFragment"
         android:label="AddAbilityFragment" />
     <fragment
         android:id="@+id/editAbilityFragment"
-        android:name="blagodarie.rating.ui.user.abilities.EditAbilityFragment"
+        android:name="blagodarie.rating.ui.abilities.EditAbilityFragment"
         android:label="EditAbilityFragment" >
         <argument
             android:name="ability"
@@ -109,7 +109,7 @@
         android:label="AddWishFragment" />
     <fragment
         android:id="@+id/editWishFragment"
-        android:name="blagodarie.rating.ui.EditWishFragment"
+        android:name="blagodarie.rating.ui.wishes.EditWishFragment"
         android:label="EditWishFragment">
         <argument
             android:name="wish"
@@ -117,7 +117,7 @@
     </fragment>
     <fragment
         android:id="@+id/wishFragment"
-        android:name="blagodarie.rating.ui.WishFragment"
+        android:name="blagodarie.rating.ui.wishes.WishFragment"
         android:label="WishFragment">
         <action
             android:id="@+id/action_wishFragment_to_editWishFragment"
@@ -136,7 +136,7 @@
     </fragment>
     <fragment
         android:id="@+id/wishesFragment"
-        android:name="blagodarie.rating.ui.WishesFragment"
+        android:name="blagodarie.rating.ui.wishes.WishesFragment"
         android:label="WishesFragment" >
         <action
             android:id="@+id/action_wishesFragment_to_wishFragment"
@@ -154,7 +154,7 @@
     <action android:id="@+id/action_global_wishesFragment" app:destination="@id/wishesFragment" />
     <fragment
         android:id="@+id/operationsFragment"
-        android:name="blagodarie.rating.ui.OperationsFragment"
+        android:name="blagodarie.rating.ui.operations.OperationsFragment"
         android:label="OperationsFragment" >
         <argument
             android:name="user_id"
@@ -170,7 +170,7 @@
     <action android:id="@+id/action_global_operationsFragment" app:destination="@id/operationsFragment" />
     <fragment
         android:id="@+id/keysFragment"
-        android:name="blagodarie.rating.ui.KeysFragment"
+        android:name="blagodarie.rating.ui.keys.KeysFragment"
         android:label="KeysFragment" >
         <action
             android:id="@+id/action_keysFragment_to_addKeyFragment"
@@ -181,7 +181,9 @@
     </fragment>
     <fragment
         android:id="@+id/addKeyFragment"
-        android:name="blagodarie.rating.ui.user.keys.AddKeyFragment"
-        android:label="AddKeyFragment" /><action android:id="@+id/action_global_keysFragment" app:destination="@id/keysFragment"/><action android:id="@+id/action_global_graphFragment" app:destination="@id/graphFragment"/>
+        android:name="blagodarie.rating.ui.keys.AddKeyFragment"
+        android:label="AddKeyFragment" />
+    <action android:id="@+id/action_global_keysFragment" app:destination="@id/keysFragment" />
+    <action android:id="@+id/action_global_graphFragment" app:destination="@id/graphFragment" />
 
 </navigation>

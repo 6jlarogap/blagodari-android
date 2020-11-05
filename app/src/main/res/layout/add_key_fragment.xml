@@ -76,7 +76,7 @@
 
         <variable
             name="UserActionListener"
-            type="blagodarie.rating.ui.user.keys.AddKeyFragment.UserActionListener" />
+            type="blagodarie.rating.ui.keys.AddKeyFragment.UserActionListener" />
 
     </data>
 

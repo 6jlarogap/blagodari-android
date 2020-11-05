@@ -62,7 +62,7 @@
 
         <variable
             name="UserActionListener"
-            type="blagodarie.rating.ui.KeysAdapter.UserActionListener" />
+            type="blagodarie.rating.ui.keys.KeysAdapter.UserActionListener" />
 
         <variable
             name="Key"

@@ -27,7 +27,7 @@
 
         <variable
             name="ViewModel"
-            type="blagodarie.rating.ui.QrScanViewModel" />
+            type="blagodarie.rating.ui.qrscan.QrScanViewModel" />
 
     </data>
 

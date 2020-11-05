@@ -68,7 +68,7 @@
 
         <variable
             name="ViewModel"
-            type="blagodarie.rating.ui.WishViewModel" />
+            type="blagodarie.rating.ui.wishes.WishViewModel" />
 
         <variable
             name="refreshListener"

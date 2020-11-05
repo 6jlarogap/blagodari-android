@@ -34,7 +34,7 @@
 
         <variable
             name="ViewModel"
-            type="blagodarie.rating.ui.WishesViewModel" />
+            type="blagodarie.rating.ui.wishes.WishesViewModel" />
 
         <variable
             name="refreshListener"
@@ -42,7 +42,7 @@
 
         <variable
             name="UserActionListener"
-            type="blagodarie.rating.ui.WishesFragment.UserActionListener" />
+            type="blagodarie.rating.ui.wishes.WishesFragment.UserActionListener" />
 
     </data>
 

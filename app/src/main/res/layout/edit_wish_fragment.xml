@@ -47,7 +47,7 @@
 
         <variable
             name="UserActionListener"
-            type="blagodarie.rating.ui.EditWishFragment.UserActionListener" />
+            type="blagodarie.rating.ui.wishes.EditWishFragment.UserActionListener" />
 
     </data>
 </layout>

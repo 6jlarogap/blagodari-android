@@ -42,7 +42,7 @@
 
         <variable
             name="UserActionListener"
-            type="blagodarie.rating.ui.AddAbilityFragment.UserActionListener" />
+            type="blagodarie.rating.ui.abilities.AddAbilityFragment.UserActionListener" />
 
     </data>
 </layout>

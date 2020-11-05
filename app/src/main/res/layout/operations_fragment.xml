@@ -35,7 +35,7 @@
 
         <variable
             name="viewModel"
-            type="blagodarie.rating.ui.OperationsViewModel" />
+            type="blagodarie.rating.ui.operations.OperationsViewModel" />
 
         <variable
             name="refreshListener"
@@ -43,7 +43,7 @@
 
         <variable
             name="userActionListener"
-            type="blagodarie.rating.ui.OperationsFragment.UserActionListener" />
+            type="blagodarie.rating.ui.operations.OperationsFragment.UserActionListener" />
 
     </data>
 

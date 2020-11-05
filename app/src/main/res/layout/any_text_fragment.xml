@@ -169,11 +169,11 @@
 
         <variable
             name="ViewModel"
-            type="blagodarie.rating.ui.user.anytext.AnyTextViewModel" />
+            type="blagodarie.rating.ui.anytext.AnyTextViewModel" />
 
         <variable
             name="UserActionListener"
-            type="blagodarie.rating.ui.user.anytext.AnyTextUserActionListener" />
+            type="blagodarie.rating.ui.anytext.AnyTextUserActionListener" />
 
     </data>
 

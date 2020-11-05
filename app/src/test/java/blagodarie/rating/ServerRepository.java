@@ -9,7 +9,7 @@ import java.util.UUID;
 import java.util.concurrent.Executors;
 
 import blagodarie.rating.model.entities.Wish;
-import blagodarie.rating.ui.user.wishes.WishesDataSource;
+import blagodarie.rating.ui.wishes.WishesDataSource;
 
 public final class ServerRepository
         implements IRepository {

@@ -36,7 +36,7 @@
 
         <variable
             name="viewModel"
-            type="blagodarie.rating.ui.KeysViewModel" />
+            type="blagodarie.rating.ui.keys.KeysViewModel" />
 
         <variable
             name="refreshListener"
@@ -44,7 +44,7 @@
 
         <variable
             name="UserActionListener"
-            type="blagodarie.rating.ui.KeysFragment.UserActionListener" />
+            type="blagodarie.rating.ui.keys.KeysFragment.UserActionListener" />
 
     </data>
 </layout>

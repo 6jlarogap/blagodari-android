@@ -155,11 +155,11 @@
 
         <variable
             name="ViewModel"
-            type="blagodarie.rating.ui.OwnProfileViewModel" />
+            type="blagodarie.rating.ui.profile.OwnProfileViewModel" />
 
         <variable
             name="UserActionListener"
-            type="blagodarie.rating.ui.OwnProfileFragment.UserActionListener" />
+            type="blagodarie.rating.ui.profile.OwnProfileFragment.UserActionListener" />
 
     </data>
 
