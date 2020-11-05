@@ -13,13 +13,17 @@ import blagodarie.rating.model.IAnyTextInfo;
 import blagodarie.rating.model.IKey;
 import blagodarie.rating.model.IKeyPair;
 import blagodarie.rating.model.IProfile;
+import blagodarie.rating.model.IWish;
 import blagodarie.rating.model.entities.OperationToAnyText;
 import blagodarie.rating.model.entities.OperationToUser;
+import blagodarie.rating.model.entities.Wish;
 import blagodarie.rating.server.AddKeyRequest;
 import blagodarie.rating.server.AddOrUpdateAbilityRequest;
+import blagodarie.rating.server.AddOrUpdateWishRequest;
 import blagodarie.rating.server.DeleteKeyRequest;
 import blagodarie.rating.server.GetAnyTextInfoRequest;
 import blagodarie.rating.server.GetProfileInfoRequest;
+import blagodarie.rating.server.GetWishInfoRequest;
 import blagodarie.rating.server.HttpException;
 import blagodarie.rating.server.ServerApiClient;
 import blagodarie.rating.server.AddOperationToAnyTextRequest;
@@ -77,12 +81,31 @@ public final class ServerRepository
         return client.execute(request).getAnyTextInfo();
     }
 
+    @Nullable
+    @Override
+    public IWish getWish (
+            @NonNull final UUID wishId
+    ) throws JSONException, IOException, HttpException {
+        final ServerApiClient client = new ServerApiClient(mAuthToken);
+        final GetWishInfoRequest request = new GetWishInfoRequest(wishId);
+        return client.execute(request).getWish();
+    }
+
     @Override
     public void upsertAbility (
             @NonNull final IAbility ability
     ) throws JSONException, IOException, HttpException {
         final ServerApiClient client = new ServerApiClient(mAuthToken);
         final AddOrUpdateAbilityRequest request = new AddOrUpdateAbilityRequest(ability);
+        client.execute(request);
+    }
+
+    @Override
+    public void upsertWish (
+            @NonNull final IWish wish
+    ) throws JSONException, IOException, HttpException {
+        final ServerApiClient client = new ServerApiClient(mAuthToken);
+        final AddOrUpdateWishRequest request = new AddOrUpdateWishRequest(wish);
         client.execute(request);
     }
 

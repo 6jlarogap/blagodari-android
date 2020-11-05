@@ -5,8 +5,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
 import android.webkit.WebViewClient;
 
 import androidx.annotation.NonNull;
@@ -19,18 +17,13 @@ import java.util.UUID;
 
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.GraphFragmentBinding;
-import blagodarie.rating.databinding.OperationsFragmentBinding;
-import blagodarie.rating.ui.user.operations.OperationsFragment;
-import blagodarie.rating.ui.user.operations.OperationsFragmentArgs;
 
-public class GraphFragment
+public final class GraphFragment
         extends Fragment {
 
     private static final String TAG = GraphFragment.class.getSimpleName();
 
     private GraphFragmentBinding mBinding;
-
-    private UUID mUserId;
 
     @NotNull
     @Override
@@ -54,7 +47,7 @@ public class GraphFragment
 
         final GraphFragmentArgs args = GraphFragmentArgs.fromBundle(requireArguments());
 
-        mUserId = args.getUserId();
+        final UUID userId = args.getUserId();
 
         mBinding.wbGraph.setWebViewClient(new WebViewClient());
         mBinding.wbGraph.getSettings().setJavaScriptEnabled(true);
@@ -62,7 +55,11 @@ public class GraphFragment
         mBinding.wbGraph.getSettings().setUseWideViewPort(true);
         mBinding.wbGraph.getSettings().setBuiltInZoomControls(true);
         mBinding.wbGraph.getSettings().setSupportZoom(true);
-        mBinding.wbGraph.loadUrl(String.format(getString(R.string.url_profile), mUserId.toString()) + "&from_app=1");
+        if (userId == null) {
+            mBinding.wbGraph.loadUrl(getString(R.string.url_social_graph) + "?from_app=1");
+        } else {
+            mBinding.wbGraph.loadUrl(getString(R.string.url_profile, userId.toString()) + "&from_app=1");
+        }
     }
 
     private void initBinding (

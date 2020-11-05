@@ -5,6 +5,10 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ObservableBoolean;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -12,19 +16,28 @@ import androidx.recyclerview.widget.RecyclerView;
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.AbilityItemBinding;
 import blagodarie.rating.model.IAbility;
+import blagodarie.rating.model.entities.Ability;
+import blagodarie.rating.ui.AbilitiesFragmentDirections;
 
-final class AbilitiesAdapter
+public final class AbilitiesAdapter
         extends PagedListAdapter<IAbility, AbilitiesAdapter.AbilityViewHolder> {
 
-    protected AbilitiesAdapter () {
+    @NonNull
+    private final ObservableBoolean mIsOwn;
+
+    public AbilitiesAdapter (
+            @NonNull final ObservableBoolean isOwn
+    ) {
         super(DIFF_CALLBACK);
+        mIsOwn = isOwn;
     }
 
     @NonNull
     @Override
     public AbilitiesAdapter.AbilityViewHolder onCreateViewHolder (
             @NonNull final ViewGroup parent,
-            final int viewType) {
+            final int viewType
+    ) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         final AbilityItemBinding binding = DataBindingUtil.inflate(inflater, R.layout.ability_item, parent, false);
         return new AbilitiesAdapter.AbilityViewHolder(binding);
@@ -38,7 +51,7 @@ final class AbilitiesAdapter
     ) {
         final IAbility ability = getItem(position);
         if (ability != null) {
-            holder.bind(ability);
+            holder.bind(ability, mIsOwn);
         }
     }
 
@@ -48,15 +61,23 @@ final class AbilitiesAdapter
         @NonNull
         private final AbilityItemBinding mBinding;
 
-        AbilityViewHolder (@NonNull final AbilityItemBinding binding) {
+        AbilityViewHolder (
+                @NonNull final AbilityItemBinding binding
+        ) {
             super(binding.getRoot());
             mBinding = binding;
         }
 
         void bind (
-                @NonNull final IAbility ability
+                @NonNull final IAbility ability,
+                @NonNull final ObservableBoolean isOwn
         ) {
             mBinding.setAbility(ability);
+            mBinding.setIsOwn(isOwn);
+            mBinding.btnEdit.setOnClickListener(v -> {
+                final NavDirections action = AbilitiesFragmentDirections.actionAbilitiesFragmentToEditAbilityFragment((Ability) ability);
+                Navigation.findNavController(itemView).navigate(action);
+            });
         }
     }
 

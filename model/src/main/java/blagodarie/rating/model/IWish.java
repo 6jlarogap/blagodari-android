@@ -14,6 +14,10 @@ public interface IWish
     @NonNull
     String getText ();
 
+    void setText (@NonNull final String text);
+
     @NonNull
     Date getLastEdit ();
+
+    void setLastEdit (@NonNull final Date lastEdit);
 }

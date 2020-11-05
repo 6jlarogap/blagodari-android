@@ -18,12 +18,16 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            resValue "string", "file_provider_authorities", "blagodarie.rating.update.files"
         }
         debug {
             debuggable true
 
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            resValue "string", "file_provider_authorities", "blagodarie.rating.dbg.update.files"
         }
     }
 

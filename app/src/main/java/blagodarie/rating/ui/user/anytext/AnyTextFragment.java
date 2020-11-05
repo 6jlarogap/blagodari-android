@@ -1,6 +1,5 @@
 package blagodarie.rating.ui.user.anytext;
 
-import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -18,6 +17,8 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
@@ -33,25 +34,21 @@ import java.util.UUID;
 
 import blagodarie.rating.AppExecutors;
 import blagodarie.rating.R;
-import blagodarie.rating.operations.OperationToAnyTextManager;
 import blagodarie.rating.databinding.AnyTextFragmentBinding;
 import blagodarie.rating.databinding.ThanksUserItemBinding;
 import blagodarie.rating.model.entities.AnyTextInfo;
 import blagodarie.rating.model.entities.OperationType;
+import blagodarie.rating.operations.OperationToAnyTextManager;
 import blagodarie.rating.repository.AsyncServerRepository;
 import blagodarie.rating.server.BadAuthorizationTokenException;
 import blagodarie.rating.ui.AccountProvider;
+import blagodarie.rating.ui.AccountSource;
 import blagodarie.rating.ui.user.GridAutofitLayoutManager;
 import blagodarie.rating.ui.user.ThanksUserAdapter;
-import io.reactivex.disposables.CompositeDisposable;
 
 public final class AnyTextFragment
         extends Fragment
         implements AnyTextUserActionListener {
-
-    public interface FragmentCommunicator {
-        void toOperationsFromAnyText (@NonNull final UUID anyTextId);
-    }
 
     private static final String TAG = AnyTextFragment.class.getSimpleName();
 
@@ -61,19 +58,12 @@ public final class AnyTextFragment
 
     private ThanksUserAdapter mThanksUserAdapter;
 
-    private Account mAccount;
-
     private String mAnyText;
 
     private UUID mAnyTextId;
 
     @NonNull
-    private CompositeDisposable mDisposables = new CompositeDisposable();
-
-    private FragmentCommunicator mFragmentCommunicator;
-
-    @NonNull
-    private final AsyncServerRepository mRepository = new AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread());
+    private final AsyncServerRepository mAsyncRepository = new AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread());
 
     @NotNull
     @Override
@@ -97,7 +87,6 @@ public final class AnyTextFragment
 
         final AnyTextFragmentArgs args = AnyTextFragmentArgs.fromBundle(requireArguments());
 
-        mAccount = args.getAccount();
         mAnyText = args.getAnyText();
     }
 
@@ -105,12 +94,6 @@ public final class AnyTextFragment
     public void onActivityCreated (@Nullable final Bundle savedInstanceState) {
         Log.d(TAG, "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
-        try {
-            mFragmentCommunicator = (FragmentCommunicator) requireActivity();
-        } catch (ClassCastException e) {
-            Log.e(TAG, requireActivity().getClass().getName() + " must implement " + FragmentCommunicator.class.getName());
-            throw new ClassCastException(requireActivity().getClass().getName() + " must implement " + FragmentCommunicator.class.getName());
-        }
 
         initThanksUserAdapter();
         initViewModel();
@@ -123,7 +106,6 @@ public final class AnyTextFragment
     public void onDestroy () {
         Log.d(TAG, "onDestroy");
         super.onDestroy();
-        mDisposables.clear();
         mBinding = null;
     }
 
@@ -155,7 +137,6 @@ public final class AnyTextFragment
         Log.d(TAG, "initViewModel");
         mViewModel = new ViewModelProvider(requireActivity()).get(AnyTextViewModel.class);
         mViewModel.getAnyText().set(mAnyText);
-        mViewModel.isHaveAccount().set(mAccount != null);
         mViewModel.getThanksUsers().observe(requireActivity(), mThanksUserAdapter::setData);
         mViewModel.getQrCode().set(createQrCodeBitmap());
     }
@@ -200,11 +181,16 @@ public final class AnyTextFragment
 
     public final void refreshAnyTextData () {
         Log.d(TAG, "refreshAnyTextData");
-        if (mAccount != null) {
-            AccountProvider.getAuthToken(requireActivity(), mAccount, this::downloadAnyTextData);
-        } else {
-            downloadAnyTextData(null);
-        }
+        AccountSource.INSTANCE.getAccount(
+                requireActivity(),
+                false,
+                account -> {
+                    if (account != null) {
+                        AccountProvider.getAuthToken(requireActivity(), account, this::downloadAnyTextData);
+                    } else {
+                        downloadAnyTextData(null);
+                    }
+                });
     }
 
     private void downloadAnyTextData (
@@ -213,8 +199,8 @@ public final class AnyTextFragment
         Log.d(TAG, "downloadAnyTextData");
         mViewModel.getDownloadInProgress().set(true);
 
-        mRepository.setAuthToken(authToken);
-        mRepository.getAnyTextInfo(
+        mAsyncRepository.setAuthToken(authToken);
+        mAsyncRepository.getAnyTextInfo(
                 mAnyText,
                 anyTextInfo -> {
                     mViewModel.getDownloadInProgress().set(false);
@@ -257,52 +243,48 @@ public final class AnyTextFragment
 
     public void attemptToAddOperation (@NonNull final OperationType operationType) {
         Log.d(TAG, "onAddOperation");
-        if (mAccount != null) {
-            AccountProvider.getAuthToken(requireActivity(), mAccount, authToken -> {
-                if (authToken != null) {
-                    mRepository.setAuthToken(authToken);
-                    new OperationToAnyTextManager().
-                            createOperationToAnyText(
-                                    requireActivity(),
-                                    UUID.fromString(mAccount.name),
-                                    mAnyTextId,
-                                    operationType,
-                                    mAnyText,
-                                    mRepository,
-                                    () -> {
-                                        Toast.makeText(requireContext(), R.string.info_msg_saved, Toast.LENGTH_LONG).show();
-                                        refreshAnyTextData();
-                                    },
-                                    throwable -> {
-                                        Log.e(TAG, Log.getStackTraceString(throwable));
-                                        if (throwable instanceof BadAuthorizationTokenException) {
-                                            AccountManager.get(requireContext()).invalidateAuthToken(getString(R.string.account_type), authToken);
-                                            attemptToAddOperation(operationType);
-                                        } else {
-                                            Toast.makeText(requireContext(), R.string.err_msg_not_saved, Toast.LENGTH_LONG).show();
-                                        }
-                                    });
-                } else {
-                    Toast.makeText(requireContext(), R.string.info_msg_need_log_in, Toast.LENGTH_LONG).show();
-                }
-            });
-        } else {
-            AccountProvider.createAccount(
-                    requireActivity(),
-                    account -> {
-                        if (account != null) {
-                            mAccount = account;
-                            mViewModel.isHaveAccount().set(true);
-                            attemptToAddOperation(operationType);
-                        }
+        AccountSource.INSTANCE.getAccount(
+                requireActivity(),
+                true,
+                account -> {
+                    if (account != null) {
+                        AccountProvider.getAuthToken(requireActivity(), account, authToken -> {
+                            if (authToken != null) {
+                                mAsyncRepository.setAuthToken(authToken);
+                                new OperationToAnyTextManager().
+                                        createOperationToAnyText(
+                                                requireActivity(),
+                                                UUID.fromString(account.name),
+                                                mAnyTextId,
+                                                operationType,
+                                                mAnyText,
+                                                mAsyncRepository,
+                                                () -> {
+                                                    Toast.makeText(requireContext(), R.string.info_msg_saved, Toast.LENGTH_LONG).show();
+                                                    refreshAnyTextData();
+                                                },
+                                                throwable -> {
+                                                    Log.e(TAG, Log.getStackTraceString(throwable));
+                                                    if (throwable instanceof BadAuthorizationTokenException) {
+                                                        AccountManager.get(requireContext()).invalidateAuthToken(getString(R.string.account_type), authToken);
+                                                        attemptToAddOperation(operationType);
+                                                    } else {
+                                                        Toast.makeText(requireContext(), R.string.err_msg_not_saved, Toast.LENGTH_LONG).show();
+                                                    }
+                                                });
+                            } else {
+                                Toast.makeText(requireContext(), R.string.info_msg_need_log_in, Toast.LENGTH_LONG).show();
+                            }
+                        });
                     }
-            );
-        }
+                }
+        );
     }
 
     @Override
     public void onOperationsClick () {
-        mFragmentCommunicator.toOperationsFromAnyText(mAnyTextId);
+        final NavDirections action = AnyTextFragmentDirections.actionAnyTextFragment2ToOperationsFragment2(mAnyTextId, null);
+        NavHostFragment.findNavController(this).navigate(action);
     }
 
 }

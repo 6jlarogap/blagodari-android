@@ -2,12 +2,15 @@
     <string name="app_name">БлагоДари!</string>
 
     <string name="host">blagodarie.org</string>
+    <string name="url_social_graph">https://blagodarie.org</string>
     <string name="url_profile">https://blagodarie.org/profile?id=%s</string>
     <string name="url_wish">https://blagodarie.org/wish?id=%s</string>
     <string name="url_any_text">https://blagodarie.org/anytext?text=%s</string>
-    <string name="url_social_graph">https://blagodarie.org/socialgraph?from=%s&amp;to=%s</string>
     <string name="url_prof">https://blagodarie.org/prof?id=%s</string>
     <string name="url_play_market">https://play.google.com/store/apps/details?id=blagodarie.rating</string>
+
+    <string name="deep_link_profile">https://blagodarie.org/profile?id={user_uuid}</string>
+    <string name="deep_link_wish">https://blagodarie.org/wish?id={wish_uuid}</string>
 
     <string name="notification_chanel_id_thanks" translatable="false">thanks_notification_chanel</string>
     <string name="notification_chanel_name_thanks">Благодарности</string>
@@ -39,6 +42,7 @@
     <string name="btn_yes">Да</string>
     <string name="btn_no">Нет</string>
     <string name="btn_settings">Настройки</string>
+    <string name="btn_enter">Войти</string>
 
     <string name="rqst_choose_account">Выберите аккаунт</string>
     <string name="rqst_scan_qr_code">Отсканируйте QR-код</string>
@@ -55,7 +59,10 @@
     <string name="info_msg_cant_add_operation_to_own_profile">Нельзя выполнить эту операцию для собственного профиля.</string>
     <string name="info_msg_need_log_in">Необходимо авторизоваться</string>
     <string name="info_msg_missing_profile">Такого профиля не существует</string>
+    <string name="info_msg_missing_wish">Такого желания не существует</string>
     <string name="info_msg_need_read_contacts_permission">Необходимо разрешение на чтение контактов</string>
+    <string name="info_msg_need_camera_permission">Для сканирования QR необходим доступ к камере</string>
+    <string name="info_msg_list_is_empty">Список пуст</string>
 
     <string name="qstn_want_load_new_version">Желаете загрузить новую версию %d?</string>
     <string name="qstn_delete_key">Удалить ключ?</string>
@@ -69,6 +76,7 @@
     <string name="err_msg_incorrect_link">Неверная ссылка</string>
     <string name="err_msg_required_to_fill">Обязательно для заполнения</string>
     <string name="err_msg_not_saved">Не удалось сохранить</string>
+    <string name="err_msg_connection_error">Ошибка соединения</string>
 
     <string name="txt_fame">Известность: %d</string>
     <string name="txt_thanks_count">Благодарности: %d</string>
@@ -87,7 +95,10 @@
     <string name="txt_update">Обновить</string>
     <string name="txt_people">Люди</string>
     <string name="txt_contacts">Контакты</string>
-    <string name="txt_qr_code_scan">Сканировать QR-код</string>
+    <string name="txt_qr_scan">Сканировать QR</string>
+    <string name="txt_search">Поиск</string>
+    <string name="txt_profile">Профиль</string>
+    <string name="txt_social_graph">Граф знакомств</string>
     <string name="txt_comment">Комментарий</string>
     <string name="txt_key">%s: %s</string>
 

@@ -27,7 +27,6 @@ import blagodarie.rating.model.IWish;
 import blagodarie.rating.model.entities.Wish;
 import blagodarie.rating.repository.AsyncRepository;
 import blagodarie.rating.repository.AsyncServerRepository;
-import blagodarie.rating.ui.user.profile.ProfileFragmentArgs;
 import blagodarie.rating.ui.wishes.EditWishActivity;
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -82,10 +81,10 @@ public final class WishesFragment
         Log.d(TAG, "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
 
-        final ProfileFragmentArgs args = ProfileFragmentArgs.fromBundle(requireArguments());
+        /*final WishesFragmentArgs args = WishesFragmentArgs.fromBundle(requireArguments());
 
-        mUserId = args.getUserId();
-        mAccount = args.getAccount();
+        mUserId = args.getUserId();*/
+        //mAccount = args.getAccount();
     }
 
     @Override
@@ -133,7 +132,7 @@ public final class WishesFragment
     }
 
     private void setupBinding () {
-        mBinding.setViewModel(mViewModel);
+        /*mBinding.setViewModel(mViewModel);
         mBinding.setUserActionListener(mUserActionListener);
         mBinding.rvWishes.setLayoutManager(new LinearLayoutManager(requireContext()));
         mBinding.rvWishes.setAdapter(mWishesAdapter);
@@ -141,7 +140,7 @@ public final class WishesFragment
             mViewModel.getDownloadInProgress().set(true);
             refreshWishes();
             mViewModel.getDownloadInProgress().set(false);
-        });
+        });*/
     }
 
     private void initOperationsAdapter () {

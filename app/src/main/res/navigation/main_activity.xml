@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_activity"
+    app:startDestination="@id/people">
+
+    <action
+        android:id="@+id/global_action_to_user"
+        app:destination="@+id/own_profile" />
+
+    <fragment
+        android:id="@+id/graphFragment"
+        android:name="blagodarie.rating.ui.user.graph.GraphFragment"
+        android:label="GraphFragment">
+        <argument
+            android:name="userId"
+            android:defaultValue="@null"
+            app:argType="java.util.UUID"
+            app:nullable="true" />
+    </fragment>
+
+    <navigation android:id="@+id/people"
+        app:startDestination="@id/peopleFragment">
+
+        <fragment
+            android:id="@+id/peopleFragment"
+            android:name="blagodarie.rating.ui.people.PeopleFragment"
+            android:label="PeopleFragment">
+            <action
+                android:id="@+id/action_peopleFragment_to_profileFragment"
+                app:destination="@id/profileFragment" />
+        </fragment>
+
+        <fragment
+            android:id="@+id/profileFragment"
+            android:name="blagodarie.rating.ui.user.profile.ProfileFragment"
+            android:label="ProfileFragment">
+            <deepLink
+                android:id="@+id/deepLinkToProfile"
+                android:autoVerify="true"
+                app:uri="https://blagodarie.org/profile?id={user_uuid}" />
+            <action
+                android:id="@+id/action_profileFragment_to_keysFragment"
+                app:destination="@id/keysFragment" />
+            <action
+                android:id="@+id/action_profileFragment_to_operationsFragment"
+                app:destination="@id/operationsFragment" />
+            <action
+                android:id="@+id/action_profileFragment_to_graphFragment"
+                app:destination="@id/graphFragment2" />
+            <argument
+                android:name="user_uuid"
+                app:argType="string" />
+            <deepLink
+                android:id="@+id/deepLink2"
+                android:autoVerify="true"
+                app:uri="https://dev.blagodarie.org/profile?id={user_uuid}" />
+        </fragment>
+        <fragment
+            android:id="@+id/keysFragment"
+            android:name="blagodarie.rating.ui.user.keys.KeysFragment"
+            android:label="KeysFragment">
+            <argument
+                android:name="user_id"
+                app:argType="java.util.UUID" />
+        </fragment>
+        <fragment
+            android:id="@+id/operationsFragment"
+            android:name="blagodarie.rating.ui.user.operations.OperationsFragment"
+            android:label="OperationsFragment">
+            <argument
+                android:name="user_id"
+                app:argType="java.util.UUID"
+                app:nullable="true" />
+            <argument
+                android:name="any_text_id"
+                app:argType="java.util.UUID"
+                app:nullable="true" />
+        </fragment>
+        <fragment
+            android:id="@+id/graphFragment2"
+            android:name="blagodarie.rating.ui.user.graph.GraphFragment"
+            android:label="GraphFragment">
+            <argument
+                android:name="user_id"
+                android:defaultValue="@null"
+                app:argType="java.util.UUID"
+                app:nullable="true" />
+        </fragment>
+    </navigation>
+
+    <include app:graph="@navigation/qr_scan" />
+    <fragment
+        android:id="@+id/updateFragment"
+        android:name="blagodarie.rating.ui.UpdateFragment"
+        android:label="UpdateFragment" />
+    <include app:graph="@navigation/own_profile" />
+    <fragment
+        android:id="@+id/abilitiesFragment"
+        android:name="blagodarie.rating.ui.AbilitiesFragment"
+        android:label="AbilitiesFragment" >
+        <argument
+            android:name="user_id"
+            app:argType="java.util.UUID" />
+        <action
+            android:id="@+id/action_abilitiesFragment_to_addAbilityFragment"
+            app:destination="@id/addAbilityFragment" />
+        <action
+            android:id="@+id/action_abilitiesFragment_to_editAbilityFragment"
+            app:destination="@id/editAbilityFragment" />
+    </fragment>
+    <action android:id="@+id/action_global_abilitiesFragment" app:destination="@id/abilitiesFragment" />
+    <fragment
+        android:id="@+id/addAbilityFragment"
+        android:name="blagodarie.rating.ui.AddAbilityFragment"
+        android:label="AddAbilityFragment" />
+    <fragment
+        android:id="@+id/editAbilityFragment"
+        android:name="blagodarie.rating.ui.user.abilities.EditAbilityFragment"
+        android:label="EditAbilityFragment" >
+        <argument
+            android:name="ability"
+            app:argType="blagodarie.rating.model.entities.Ability" />
+    </fragment>
+    <fragment
+        android:id="@+id/addWishFragment"
+        android:name="blagodarie.rating.ui.AddWishFragment"
+        android:label="AddWishFragment" />
+    <fragment
+        android:id="@+id/editWishFragment"
+        android:name="blagodarie.rating.ui.EditWishFragment"
+        android:label="EditWishFragment">
+        <argument
+            android:name="wish"
+            app:argType="blagodarie.rating.model.entities.Wish" />
+    </fragment>
+    <fragment
+        android:id="@+id/wishFragment"
+        android:name="blagodarie.rating.ui.WishFragment"
+        android:label="WishFragment">
+        <action
+            android:id="@+id/action_wishFragment_to_editWishFragment"
+            app:destination="@id/editWishFragment" />
+        <deepLink
+            android:id="@+id/deepLinkToWish"
+            android:autoVerify="true"
+            app:uri="https://blagodarie.org/wish?id={wish_uuid}" />
+        <argument
+            android:name="wish_uuid"
+            app:argType="string" />
+        <deepLink
+            android:id="@+id/deepLink"
+            android:autoVerify="true"
+            app:uri="https://dev.blagodarie.org/wish?id={wish_uuid}" />
+    </fragment>
+    <fragment
+        android:id="@+id/wishesFragment"
+        android:name="blagodarie.rating.ui.WishesFragment"
+        android:label="WishesFragment" >
+        <action
+            android:id="@+id/action_wishesFragment_to_wishFragment"
+            app:destination="@id/wishFragment" />
+        <action
+            android:id="@+id/action_wishesFragment_to_editWishFragment"
+            app:destination="@id/editWishFragment" />
+        <action
+            android:id="@+id/action_wishesFragment_to_addWishFragment"
+            app:destination="@id/addWishFragment" />
+        <argument
+            android:name="user_id"
+            app:argType="java.util.UUID" />
+    </fragment>
+    <action android:id="@+id/action_global_wishesFragment" app:destination="@id/wishesFragment" />
+
+</navigation>

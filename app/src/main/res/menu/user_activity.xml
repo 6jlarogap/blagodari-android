@@ -5,7 +5,7 @@
     <item
         android:id="@+id/miQRCodeScan"
         android:icon="@drawable/qrcode_scan"
-        android:title="@string/txt_qr_code_scan"
+        android:title="@string/txt_qr_scan"
         app:showAsAction="ifRoom" />
 
     <item

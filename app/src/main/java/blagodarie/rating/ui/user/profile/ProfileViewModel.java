@@ -1,5 +1,6 @@
 package blagodarie.rating.ui.user.profile;
 
+import android.accounts.Account;
 import android.graphics.Bitmap;
 
 import androidx.annotation.NonNull;
@@ -25,12 +26,6 @@ public final class ProfileViewModel
     @NonNull
     private final ObservableBoolean mDownloadInProgress = new ObservableBoolean(false);
 
-    @NonNull
-    private final ObservableBoolean mHaveAccount = new ObservableBoolean(false);
-
-    @NonNull
-    private final ObservableBoolean mOwnProfile = new ObservableBoolean(false);
-
     private LiveData<PagedList<GetThanksUsersResponse.ThanksUser>> mThanksUsers;
 
     public ProfileViewModel () {
@@ -49,15 +44,6 @@ public final class ProfileViewModel
     @NonNull
     public final ObservableBoolean getDownloadInProgress () {
         return mDownloadInProgress;
-    }
-
-    @NonNull
-    public final ObservableBoolean isHaveAccount () {
-        return mHaveAccount;
-    }
-
-    public final ObservableBoolean isOwnProfile () {
-        return mOwnProfile;
     }
 
     @NonNull

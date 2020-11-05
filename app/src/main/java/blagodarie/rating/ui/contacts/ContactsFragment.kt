@@ -97,7 +97,7 @@ class ContactsFragment : Fragment() {
 
     private fun attemptToReadContacts(){
         if (mNeedContactsUpdate) {
-            if (readContactsAllowed()) {
+            if (isReadContactsAllowed()) {
                 readContacts()
             } else {
                 requestPermissions()
@@ -143,7 +143,7 @@ class ContactsFragment : Fragment() {
         mBinding.userActionListener = mUserActionListener
     }
 
-    private fun readContactsAllowed(): Boolean {
+    private fun isReadContactsAllowed(): Boolean {
         return ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
     }
 

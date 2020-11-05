@@ -4,21 +4,14 @@
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingHorizontal="5dp">
+        android:layout_height="match_parent">
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/srlRefreshProfileInfo"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:refreshing="@{ViewModel.downloadInProgress}">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvWishes"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        <include
+            android:id="@+id/list"
+            layout="@layout/base_recycler"
+            app:downloadInProgress="@{ViewModel.downloadInProgress}"
+            app:isEmpty="@{ViewModel.isEmpty()}"
+            app:refreshListener="@{refreshListener}" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:layout_width="wrap_content"
@@ -27,7 +20,7 @@
             android:layout_margin="@dimen/fab_margin"
             android:onClick="@{() -> UserActionListener.onAddWishClick()}"
             android:src="@drawable/plus"
-            android:visibility="@{ViewModel.isOwnProfile() ? View.VISIBLE : View.GONE}"
+            android:visibility="@{ViewModel.isOwn() ? View.VISIBLE : View.GONE}"
             app:backgroundTint="@color/colorPrimary"
             app:borderWidth="0dp"
             app:elevation="6dp"
@@ -41,11 +34,15 @@
 
         <variable
             name="ViewModel"
-            type="blagodarie.rating.ui.user.wishes.WishesViewModel" />
+            type="blagodarie.rating.ui.WishesViewModel" />
+
+        <variable
+            name="refreshListener"
+            type="androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener" />
 
         <variable
             name="UserActionListener"
-            type="blagodarie.rating.ui.user.wishes.WishesFragment.UserActionListener" />
+            type="blagodarie.rating.ui.WishesFragment.UserActionListener" />
 
     </data>
 

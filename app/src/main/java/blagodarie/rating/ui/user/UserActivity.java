@@ -23,7 +23,6 @@ import androidx.databinding.DataBindingUtil;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -33,39 +32,27 @@ import com.squareup.picasso.Picasso;
 
 import java.util.UUID;
 
-import blagodarie.rating.BuildConfig;
 import blagodarie.rating.R;
 import blagodarie.rating.auth.AccountGeneral;
 import blagodarie.rating.databinding.NavHeaderLayoutBinding;
 import blagodarie.rating.databinding.UserActivityBinding;
-import blagodarie.rating.model.entities.Ability;
 import blagodarie.rating.ui.AccountProvider;
 import blagodarie.rating.ui.splash.SplashActivity;
-import blagodarie.rating.ui.user.abilities.AbilitiesFragment;
-import blagodarie.rating.ui.user.abilities.AbilitiesFragmentDirections;
-import blagodarie.rating.ui.user.anytext.AnyTextFragment;
-import blagodarie.rating.ui.user.anytext.AnyTextFragmentDirections;
 import blagodarie.rating.ui.user.keys.AddKeyFragment;
 import blagodarie.rating.ui.user.keys.KeysFragment;
-import blagodarie.rating.ui.user.keys.KeysFragmentDirections;
-import blagodarie.rating.ui.user.profile.ProfileFragment;
-import blagodarie.rating.ui.user.profile.ProfileFragmentDirections;
 import blagodarie.rating.update.UpdateManager;
 import io.reactivex.disposables.CompositeDisposable;
 
 public final class UserActivity
         extends AppCompatActivity
-        implements ProfileFragment.FragmentCommunicator,
-        AnyTextFragment.FragmentCommunicator,
-        UpdateManager.OnCheckUpdateListener,
+        implements UpdateManager.OnCheckUpdateListener,
         KeysFragment.FragmentCommunicator,
-        AbilitiesFragment.FragmentCommunicator,
         AddKeyFragment.FragmentCommunicator {
 
     private static final String TAG = UserActivity.class.getSimpleName();
 
-    private static final String EXTRA_ANY_TEXT = "blagodarie.rating.ui.user.UserActivity.ANY_TEXT";
-    public static final String EXTRA_TO_OPERATIONS = "blagodarie.rating.ui.user.UserActivity.TO_OPERATIONS";
+    private static final String EXTRA_ANY_TEXT = "blagodarie.rating.ui.own_profile.UserActivity.ANY_TEXT";
+    public static final String EXTRA_TO_OPERATIONS = "blagodarie.rating.ui.own_profile.UserActivity.TO_OPERATIONS";
 
     private AccountManager mAccountManager;
 
@@ -120,7 +107,7 @@ public final class UserActivity
                     this,
                     this::onAccountSelected
             );
-            mUpdateManager = new UpdateManager(getString(R.string.file_provider_authorities));
+            /*mUpdateManager = new UpdateManager(getString(R.string.file_provider_authorities));
             mDisposables.add(
                     mUpdateManager.checkUpdate(
                             this,
@@ -128,7 +115,7 @@ public final class UserActivity
                             this,
                             throwable -> Toast.makeText(this, throwable.getLocalizedMessage(), Toast.LENGTH_LONG).show()
                     )
-            );
+            );*/
         } else {
             Toast.makeText(this, R.string.err_msg_missing_data, Toast.LENGTH_LONG).show();
             finish();
@@ -162,7 +149,7 @@ public final class UserActivity
         Log.d(TAG, "onHaveUpdate");
         mActivityBinding.nvNavigation.getMenu().findItem(R.id.miUpdate).setVisible(true);
     }
-
+/*
     @Override
     public void onBackPressed () {
         Log.d(TAG, "onBackPressed");
@@ -175,7 +162,7 @@ public final class UserActivity
             }
         }
     }
-
+*/
     public void onAccountSelected (@Nullable final Account account) {
         Log.d(TAG, "onAccountSelected account=" + (account != null ? account.toString() : "null"));
         if (account != null) {
@@ -186,11 +173,11 @@ public final class UserActivity
         mActivityBinding.nvNavigation.getMenu().findItem(R.id.miLogout).setEnabled(mAccount != null);
         mViewModel.isOwnProfile().set(mAccount != null && mUserId != null && mAccount.name.equals(mUserId.toString()));
         if (mUserId != null) {
-            if (mNavController.getCurrentDestination() != null && mNavController.getCurrentDestination().getId() != R.id.profileFragment) {
+            /*if (mNavController.getCurrentDestination() != null && mNavController.getCurrentDestination().getId() != R.id.profileFragment) {
                 toProfile();
-            }
+            }*/
             if (getIntent().getBooleanExtra(EXTRA_TO_OPERATIONS, false)) {
-                toOperationsFromProfile();
+                //toOperationsFromProfile();
             }
         } else if (mAnyText != null) {
             toAnyText();
@@ -199,24 +186,24 @@ public final class UserActivity
 
     void toProfile () {
         Log.d(TAG, "toProfile");
-        final NavDirections action = StartFragmentDirections.actionStartFragment2ToProfileFragment(mUserId, mAccount);
-        mNavController.navigate(action);
+        /*final NavDirections action = StartFragmentDirections.actionStartFragment2ToProfileFragment(mUserId);
+        mNavController.navigate(action);*/
     }
 
     void toAnyText () {
         Log.d(TAG, "toAnyText");
-        final NavDirections action = StartFragmentDirections.actionStartFragment2ToAnyTextFragment(mAnyText, mAccount);
-        mNavController.navigate(action);
+        /*final NavDirections action = StartFragmentDirections.actionStartFragment2ToAnyTextFragment(mAnyText, mAccount);
+        mNavController.navigate(action);*/
     }
 
     void toPeople () {
         Log.d(TAG, "toPeople");
-        mNavController.navigate(R.id.peopleFragment);
+        //mNavController.navigate(R.id.peopleFragment);
     }
 
     void toContacts () {
         Log.d(TAG, "toContacts");
-        mNavController.navigate(R.id.contactsFragment);
+        //mNavController.navigate(R.id.contactsFragment);
     }
 
     private void initViewModel () {
@@ -258,11 +245,11 @@ public final class UserActivity
             ivOwnAccountPhoto.setOnClickListener(view -> {
                 if (mViewModel.isOwnProfile().get()) {
                     if (mNavController.getCurrentDestination() != null) {
-                        if (mNavController.getCurrentDestination().getId() == R.id.profileFragment) {
+                        /*if (mNavController.getCurrentDestination().getId() == R.id.profileFragment) {
                             ((ProfileFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment).getChildFragmentManager().getFragments().get(0)).refreshProfileData();
                         } else {
                             onBackPressed();
-                        }
+                        }*/
                     }
                 } else {
                     final Intent i = new Intent(Intent.ACTION_VIEW);
@@ -433,61 +420,10 @@ public final class UserActivity
     }
 
     @Override
-    public void toOperationsFromProfile () {
-        Log.d(TAG, "toOperationsFromProfile");
-        final NavDirections action = ProfileFragmentDirections.actionProfileFragmentToOperationsFragment(mUserId, null, mAccount);
-        mNavController.navigate(action);
-    }
-
-    @Override
-    public void toOperationsFromAnyText (@NonNull final UUID anyTextId) {
-        Log.d(TAG, "toOperationsFromAnyText");
-        final NavDirections action = AnyTextFragmentDirections.actionAnyTextFragmentToOperationsFragment(mUserId, anyTextId, mAccount);
-        mNavController.navigate(action);
-    }
-
-    @Override
-    public void toWishes () {
-        Log.d(TAG, "toWishes");
-        final NavDirections action = ProfileFragmentDirections.actionProfileFragmentToWishesFragment(mUserId, mAccount);
-        mNavController.navigate(action);
-    }
-
-    @Override
-    public void toAbilities () {
-        Log.d(TAG, "toAbilities");
-        final NavDirections action = ProfileFragmentDirections.actionProfileFragmentToAbilitiesFragment(mUserId, mAccount);
-        mNavController.navigate(action);
-    }
-
-    @Override
-    public void toKeysFromProfile () {
-        Log.d(TAG, "toKeysFromProfile");
-        final NavDirections action = ProfileFragmentDirections.actionProfileFragmentToKeysFragment(mUserId, mAccount);
-        mNavController.navigate(action);
-    }
-
-    @Override
-    public void toGraph () {
-        Log.d(TAG, "toGraph");
-        final NavDirections action = ProfileFragmentDirections.actionProfileFragmentToGraphFragment(mUserId);
-        mNavController.navigate(action);
-    }
-
-    @Override
     public void toAddKey () {
         Log.d(TAG, "toAddKey");
-        final NavDirections action = KeysFragmentDirections.actionKeysFragmentToAddKeyFragment(mAccount);
-        mNavController.navigate(action);
-    }
-
-    @Override
-    public void toEditAbility (
-            @Nullable final Ability ability
-    ) {
-        Log.d(TAG, "toEditAbility");
-        final NavDirections action = AbilitiesFragmentDirections.actionAbilitiesFragmentToEditAbilityFragment(mAccount, ability);
-        mNavController.navigate(action);
+        /*final NavDirections action = KeysFragmentDirections.actionKeysFragmentToAddKeyFragment(mAccount);
+        mNavController.navigate(action);*/
     }
 
     @Override

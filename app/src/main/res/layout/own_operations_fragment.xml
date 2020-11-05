@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include
+            android:id="@+id/list"
+            layout="@layout/base_recycler"
+            app:downloadInProgress="@{ViewModel.downloadInProgress}"
+            app:isEmpty="@{ViewModel.isEmpty()}"
+            app:refreshListener="@{refreshListener}" />
+
+    </FrameLayout>
+
+    <data>
+
+        <variable
+            name="ViewModel"
+            type="blagodarie.rating.ui.OwnOperationsViewModel" />
+
+        <variable
+            name="refreshListener"
+            type="androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener" />
+
+    </data>
+
+</layout>

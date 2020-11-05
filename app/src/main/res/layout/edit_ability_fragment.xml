@@ -13,7 +13,7 @@
             android:layout_height="wrap_content">
 
             <EditText
-                android:id="@+id/etWishText"
+                android:id="@+id/etAbilityText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="start"

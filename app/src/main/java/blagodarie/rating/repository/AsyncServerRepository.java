@@ -7,6 +7,9 @@ import androidx.paging.DataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 
@@ -15,8 +18,10 @@ import blagodarie.rating.model.IAnyTextInfo;
 import blagodarie.rating.model.IKey;
 import blagodarie.rating.model.IKeyPair;
 import blagodarie.rating.model.IProfile;
+import blagodarie.rating.model.IWish;
 import blagodarie.rating.model.entities.OperationToAnyText;
 import blagodarie.rating.model.entities.OperationToUser;
+import blagodarie.rating.server.HttpException;
 
 public final class AsyncServerRepository
         implements AsyncRepository,
@@ -110,6 +115,22 @@ public final class AsyncServerRepository
     }
 
     @Override
+    public void getWish (
+            @NonNull final UUID wishId,
+            @NonNull final OnLoadListener<IWish> onLoadListener,
+            @NonNull final OnErrorListener onErrorListener
+    ) {
+        mExecutor.execute(() -> {
+            try {
+                final IWish wish = mServerRepository.getWish(wishId);
+                mMainThreadExecutor.execute(() -> onLoadListener.onLoad(wish));
+            } catch (Throwable throwable) {
+                mMainThreadExecutor.execute(() -> onErrorListener.onError(throwable));
+            }
+        });
+    }
+
+    @Override
     public void upsertAbility (
             @NonNull final IAbility ability,
             @NonNull final OnCompleteListener onCompleteListener,
@@ -118,6 +139,22 @@ public final class AsyncServerRepository
         mExecutor.execute(() -> {
             try {
                 mServerRepository.upsertAbility(ability);
+                mMainThreadExecutor.execute(onCompleteListener::onComplete);
+            } catch (Throwable throwable) {
+                mMainThreadExecutor.execute(() -> onErrorListener.onError(throwable));
+            }
+        });
+    }
+
+    @Override
+    public void upsertWish (
+            @NonNull final IWish wish,
+            @NonNull final OnCompleteListener onCompleteListener,
+            @NonNull final OnErrorListener onErrorListener
+    ) {
+        mExecutor.execute(() -> {
+            try {
+                mServerRepository.upsertWish(wish);
                 mMainThreadExecutor.execute(onCompleteListener::onComplete);
             } catch (Throwable throwable) {
                 mMainThreadExecutor.execute(() -> onErrorListener.onError(throwable));

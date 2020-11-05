@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/qr_scan"
+    app:startDestination="@id/qrScanFragment2">
+
+    <fragment
+        android:id="@+id/qrScanFragment2"
+        android:name="blagodarie.rating.ui.QrScanFragment"
+        android:label="QrScanFragment" >
+        <action
+            android:id="@+id/action_qrScanFragment2_to_anyTextFragment2"
+            app:destination="@id/anyTextFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/anyTextFragment2"
+        android:name="blagodarie.rating.ui.user.anytext.AnyTextFragment"
+        android:label="AnyTextFragment">
+        <action
+            android:id="@+id/action_anyTextFragment2_to_operationsFragment2"
+            app:destination="@id/operationsFragment2" />
+        <argument
+            android:name="any_text"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/operationsFragment2"
+        android:name="blagodarie.rating.ui.user.operations.OperationsFragment"
+        android:label="OperationsFragment" >
+        <argument
+            android:name="user_id"
+            app:argType="java.util.UUID"
+            app:nullable="true" />
+        <argument
+            android:name="any_text_id"
+            app:argType="java.util.UUID"
+            app:nullable="true" />
+    </fragment>
+</navigation>

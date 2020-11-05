@@ -1,8 +1,5 @@
 package blagodarie.rating.ui.people;
 
-import android.accounts.Account;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -15,18 +12,19 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.util.UUID;
 
 import blagodarie.rating.AppExecutors;
-import blagodarie.rating.R;
 import blagodarie.rating.databinding.PeopleFragmentBinding;
 import blagodarie.rating.repository.AsyncRepository;
 import blagodarie.rating.repository.AsyncServerRepository;
 import blagodarie.rating.ui.user.wishes.WishesFragment;
 
-public class PeopleFragment
+public final class PeopleFragment
         extends Fragment {
 
     public interface UserActionListener {
@@ -40,10 +38,6 @@ public class PeopleFragment
     private PeopleFragmentBinding mBinding;
 
     private PeopleAdapter mPeopleAdapter;
-
-    private Account mAccount;
-
-    private UUID mUserId;
 
     @NonNull
     private final AsyncRepository mAsyncRepository = new AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread());
@@ -151,8 +145,7 @@ public class PeopleFragment
     }
 
     private void onProfileClick (@NonNull final UUID userId) {
-        final Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(getString(R.string.url_profile, userId)));
-        startActivity(i);
+        final NavDirections action = PeopleFragmentDirections.actionPeopleFragmentToProfileFragment().setUserId(userId);
+        NavHostFragment.findNavController(this).navigate(action);
     }
 }

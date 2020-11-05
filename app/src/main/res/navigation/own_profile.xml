@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/own_profile"
+    app:startDestination="@id/ownProfileFragment">
+
+    <fragment
+        android:id="@+id/ownOperationsFragment"
+        android:name="blagodarie.rating.ui.OwnOperationsFragment"
+        android:label="OwnOperationsFragment" >
+        <argument
+            android:name="user_id"
+            app:argType="java.util.UUID" />
+    </fragment>
+    <fragment
+        android:id="@+id/ownProfileFragment"
+        android:name="blagodarie.rating.ui.OwnProfileFragment"
+        android:label="OwnProfileFragment" >
+        <action
+            android:id="@+id/action_ownProfileFragment_to_ownOperationsFragment"
+            app:destination="@id/ownOperationsFragment" />
+    </fragment>
+</navigation>

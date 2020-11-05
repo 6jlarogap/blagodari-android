@@ -14,7 +14,7 @@ import blagodarie.rating.R;
 import blagodarie.rating.databinding.WishItemBinding;
 import blagodarie.rating.model.IWish;
 
-final class WishesAdapter
+public final class WishesAdapter
         extends PagedListAdapter<IWish, WishesAdapter.WishViewHolder> {
 
     interface UserActionListener {

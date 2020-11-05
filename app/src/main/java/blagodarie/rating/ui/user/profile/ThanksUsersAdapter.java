@@ -23,14 +23,14 @@ public final class ThanksUsersAdapter
 
     private static final String TAG = ThanksUsersAdapter.class.getSimpleName();
 
-    interface OnItemClickListener {
+    public interface OnItemClickListener {
         void onClick (@NonNull final UUID userId);
     }
 
     @NonNull
     private final ThanksUsersAdapter.OnItemClickListener mOnItemClickListener;
 
-    protected ThanksUsersAdapter (
+    public ThanksUsersAdapter (
             @NonNull final ThanksUsersAdapter.OnItemClickListener onItemClickListener
     ) {
         super(DIFF_CALLBACK);

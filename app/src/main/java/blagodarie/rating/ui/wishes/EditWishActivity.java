@@ -135,7 +135,7 @@ public final class EditWishActivity
                 onBackPressed();
                 return true;
             case R.id.miSave:
-                mWish.setText(mActivityBinding.etWishText.getText().toString());
+                mWish.setText(mActivityBinding.etAbilityText.getText().toString());
                 mWish.setLastEdit(new Date());
                 getAuthTokenAndAddOrUpdateWish();
                 return true;

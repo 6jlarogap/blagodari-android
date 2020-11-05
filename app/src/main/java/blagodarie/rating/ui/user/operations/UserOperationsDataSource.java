@@ -13,7 +13,7 @@ import blagodarie.rating.server.GetUserOperationsRequest;
 import blagodarie.rating.server.GetOperationsResponse;
 import blagodarie.rating.server.ServerApiClient;
 
-final class UserOperationsDataSource
+public final class UserOperationsDataSource
         extends PositionalDataSource<IDisplayOperation> {
 
     private static final String TAG = UserOperationsDataSource.class.getSimpleName();
@@ -21,7 +21,7 @@ final class UserOperationsDataSource
     @NonNull
     private final UUID mUserId;
 
-    UserOperationsDataSource (
+    public UserOperationsDataSource (
             @NonNull final UUID userId
     ) {
         Log.d(TAG, "UserOperationsDataSource");
@@ -60,14 +60,14 @@ final class UserOperationsDataSource
         }
     }
 
-    static class UserOperationsDataSourceFactory
+    public static class UserOperationsDataSourceFactory
             extends Factory<Integer, IDisplayOperation> {
 
         @NonNull
         private final UUID mUserId;
 
 
-        UserOperationsDataSourceFactory (
+        public UserOperationsDataSourceFactory (
                 @NonNull final UUID userId
         ) {
             mUserId = userId;

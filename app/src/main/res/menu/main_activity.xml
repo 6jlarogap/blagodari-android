@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/people"
+        android:icon="@drawable/account_group"
+        android:title="@string/txt_people"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/graphFragment"
+        android:icon="@drawable/apache_kafka"
+        android:title="@string/txt_social_graph"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/qr_scan"
+        android:icon="@drawable/qrcode_scan"
+        android:title="@string/txt_qr_scan"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/own_profile"
+        android:icon="@drawable/account_circle"
+        android:title="@string/txt_profile"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/updateFragment"
+        android:icon="@drawable/cellphone_arrow_down"
+        android:title="@string/txt_update"
+        android:visible="false"
+        app:showAsAction="ifRoom" />
+
+</menu>

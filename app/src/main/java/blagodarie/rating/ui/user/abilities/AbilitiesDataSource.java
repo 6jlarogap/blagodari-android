@@ -13,7 +13,7 @@ import blagodarie.rating.server.GetUserAbilitiesRequest;
 import blagodarie.rating.server.GetUserAbilitiesResponse;
 import blagodarie.rating.server.ServerApiClient;
 
-class AbilitiesDataSource
+public final class AbilitiesDataSource
         extends PositionalDataSource<IAbility> {
 
     private static final String TAG = AbilitiesDataSource.class.getSimpleName();
@@ -21,7 +21,7 @@ class AbilitiesDataSource
     @NonNull
     private final UUID mUserId;
 
-    AbilitiesDataSource (
+    public AbilitiesDataSource (
             @NonNull final UUID userId
     ) {
         Log.d(TAG, "OperationDataSource");

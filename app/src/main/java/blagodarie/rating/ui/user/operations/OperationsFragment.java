@@ -2,8 +2,6 @@ package blagodarie.rating.ui.user.operations;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,7 +28,6 @@ import blagodarie.rating.operations.OperationToUserManager;
 import blagodarie.rating.repository.AsyncServerRepository;
 import blagodarie.rating.server.BadAuthorizationTokenException;
 import blagodarie.rating.ui.AccountProvider;
-import io.reactivex.disposables.CompositeDisposable;
 
 public final class OperationsFragment
         extends Fragment {
@@ -38,6 +35,7 @@ public final class OperationsFragment
     public interface UserActionListener {
         void onThanksClick ();
     }
+
     private static final String TAG = OperationsFragment.class.getSimpleName();
 
     private OperationsViewModel mViewModel;
@@ -53,9 +51,6 @@ public final class OperationsFragment
     private UUID mAnyTextId;
 
     @NonNull
-    private CompositeDisposable mDisposables = new CompositeDisposable();
-
-    @NonNull
     private final AsyncServerRepository mAsyncRepository = new AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread());
 
     @NonNull
@@ -63,21 +58,6 @@ public final class OperationsFragment
         @Override
         public void onThanksClick () {
             attemptToAddOperation(OperationType.THANKS, mUserId);
-        }
-    };
-
-    @NonNull
-    private final OperationsAdapter.UserActionListener mOnOperationClickListener = new OperationsAdapter.UserActionListener() {
-        @Override
-        public void onOperationClick (@NonNull final UUID userId) {
-            final Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(getString(R.string.url_profile, userId.toString())));
-            startActivity(i);
-        }
-
-        @Override
-        public void onThanksClick (@NonNull final UUID userIdTo) {
-            attemptToAddOperation(OperationType.THANKS, userIdTo);
         }
     };
 
@@ -105,7 +85,6 @@ public final class OperationsFragment
 
         mUserId = args.getUserId();
         mAnyTextId = args.getAnyTextId();
-        mAccount = args.getAccount();
     }
 
     @Override
@@ -118,9 +97,9 @@ public final class OperationsFragment
     }
 
     @Override
-    public void onStart () {
-        Log.d(TAG, "onStart");
-        super.onStart();
+    public void onResume () {
+        Log.d(TAG, "onResume");
+        super.onResume();
         refreshOperations();
     }
 
@@ -128,12 +107,11 @@ public final class OperationsFragment
     public void onDestroy () {
         Log.d(TAG, "onDestroy");
         super.onDestroy();
-        mDisposables.clear();
         mBinding = null;
     }
 
     private void initOperationsAdapter () {
-        mOperationsAdapter = new OperationsAdapter(mOnOperationClickListener, mViewModel);
+        mOperationsAdapter = new OperationsAdapter();
     }
 
     private void initBinding (
@@ -155,21 +133,21 @@ public final class OperationsFragment
         mBinding.setUserActionsListener(mUserActionListener);
         mBinding.rvOperations.setLayoutManager(new LinearLayoutManager(requireContext()));
         mBinding.rvOperations.setAdapter(mOperationsAdapter);
-        mBinding.srlRefreshProfileInfo.setOnRefreshListener(() -> {
-            mViewModel.getDownloadInProgress().set(true);
-            refreshOperations();
-            mViewModel.getDownloadInProgress().set(false);
-        });
+        mBinding.srlRefreshProfileInfo.setOnRefreshListener(this::refreshOperations);
     }
 
     private void refreshOperations () {
+        mViewModel.getDownloadInProgress().set(true);
         Log.d(TAG, "refreshOperations");
         mViewModel.setOperations(
                 mUserId != null ?
                         mAsyncRepository.getLiveDataPagedListFromDataSource(new UserOperationsDataSource.UserOperationsDataSourceFactory(mUserId)) :
                         mAsyncRepository.getLiveDataPagedListFromDataSource(new AnyTextOperationsDataSource.AnyTextOperationsDataSourceFactory(mAnyTextId))
         );
-        mViewModel.getOperations().observe(requireActivity(), mOperationsAdapter::submitList);
+        mViewModel.getOperations().observe(requireActivity(), operations -> {
+            mViewModel.getDownloadInProgress().set(false);
+            mOperationsAdapter.submitList(operations);
+        });
     }
 
     private void attemptToAddOperation (

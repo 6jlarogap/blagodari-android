@@ -1,6 +1,5 @@
 package blagodarie.rating.ui.user.abilities;
 
-import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,16 +15,15 @@ import androidx.fragment.app.Fragment;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
-import java.util.UUID;
 
 import blagodarie.rating.AppExecutors;
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.EditAbilityFragmentBinding;
 import blagodarie.rating.model.IAbility;
-import blagodarie.rating.model.entities.Ability;
 import blagodarie.rating.repository.AsyncServerRepository;
 import blagodarie.rating.server.BadAuthorizationTokenException;
 import blagodarie.rating.ui.AccountProvider;
+import blagodarie.rating.ui.AccountSource;
 
 public final class EditAbilityFragment
         extends Fragment {
@@ -38,8 +36,6 @@ public final class EditAbilityFragment
 
     private EditAbilityFragmentBinding mBinding;
 
-    private Account mAccount;
-
     private IAbility mAbility;
 
     private final AsyncServerRepository mAsyncRepository = new AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread());
@@ -48,9 +44,10 @@ public final class EditAbilityFragment
         @Override
         public void onSaveClick (@NonNull final IAbility ability) {
             if (!mAbility.getText().isEmpty()) {
+                mAbility.setLastEdit(new Date());
                 attemptToSaveAbility();
             } else {
-                mBinding.etWishText.setError(getString(R.string.err_msg_required_to_fill));
+                mBinding.etAbilityText.setError(getString(R.string.err_msg_required_to_fill));
             }
         }
     };
@@ -77,11 +74,7 @@ public final class EditAbilityFragment
 
         final EditAbilityFragmentArgs args = EditAbilityFragmentArgs.fromBundle(requireArguments());
 
-        mAccount = args.getAccount();
         mAbility = args.getAbility();
-        if (mAbility == null) {
-            mAbility = new Ability(UUID.randomUUID(), UUID.fromString(mAccount.name), "", new Date());
-        }
     }
 
     @Override
@@ -113,16 +106,25 @@ public final class EditAbilityFragment
     }
 
     private void attemptToSaveAbility () {
-        AccountProvider.getAuthToken(
+        AccountSource.INSTANCE.getAccount(
                 requireActivity(),
-                mAccount,
-                authToken -> {
-                    if (authToken != null) {
-                        saveAbility(authToken);
-                    } else {
-                        Toast.makeText(requireContext(), R.string.info_msg_need_log_in, Toast.LENGTH_LONG).show();
+                true,
+                account -> {
+                    if (account != null) {
+                        AccountProvider.getAuthToken(
+                                requireActivity(),
+                                account,
+                                authToken -> {
+                                    if (authToken != null) {
+                                        saveAbility(authToken);
+                                    } else {
+                                        Toast.makeText(requireContext(), R.string.info_msg_need_log_in, Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                        );
                     }
                 }
+
         );
     }
 

@@ -85,18 +85,17 @@ public final class KeysFragment
         final KeysFragmentArgs args = KeysFragmentArgs.fromBundle(requireArguments());
 
         mUserId = args.getUserId();
-        mAccount = args.getAccount();
     }
 
     @Override
     public void onActivityCreated (@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        try {
+        /*try {
             mFragmentCommunicator = (FragmentCommunicator) requireActivity();
         } catch (ClassCastException e) {
             Log.e(TAG, requireActivity().getClass().getName() + " must implement " + FragmentCommunicator.class.getName());
             throw new ClassCastException(requireActivity().getClass().getName() + " must implement " + FragmentCommunicator.class.getName());
-        }
+        }*/
 
         initKeysAdapter();
         initViewModel();

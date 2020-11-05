@@ -1,51 +1,33 @@
 package blagodarie.rating.ui.user.operations;
 
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.navigation.Navigation;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.squareup.picasso.Picasso;
-
-import java.util.UUID;
 
 import blagodarie.rating.R;
 import blagodarie.rating.databinding.OperationItemBinding;
 import blagodarie.rating.model.IDisplayOperation;
 
-final class OperationsAdapter
+public final class OperationsAdapter
         extends PagedListAdapter<IDisplayOperation, OperationsAdapter.OperationViewHolder> {
 
-    interface UserActionListener {
-        void onOperationClick (@NonNull final UUID userId);
-
-        void onThanksClick (@NonNull final UUID userIdTo);
-    }
-
-    @NonNull
-    private final UserActionListener mUserActionListener;
-
-    @NonNull
-    private final OperationsViewModel mOperationsViewModel;
-
-    protected OperationsAdapter (
-            @NonNull final UserActionListener userActionListener,
-            @NonNull final OperationsViewModel operationsViewModel
-    ) {
+    public OperationsAdapter () {
         super(DIFF_CALLBACK);
-        mUserActionListener = userActionListener;
-        mOperationsViewModel = operationsViewModel;
     }
 
     @NonNull
     @Override
     public OperationViewHolder onCreateViewHolder (
             @NonNull ViewGroup parent,
-            int viewType) {
+            int viewType
+    ) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         final OperationItemBinding binding = DataBindingUtil.inflate(inflater, R.layout.operation_item, parent, false);
         return new OperationsAdapter.OperationViewHolder(binding);
@@ -59,7 +41,7 @@ final class OperationsAdapter
     ) {
         final IDisplayOperation operation = getItem(position);
         if (operation != null) {
-            holder.bind(operation, mUserActionListener, mOperationsViewModel);
+            holder.bind(operation);
         }
     }
 
@@ -75,16 +57,12 @@ final class OperationsAdapter
         }
 
         void bind (
-                @NonNull final IDisplayOperation operation,
-                @NonNull final UserActionListener userActionListener,
-                @NonNull final OperationsViewModel viewModel
+                @NonNull final IDisplayOperation operation
         ) {
-            itemView.setOnClickListener(view -> userActionListener.onOperationClick(operation.getUserIdFrom()));
-            mBinding.setViewModel(viewModel);
+            itemView.setOnClickListener(view -> Navigation.findNavController(itemView).navigate(Uri.parse(mBinding.getRoot().getContext().getString(R.string.url_profile, operation.getUserIdFrom().toString()))));
             mBinding.setOperation(operation);
             mBinding.setOperationName(mBinding.getRoot().getContext().getString(operation.getOperationType().getNameResId()));
-            mBinding.fabThanks.setOnClickListener(view -> userActionListener.onThanksClick(operation.getUserIdFrom()));
-            Picasso.get().load(operation.getPhoto()).into(mBinding.ivPhoto);
+            mBinding.setPhotoUrl(operation.getPhoto());
         }
     }
 

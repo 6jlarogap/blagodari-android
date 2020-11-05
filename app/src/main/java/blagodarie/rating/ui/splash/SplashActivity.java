@@ -26,7 +26,7 @@ public final class SplashActivity
         extends AppCompatActivity
         implements AccountProvider.OnAccountSelectListener {
 
-    private static final String TAG = SplashActivity.class.getSimpleName();
+    private static final String TAG = _SplashActivity.class.getSimpleName();
 
     private AccountManager mAccountManager;
 

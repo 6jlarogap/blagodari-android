@@ -11,12 +11,12 @@ android {
         applicationId "blagodarie.rating"
         minSdkVersion 19
         targetSdkVersion 30
-        versionCode 34
-        versionName "0.0.34"
+        versionCode 35
+        versionName "0.0.35"
 
         project.ext.set("archivesBaseName", "rating-" + defaultConfig.versionName)
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        multiDexEnabled false
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -26,20 +26,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
             manifestPlaceholders = [hostName: "blagodarie.org"]
-
-            resValue "string", "file_provider_authorities", "blagodarie.rating.files"
         }
         debug {
             debuggable true
             applicationIdSuffix ".dbg"
 
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
             manifestPlaceholders = [hostName: "dev.blagodarie.org"]
-
-            resValue "string", "file_provider_authorities", "blagodarie.rating.dbg.files"
         }
     }
 

@@ -28,7 +28,8 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".ui.splash.SplashActivity"
+            android:name=".ui.splash._SplashActivity"
+            android:noHistory="true"
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
             <intent-filter>
@@ -38,27 +39,14 @@
         </activity>
 
         <activity
-            android:name=".ui.pay.PayActivity"
-            android:screenOrientation="portrait" />
+            android:name=".ui.MainActivity"
+            android:screenOrientation="portrait">
+            <nav-graph android:value="@navigation/main_activity" />
+        </activity>
 
         <activity
-            android:name=".ui.wishes.WishActivity"
-            android:screenOrientation="portrait">
-            <intent-filter
-                android:autoVerify="true"
-                tools:targetApi="m">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="${hostName}"
-                    android:pathPrefix="/wish"
-                    android:scheme="https" />
-            </intent-filter>
-
-        </activity>
+            android:name=".ui.pay.PayActivity"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".ui.wishes.EditWishActivity"
@@ -84,7 +72,7 @@
 
                 <data
                     android:host="${hostName}"
-                    android:pathPrefix="/profile"
+                    android:pathPrefix="/profile_"
                     android:scheme="https" />
             </intent-filter>
         </activity>

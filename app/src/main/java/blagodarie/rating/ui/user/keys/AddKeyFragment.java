@@ -92,9 +92,9 @@ public final class AddKeyFragment
             throw new ClassCastException(requireActivity().getClass().getName() + " must implement " + FragmentCommunicator.class.getName());
         }
 
-        final AddKeyFragmentArgs args = AddKeyFragmentArgs.fromBundle(requireArguments());
+        /*final AddKeyFragmentArgs args = AddKeyFragmentArgs.fromBundle(requireArguments());
 
-        mAccount = args.getAccount();
+        mAccount = args.getAccount();*/
     }
 
     @Override

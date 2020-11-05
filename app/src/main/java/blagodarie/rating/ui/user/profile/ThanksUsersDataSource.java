@@ -12,7 +12,7 @@ import blagodarie.rating.server.GetThanksUsersRequest;
 import blagodarie.rating.server.GetThanksUsersResponse;
 import blagodarie.rating.server.ServerApiClient;
 
-final class ThanksUsersDataSource
+public final class ThanksUsersDataSource
         extends PositionalDataSource<GetThanksUsersResponse.ThanksUser> {
 
     private static final String TAG = ThanksUsersDataSource.class.getSimpleName();
@@ -59,13 +59,13 @@ final class ThanksUsersDataSource
         }
     }
 
-    static class ThanksUserDataSourceFactory
+    public static class ThanksUserDataSourceFactory
             extends Factory<Integer, GetThanksUsersResponse.ThanksUser> {
 
         @NonNull
         private final UUID mUserId;
 
-        ThanksUserDataSourceFactory (
+        public ThanksUserDataSourceFactory (
                 @NonNull final UUID userId
         ) {
             mUserId = userId;
