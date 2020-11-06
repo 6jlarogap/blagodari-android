@@ -8,12 +8,11 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.databinding.Observable
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -25,8 +24,6 @@ import blagodarie.rating.repository.AsyncServerRepository
 import blagodarie.rating.server.BadAuthorizationTokenException
 import blagodarie.rating.ui.AccountProvider
 import blagodarie.rating.ui.AccountSource
-import blagodarie.rating.ui.wishes.WishFragmentArgs
-import blagodarie.rating.ui.wishes.WishFragmentDirections
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.WriterException
@@ -45,7 +42,17 @@ class WishFragment : Fragment() {
 
     private lateinit var mWishId: UUID
 
+    private var mMiEdit: MenuItem? = null
+
+    private var mMiDelete: MenuItem? = null
+
     private val mAsyncRepository = AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread())
+
+    private val mIsOwnObserver = object : Observable.OnPropertyChangedCallback() {
+        override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
+            updateMenuItemsVisibility()
+        }
+    }
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -53,6 +60,7 @@ class WishFragment : Fragment() {
             savedInstanceState: Bundle?
     ): View {
         Log.d(TAG, "onCreateView")
+        setHasOptionsMenu(true)
         initBinding(inflater, container)
         return mBinding.root
     }
@@ -67,6 +75,7 @@ class WishFragment : Fragment() {
     }
 
     private fun initWishId() {
+        Log.d(TAG, "initWishId")
         val args = WishFragmentArgs.fromBundle(requireArguments())
         mWishId = UUID.fromString(args.wishUuid)
     }
@@ -90,6 +99,42 @@ class WishFragment : Fragment() {
         }
     }
 
+    override fun onDestroyView() {
+        Log.d(TAG, "onDestroyView")
+        super.onDestroyView()
+        mViewModel.isOwn.removeOnPropertyChangedCallback(mIsOwnObserver)
+        mViewModel.discardValues()
+    }
+
+    override fun onCreateOptionsMenu(
+            menu: Menu,
+            inflater: MenuInflater
+    ) {
+        Log.d(TAG, "onCreateOptionsMenu")
+        super.onCreateOptionsMenu(menu, inflater)
+        requireActivity().menuInflater.inflate(R.menu.wish_fragment, menu)
+        mMiEdit = menu.findItem(R.id.miEdit)
+        mMiDelete = menu.findItem(R.id.miDelete)
+        updateMenuItemsVisibility()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Log.d(TAG, "onOptionsItemSelected")
+        when (item.itemId) {
+            R.id.miEdit -> {
+                val action = WishFragmentDirections.actionWishFragmentToEditWishFragment(mViewModel.wish.get() as Wish)
+                NavHostFragment.findNavController(this).navigate(action)
+            }
+            R.id.miDelete -> {
+                showDeleteWishConfirmDialog()
+            }
+            else -> {
+                throw IllegalArgumentException("Unknown menu item")
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     private fun initBinding(
             inflater: LayoutInflater,
             container: ViewGroup?
@@ -101,15 +146,7 @@ class WishFragment : Fragment() {
     private fun initViewModel() {
         Log.d(TAG, "initViewModel")
         mViewModel = ViewModelProvider(requireActivity()).get(WishViewModel::class.java)
-        mViewModel.qrCode.set(createQrCodeBitmap())
-        mViewModel.account.observe(requireActivity()) {
-            mViewModel.isOwn.set(it != null && it.name == mViewModel.wish.get()?.ownerUuid.toString())
-        }
-        mViewModel.wish.addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
-            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-                mViewModel.isOwn.set(mViewModel.account.value != null && mViewModel.account.value!!.name == mViewModel.wish.get()?.ownerUuid.toString())
-            }
-        })
+        mViewModel.isOwn.addOnPropertyChangedCallback(mIsOwnObserver)
     }
 
     private fun setupBinding() {
@@ -118,41 +155,64 @@ class WishFragment : Fragment() {
         mBinding.refreshListener = SwipeRefreshLayout.OnRefreshListener {
             downloadWish()
         }
-        mBinding.btnEdit.setOnClickListener {
-            val action = WishFragmentDirections.actionWishFragmentToEditWishFragment(mViewModel.wish.get() as Wish)
-            NavHostFragment.findNavController(this).navigate(action)
-        }
-        mBinding.btnDelete.setOnClickListener {
-            showDeleteWishConfirmDialog()
+    }
+
+    private fun updateMenuItemsVisibility() {
+        Log.d(TAG, "updateMenuItemsVisibility")
+        mMiEdit?.isVisible = mViewModel.isOwn.get()
+        mMiDelete?.isVisible = mViewModel.isOwn.get()
+    }
+
+    private fun downloadWish() {
+        Log.d(TAG, "downloadWish")
+        mViewModel.downloadInProgress.set(true)
+        mAsyncRepository.getWish(
+                mWishId,
+                {
+                    mViewModel.wishLiveData.value = it
+                    mViewModel.downloadInProgress.set(false)
+                }
+        ) {
+            Log.e(TAG, Log.getStackTraceString(it))
+            mViewModel.downloadInProgress.set(false)
         }
     }
 
     private fun showDeleteWishConfirmDialog() {
+        Log.d(TAG, "showDeleteWishConfirmDialog")
         AlertDialog.Builder(requireContext()).setMessage(R.string.qstn_delete_wish).setPositiveButton(
                 R.string.btn_delete
         ) { _: DialogInterface, _: Int ->
-            attemptToDeleteWish()
+            deleteWish()
         }.setNegativeButton(
                 R.string.btn_cancel,
                 null).show()
     }
 
-    private fun attemptToDeleteWish() {
+    private fun deleteWish() {
+        Log.d(TAG, "deleteWish")
         AccountSource.getAccount(
                 requireActivity(),
                 true
         ) { account: Account? ->
             if (account != null) {
-                AccountProvider.getAuthToken(
-                        requireActivity(),
-                        account
-                ) { authToken: String? ->
-                    if (authToken != null) {
-                        deleteWish(authToken)
-                    } else {
-                        Toast.makeText(requireContext(), R.string.info_msg_need_log_in, Toast.LENGTH_LONG).show()
-                    }
-                }
+                deleteWish(account)
+            }
+        }
+    }
+
+    private fun deleteWish(
+            account: Account
+    ) {
+        Log.d(TAG, "deleteWish account=$account")
+        AccountProvider.getAuthToken(
+                requireActivity(),
+                account
+        ) { authToken: String? ->
+            if (authToken != null) {
+                deleteWish(authToken)
+            } else {
+                Toast.makeText(requireContext(), R.string.info_msg_need_log_in, Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -160,6 +220,7 @@ class WishFragment : Fragment() {
     private fun deleteWish(
             authToken: String
     ) {
+        Log.d(TAG, "deleteWish authToken=$authToken")
         mAsyncRepository.setAuthToken(authToken)
         mAsyncRepository.deleteWish(
                 mWishId,
@@ -170,54 +231,11 @@ class WishFragment : Fragment() {
         ) { throwable: Throwable ->
             if (throwable is BadAuthorizationTokenException) {
                 AccountManager.get(requireContext()).invalidateAuthToken(getString(R.string.account_type), authToken)
-                attemptToDeleteWish()
+                deleteWish()
             } else {
                 Log.e(TAG, Log.getStackTraceString(throwable))
                 Toast.makeText(requireContext(), throwable.message, Toast.LENGTH_LONG).show()
             }
-        }
-    }
-
-    private fun createQrCodeBitmap(): Bitmap {
-        Log.d(TAG, "createQrCodeBitmap")
-        val width = 500
-        val height = 500
-        val result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        val writer = QRCodeWriter()
-        val hints: MutableMap<EncodeHintType, Any?> = EnumMap(EncodeHintType::class.java)
-        hints[EncodeHintType.CHARACTER_SET] = "UTF-8"
-        hints[EncodeHintType.MARGIN] = 0 // default = 4
-        try {
-            val bitMatrix = writer.encode(
-                    getString(R.string.url_wish, mWishId),
-                    BarcodeFormat.QR_CODE,
-                    width,
-                    height,
-                    hints
-            )
-            for (x in 0 until width) {
-                for (y in 0 until height) {
-                    result.setPixel(x, y, if (bitMatrix[x, y]) Color.BLACK else Color.TRANSPARENT)
-                }
-            }
-        } catch (e: WriterException) {
-            Log.e(TAG, Log.getStackTraceString(e))
-        }
-        return result
-    }
-
-    private fun downloadWish() {
-        Log.d(TAG, "downloadWish")
-        mViewModel.downloadInProgress.set(true)
-        mAsyncRepository.getWish(
-                mWishId,
-                {
-                    mViewModel.wish.set(it)
-                    mViewModel.downloadInProgress.set(false)
-                }
-        ) {
-            Log.e(TAG, Log.getStackTraceString(it))
-            mViewModel.downloadInProgress.set(false)
         }
     }
 }

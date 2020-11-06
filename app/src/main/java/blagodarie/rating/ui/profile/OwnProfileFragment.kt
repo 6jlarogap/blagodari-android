@@ -106,6 +106,7 @@ class OwnProfileFragment : Fragment() {
     }
 
     override fun onResume() {
+        Log.d(TAG, "onResume")
         super.onResume()
         AccountSource.getAccount(
                 requireActivity(),
@@ -154,7 +155,6 @@ class OwnProfileFragment : Fragment() {
         mBinding.viewModel = mViewModel
     }
 
-
     override fun onCreateOptionsMenu(
             menu: Menu,
             inflater: MenuInflater
@@ -175,7 +175,6 @@ class OwnProfileFragment : Fragment() {
         }
         return super.onOptionsItemSelected(item)
     }
-
 
     private fun createQrCodeBitmap(
             userId: UUID

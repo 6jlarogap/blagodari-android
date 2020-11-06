@@ -13,6 +13,7 @@ import java.util.UUID;
 
 import blagodarie.rating.model.entities.Wish;
 import okhttp3.Request;
+import okhttp3.Response;
 
 public final class GetWishInfoRequest
         extends ServerApiRequest<GetWishInfoResponse> {
@@ -46,5 +47,13 @@ public final class GetWishInfoRequest
         final String text = json.getString("text");
         final long timestamp = json.getLong("last_edit");
         return new GetWishInfoResponse(new Wish(mWishId, ownerUuid, text, new Date(timestamp)));
+    }
+
+
+    @Override
+    protected GetWishInfoResponse parse400Response (
+            @NonNull final Response response
+    ) {
+        return new GetWishInfoResponse(null);
     }
 }

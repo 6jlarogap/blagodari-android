@@ -18,6 +18,4 @@ public interface IWish
 
     @NonNull
     Date getLastEdit ();
-
-    void setLastEdit (@NonNull final Date lastEdit);
 }

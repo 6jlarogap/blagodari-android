@@ -12,6 +12,8 @@ import blagodarie.rating.model.IWish;
 public final class Wish
         implements IWish, Serializable {
 
+    public static final Wish EMPTY_WISH = new Wish(UUID.fromString("00000000-0000-0000-0000-000000000000"), UUID.fromString("00000000-0000-0000-0000-000000000000"), "", new Date(0));
+
     @NonNull
     private final UUID mUuid;
 
