@@ -2,8 +2,6 @@ package blagodarie.rating.ui.profile;
 
 public interface ProfileUserActionListener {
 
-    void onShareClick ();
-
     void onTrustClick();
 
     void onMistrustClick();

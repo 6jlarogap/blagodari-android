@@ -9,12 +9,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
@@ -70,6 +74,7 @@ public final class ProfileFragment
             @Nullable final Bundle savedInstanceState
     ) {
         Log.d(TAG, "onCreateView");
+        setHasOptionsMenu(true);
         initBinding(inflater, container);
         return mBinding.getRoot();
     }
@@ -134,6 +139,7 @@ public final class ProfileFragment
         mBinding = null;
     }
 
+
     private void initBinding (
             @NonNull final LayoutInflater inflater,
             @Nullable final ViewGroup container
@@ -160,6 +166,30 @@ public final class ProfileFragment
         mBinding.rvThanksUsers.setLayoutManager(new GridAutofitLayoutManager(requireContext(), (int) ((getResources().getDimension(R.dimen.thanks_user_photo_width) + (getResources().getDimension(R.dimen.thanks_user_photo_margin) * 2)))));
         mBinding.rvThanksUsers.setAdapter(mThanksUsersAdapter);
         mBinding.setViewModel(mViewModel);
+    }
+
+    @Override
+    public void onCreateOptionsMenu (
+            @NonNull final Menu menu,
+            @NonNull final MenuInflater inflater
+    ) {
+        Log.d(TAG, "onCreateOptionsMenu");
+        super.onCreateOptionsMenu(menu, inflater);
+        requireActivity().getMenuInflater().inflate(R.menu.profile_fragment, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected (MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.miShare: {
+                share();
+                break;
+            }
+            default: {
+                throw new IllegalArgumentException("Unknown menu item");
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @NonNull
@@ -239,9 +269,8 @@ public final class ProfileFragment
         mViewModel.getThanksUsers().observe(requireActivity(), mThanksUsersAdapter::submitList);
     }
 
-    @Override
-    public void onShareClick () {
-        Log.d(TAG, "onShareClick");
+    public void share () {
+        Log.d(TAG, "share");
         final Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.url_profile, mUserId.toString()));

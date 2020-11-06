@@ -20,7 +20,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/rqst_enter_key"
-                    android:inputType="text" />
+                    android:imeOptions="actionDone"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+                    android:singleLine="true" />
 
             </com.google.android.material.textfield.TextInputLayout>
 

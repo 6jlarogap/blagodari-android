@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,6 +24,7 @@ import blagodarie.rating.repository.AsyncServerRepository;
 import blagodarie.rating.server.BadAuthorizationTokenException;
 import blagodarie.rating.ui.AccountProvider;
 import blagodarie.rating.ui.AccountSource;
+import blagodarie.rating.ui.SoftKeyboardUtilKt;
 
 public final class AddKeyFragment
         extends Fragment {
@@ -38,26 +40,7 @@ public final class AddKeyFragment
 
     private final AsyncServerRepository mAsyncRepository = new AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread());
 
-    private final UserActionListener mUserActionListener = new UserActionListener() {
-        @Override
-        public void onSaveClick () {
-            final String value = mBinding.etValue.getText().toString();
-            if (!value.isEmpty()) {
-                KeyType keyType = KeyType.PHONE;
-                if (mBinding.rbEmail.isChecked()) {
-                    keyType = KeyType.EMAIL;
-                } else if (mBinding.rbCreditCard.isChecked()) {
-                    keyType = KeyType.CREDIT_CARD;
-                } else if (mBinding.rbLink.isChecked()) {
-                    keyType = KeyType.LINK;
-                }
-                final KeyPair keyPair = new KeyPair(value, keyType);
-                attemptToInsertKey(keyPair);
-            } else {
-                mBinding.etValue.setError(getString(R.string.err_msg_required_to_fill));
-            }
-        }
-    };
+    private final UserActionListener mUserActionListener = this::saveKey;
 
     @NotNull
     @Override
@@ -82,9 +65,10 @@ public final class AddKeyFragment
 
     @Override
     public void onActivityCreated (@Nullable final Bundle savedInstanceState) {
+        Log.d(TAG, "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
-
         setupBinding();
+        SoftKeyboardUtilKt.showSoftKeyboard(requireContext(), mBinding.etValue);
     }
 
     @Override
@@ -105,6 +89,33 @@ public final class AddKeyFragment
     private void setupBinding () {
         Log.d(TAG, "setupBinding");
         mBinding.setUserActionListener(mUserActionListener);
+        mBinding.etValue.setOnEditorActionListener((v, actionId, event) -> {
+            boolean handled = false;
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                saveKey();
+                handled = true;
+            }
+            return handled;
+        });
+    }
+
+    private void saveKey () {
+        final String value = mBinding.etValue.getText().toString().trim();
+        if (!value.isEmpty()) {
+            SoftKeyboardUtilKt.hideSoftKeyboard(requireActivity());
+            KeyType keyType = KeyType.PHONE;
+            if (mBinding.rbEmail.isChecked()) {
+                keyType = KeyType.EMAIL;
+            } else if (mBinding.rbCreditCard.isChecked()) {
+                keyType = KeyType.CREDIT_CARD;
+            } else if (mBinding.rbLink.isChecked()) {
+                keyType = KeyType.LINK;
+            }
+            final KeyPair keyPair = new KeyPair(value, keyType);
+            attemptToInsertKey(keyPair);
+        } else {
+            mBinding.etValue.setError(getString(R.string.err_msg_required_to_fill));
+        }
     }
 
     private void attemptToInsertKey (@NonNull final KeyPair keyPair) {
@@ -112,7 +123,9 @@ public final class AddKeyFragment
                 requireActivity(),
                 true,
                 account -> {
-                    AccountProvider.getAuthToken(requireActivity(), account, authToken -> insertKey(authToken, keyPair));
+                    if (account != null) {
+                        AccountProvider.getAuthToken(requireActivity(), account, authToken -> insertKey(authToken, keyPair));
+                    }
                 }
         );
     }
@@ -142,5 +155,4 @@ public final class AddKeyFragment
             Toast.makeText(requireContext(), R.string.info_msg_need_log_in, Toast.LENGTH_LONG).show();
         }
     }
-
 }

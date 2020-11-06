@@ -44,9 +44,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupToolbar() {
         Log.d(TAG, "setupToolbar")
-        setSupportActionBar(findViewById(R.id.toolbar))
+        setSupportActionBar(mBinding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
-        supportActionBar?.setDisplayHomeAsUpEnabled(false)
     }
 
 }

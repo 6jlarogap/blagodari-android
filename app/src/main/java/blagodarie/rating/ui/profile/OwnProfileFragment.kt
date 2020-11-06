@@ -7,9 +7,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -35,7 +33,6 @@ import java.util.*
 class OwnProfileFragment : Fragment() {
 
     interface UserActionListener {
-        fun onShareClick()
         fun onOperationsClick()
         fun onWishesClick()
         fun onAbilitiesClick()
@@ -56,14 +53,6 @@ class OwnProfileFragment : Fragment() {
     private val mAsyncRepository = AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread())
 
     val userActionListener = object : UserActionListener {
-        override fun onShareClick() {
-            Log.d(TAG, "onShareClick")
-            val sendIntent = Intent()
-            sendIntent.action = Intent.ACTION_SEND
-            sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.url_profile, mViewModel.account.get()?.name.toString()))
-            sendIntent.type = "text/plain"
-            startActivity(Intent.createChooser(sendIntent, "Поделиться"))
-        }
 
         override fun onOperationsClick() {
             Log.d(TAG, "onOperationsClick")
@@ -102,6 +91,7 @@ class OwnProfileFragment : Fragment() {
             savedInstanceState: Bundle?
     ): View? {
         Log.d(TAG, "onCreateView")
+        setHasOptionsMenu(true)
         initBinding(inflater, container)
         return mBinding.root
     }
@@ -163,6 +153,29 @@ class OwnProfileFragment : Fragment() {
         mBinding.rvThanksUsers.adapter = mThanksUsersAdapter
         mBinding.viewModel = mViewModel
     }
+
+
+    override fun onCreateOptionsMenu(
+            menu: Menu,
+            inflater: MenuInflater
+    ) {
+        Log.d(TAG, "onCreateOptionsMenu")
+        super.onCreateOptionsMenu(menu, inflater)
+        requireActivity().menuInflater.inflate(R.menu.profile_fragment, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.miShare -> {
+                share()
+            }
+            else -> {
+                throw IllegalArgumentException("Unknown menu item")
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
 
     private fun createQrCodeBitmap(
             userId: UUID
@@ -236,5 +249,14 @@ class OwnProfileFragment : Fragment() {
         Log.d(TAG, "refreshThanksUsers")
         mViewModel.thanksUsers = mAsyncRepository.getLiveDataPagedListFromDataSource(ThanksUserDataSourceFactory(userId))
         mViewModel.thanksUsers?.observe(requireActivity(), androidx.lifecycle.Observer { pagedList: PagedList<ThanksUser?>? -> mThanksUsersAdapter.submitList(pagedList) })
+    }
+
+    private fun share() {
+        Log.d(TAG, "onShareClick")
+        val sendIntent = Intent()
+        sendIntent.action = Intent.ACTION_SEND
+        sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.url_profile, mViewModel.account.get()?.name.toString()))
+        sendIntent.type = "text/plain"
+        startActivity(Intent.createChooser(sendIntent, "Поделиться"))
     }
 }

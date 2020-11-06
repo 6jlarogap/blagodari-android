@@ -105,7 +105,7 @@
     </fragment>
     <fragment
         android:id="@+id/addWishFragment"
-        android:name="blagodarie.rating.ui.AddWishFragment"
+        android:name="blagodarie.rating.ui.wishes.AddWishFragment"
         android:label="AddWishFragment" />
     <fragment
         android:id="@+id/editWishFragment"

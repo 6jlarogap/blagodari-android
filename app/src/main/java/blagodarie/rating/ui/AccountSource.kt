@@ -77,7 +77,7 @@ object AccountSource {
                 ArrayAdapter(
                         context,
                         android.R.layout.simple_list_item_1, names)
-        ) { dialog: DialogInterface?, which: Int ->
+        ) { _: DialogInterface?, which: Int ->
             val sharedPreferences = context.getSharedPreferences(LAST_ACCOUNT_PREFERENCE, Context.MODE_PRIVATE)
             sharedPreferences.edit().putString(LAST_ACCOUNT_NAME, accounts[which].name).apply()
             getAccountListener.onGetAccount(accounts[which])

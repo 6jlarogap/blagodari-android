@@ -5,8 +5,8 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.DialogInterface
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
@@ -96,13 +96,31 @@ class KeysAdapter(
                     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     val etKeyValue = EditText(context)
                     etKeyValue.setText(key.value)
-                    val dialog = AlertDialog.Builder(context).setTitle(R.string.rqst_enter_key).setView(etKeyValue).setPositiveButton(R.string.btn_update, null).setNegativeButton(R.string.btn_cancel) { dialogInterface, i -> imm.hideSoftInputFromWindow(etKeyValue.windowToken, 0) }.create()
+                    etKeyValue.imeOptions = EditorInfo.IME_ACTION_DONE
+                    val dialog = AlertDialog.Builder(context).setTitle(R.string.rqst_enter_key).setView(etKeyValue).setPositiveButton(R.string.btn_update, null).setNegativeButton(R.string.btn_cancel) { _, _ -> imm.hideSoftInputFromWindow(etKeyValue.windowToken, 0) }.create()
                     dialog.show()
-                    dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener { view: View? ->
-                        if (!etKeyValue.text.toString().isEmpty()) {
+                    etKeyValue.isSingleLine = true
+                    etKeyValue.setOnEditorActionListener { _, actionId, _ ->
+                        var handled = false
+                        if (actionId == EditorInfo.IME_ACTION_DONE) {
+                            val value = etKeyValue.text.toString().trim()
+                            if (value.isNotBlank()) {
+                                imm.hideSoftInputFromWindow(etKeyValue.windowToken, 0)
+                                dialog.dismiss()
+                                adapterCommunicator.onEditKey(Key(key.id, key.ownerId, value, key.keyType))
+                            } else {
+                                etKeyValue.error = context.getString(R.string.err_msg_required_to_fill)
+                            }
+                            handled = true
+                        }
+                        handled
+                    }
+                    dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
+                        val value = etKeyValue.text.toString().trim()
+                        if (value.isNotBlank()) {
                             imm.hideSoftInputFromWindow(etKeyValue.windowToken, 0)
                             dialog.dismiss()
-                            adapterCommunicator.onEditKey(Key(key.id, key.ownerId, etKeyValue.text.toString(), key.keyType))
+                            adapterCommunicator.onEditKey(Key(key.id, key.ownerId, value, key.keyType))
                         } else {
                             etKeyValue.error = context.getString(R.string.err_msg_required_to_fill)
                         }
@@ -123,7 +141,7 @@ class KeysAdapter(
 
                 override fun onDeleteClick() {
                     val context: Context = binding.root.context
-                    AlertDialog.Builder(context).setMessage(R.string.qstn_delete_key).setPositiveButton(R.string.btn_yes) { dialogInterface, i -> adapterCommunicator.onDeleteKey(key) }.setNegativeButton(R.string.btn_no, null).create().show()
+                    AlertDialog.Builder(context).setMessage(R.string.qstn_delete_key).setPositiveButton(R.string.btn_yes) { _, _ -> adapterCommunicator.onDeleteKey(key) }.setNegativeButton(R.string.btn_no, null).create().show()
                 }
             }
         }

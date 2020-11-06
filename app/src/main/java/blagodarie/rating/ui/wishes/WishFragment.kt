@@ -130,7 +130,7 @@ class WishFragment : Fragment() {
     private fun showDeleteWishConfirmDialog() {
         AlertDialog.Builder(requireContext()).setMessage(R.string.qstn_delete_wish).setPositiveButton(
                 R.string.btn_delete
-        ) { dialogInterface: DialogInterface, i: Int ->
+        ) { _: DialogInterface, _: Int ->
             attemptToDeleteWish()
         }.setNegativeButton(
                 R.string.btn_cancel,
