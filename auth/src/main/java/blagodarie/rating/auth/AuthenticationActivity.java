@@ -71,12 +71,12 @@ public final class AuthenticationActivity
             final Account[] accounts = AccountManager.get(this).getAccountsByType(getString(R.string.account_type));
             Log.d(TAG, "existing accounts=" + Arrays.toString(accounts));
 
-            /*if (accounts.length > 0) {
+            if (accounts.length > 0) {
                 Toast.makeText(this, R.string.info_msg_one_account_only, Toast.LENGTH_LONG).show();
                 finish();
-            } else {*/
+            } else {
                 toSignUp();
-            //}
+            }
         }
 
     }

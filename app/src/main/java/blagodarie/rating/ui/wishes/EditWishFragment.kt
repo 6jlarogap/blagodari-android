@@ -14,6 +14,7 @@ import blagodarie.rating.AppExecutors
 import blagodarie.rating.R
 import blagodarie.rating.databinding.EditWishFragmentBinding
 import blagodarie.rating.model.IWish
+import blagodarie.rating.model.entities.Wish
 import blagodarie.rating.repository.AsyncServerRepository
 import blagodarie.rating.server.BadAuthorizationTokenException
 import blagodarie.rating.ui.AccountProvider
@@ -105,8 +106,8 @@ class EditWishFragment : Fragment() {
                 true
         ) { account: Account? ->
             if (account != null) {
-                mWish.text = wishText
-                saveWish(mWish, account)
+                val wish = Wish(mWish.id, mWish.ownerId, wishText, mWish.lastEdit)
+                saveWish(wish, account)
             }
         }
     }

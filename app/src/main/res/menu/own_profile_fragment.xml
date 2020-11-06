@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/miShare"
         android:icon="@drawable/share_variant"
         android:title="@string/txt_share"
+        android:visible="false"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/miLogout"
+        android:icon="@drawable/logout"
+        android:title="@string/txt_logout"
+        android:visible="false"
+        app:showAsAction="ifRoom" />
+
 </menu>

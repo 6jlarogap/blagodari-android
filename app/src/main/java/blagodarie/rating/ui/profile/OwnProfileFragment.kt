@@ -1,14 +1,17 @@
 package blagodarie.rating.ui.profile
 
 import android.accounts.Account
+import android.accounts.AccountManager
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Toast
+import androidx.databinding.Observable
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavDirections
@@ -24,10 +27,6 @@ import blagodarie.rating.ui.AccountProvider
 import blagodarie.rating.ui.AccountSource
 import blagodarie.rating.ui.GridAutofitLayoutManager
 import blagodarie.rating.ui.profile.ThanksUsersDataSource.ThanksUserDataSourceFactory
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.EncodeHintType
-import com.google.zxing.WriterException
-import com.google.zxing.qrcode.QRCodeWriter
 import java.util.*
 
 class OwnProfileFragment : Fragment() {
@@ -50,7 +49,20 @@ class OwnProfileFragment : Fragment() {
 
     private lateinit var mThanksUsersAdapter: ThanksUsersAdapter
 
+    private var mMiShare: MenuItem? = null
+
+    private var mMiLogout: MenuItem? = null
+
+    private var mIsFirstAccountRequest = true
+
     private val mAsyncRepository = AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread())
+
+    private val mAccountObserver = object : Observable.OnPropertyChangedCallback() {
+        override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
+            updateMenuItemsVisibility()
+            refreshProfileData()
+        }
+    }
 
     val userActionListener = object : UserActionListener {
 
@@ -110,16 +122,23 @@ class OwnProfileFragment : Fragment() {
         super.onResume()
         AccountSource.getAccount(
                 requireActivity(),
-                true
+                mIsFirstAccountRequest
         ) {
-            if (mViewModel.account.get() != it) {
+            if (mViewModel.account.get() == null && it != null ||
+                    mViewModel.account.get() != null && it == null ||
+                    mViewModel.account.get() != null && it != null && mViewModel.account.get()!! != it) {
                 mViewModel.account.set(it)
-                if (it != null) {
-                    mViewModel.qrCode.set(createQrCodeBitmap(UUID.fromString(it.name)))
-                }
-                refreshProfileData()
             }
         }
+        if (mIsFirstAccountRequest) {
+            mIsFirstAccountRequest = false
+        }
+    }
+
+    override fun onDestroyView() {
+        Log.d(TAG, "onDestroyView")
+        super.onDestroyView()
+        mViewModel.account.removeOnPropertyChangedCallback(mAccountObserver)
     }
 
     private fun initBinding(
@@ -144,6 +163,8 @@ class OwnProfileFragment : Fragment() {
     private fun initViewModel() {
         Log.d(TAG, "initViewModel")
         mViewModel = ViewModelProvider(requireActivity()).get(OwnProfileViewModel::class.java)
+        mViewModel.discardValues()
+        mViewModel.account.addOnPropertyChangedCallback(mAccountObserver)
     }
 
     private fun setupBinding() {
@@ -153,6 +174,18 @@ class OwnProfileFragment : Fragment() {
         mBinding.rvThanksUsers.layoutManager = GridAutofitLayoutManager(requireContext(), (resources.getDimension(R.dimen.thanks_user_photo_width) + resources.getDimension(R.dimen.thanks_user_photo_margin) * 2).toInt())
         mBinding.rvThanksUsers.adapter = mThanksUsersAdapter
         mBinding.viewModel = mViewModel
+        mBinding.btnEnter.setOnClickListener {
+            AccountSource.getAccount(
+                    requireActivity(),
+                    true
+            ) {
+                if (mViewModel.account.get() == null && it != null ||
+                        mViewModel.account.get() != null && it == null ||
+                        mViewModel.account.get() != null && it != null && mViewModel.account.get()!! != it) {
+                    mViewModel.account.set(it)
+                }
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(
@@ -161,13 +194,26 @@ class OwnProfileFragment : Fragment() {
     ) {
         Log.d(TAG, "onCreateOptionsMenu")
         super.onCreateOptionsMenu(menu, inflater)
-        requireActivity().menuInflater.inflate(R.menu.profile_fragment, menu)
+        requireActivity().menuInflater.inflate(R.menu.own_profile_fragment, menu)
+        mMiShare = menu.findItem(R.id.miShare)
+        mMiLogout = menu.findItem(R.id.miLogout)
+        updateMenuItemsVisibility()
+    }
+
+    private fun updateMenuItemsVisibility() {
+        Log.d(TAG, "updateMenuItemsVisibility")
+        mMiShare?.isVisible = mViewModel.account.get() != null
+        mMiLogout?.isVisible = mViewModel.account.get() != null
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Log.d(TAG, "onOptionsItemSelected")
         when (item.itemId) {
             R.id.miShare -> {
                 share()
+            }
+            R.id.miLogout -> {
+                showLogoutConfirmDialog()
             }
             else -> {
                 throw IllegalArgumentException("Unknown menu item")
@@ -176,34 +222,31 @@ class OwnProfileFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun createQrCodeBitmap(
-            userId: UUID
-    ): Bitmap {
-        Log.d(TAG, "createQrCodeBitmap")
-        val width = 500
-        val height = 500
-        val result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        val writer = QRCodeWriter()
-        val hints: MutableMap<EncodeHintType, Any?> = EnumMap(EncodeHintType::class.java)
-        hints[EncodeHintType.CHARACTER_SET] = "UTF-8"
-        hints[EncodeHintType.MARGIN] = 0 // default = 4
-        try {
-            val bitMatrix = writer.encode(
-                    getString(R.string.url_profile, userId.toString()),
-                    BarcodeFormat.QR_CODE,
-                    width,
-                    height,
-                    hints
-            )
-            for (x in 0 until width) {
-                for (y in 0 until height) {
-                    result.setPixel(x, y, if (bitMatrix[x, y]) Color.BLACK else Color.TRANSPARENT)
-                }
-            }
-        } catch (e: WriterException) {
-            Log.e(TAG, Log.getStackTraceString(e))
+    private fun showLogoutConfirmDialog(){
+        AlertDialog.Builder(requireContext()).setMessage(R.string.qstn_realy_logout).setPositiveButton(R.string.btn_yes) { _: DialogInterface, _: Int ->
+            logout()
+        }.setNegativeButton(R.string.btn_no, null).show()
+    }
+
+    private fun logout() {
+        //unSubscribeOnFirebaseNotifications(mAccount.name)
+        mViewModel.discardValues()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            AccountManager.get(requireContext()).removeAccount(
+                    mViewModel.account.get(),
+                    requireActivity(),
+                    {
+                        mViewModel.account.set(null)
+                    },
+                    null)
+        } else {
+            AccountManager.get(requireContext()).removeAccount(
+                    mViewModel.account.get(),
+                    {
+                        mViewModel.account.set(null)
+                    },
+                    null)
         }
-        return result
     }
 
     private fun refreshProfileData() {
@@ -212,7 +255,11 @@ class OwnProfileFragment : Fragment() {
                 requireActivity(),
                 false
         ) { account: Account? ->
-            mViewModel.account.set(account)
+            if (mViewModel.account.get() == null && account != null ||
+                    mViewModel.account.get() != null && account == null ||
+                    mViewModel.account.get() != null && account != null && mViewModel.account.get()!! != account) {
+                mViewModel.account.set(account)
+            }
             if (account != null) {
                 AccountProvider.getAuthToken(
                         requireActivity(),

@@ -24,8 +24,6 @@ import blagodarie.rating.repository.AsyncServerRepository
 import blagodarie.rating.server.BadAuthorizationTokenException
 import blagodarie.rating.ui.AccountProvider
 import blagodarie.rating.ui.AccountSource
-import blagodarie.rating.ui.wishes.WishesFragmentArgs
-import blagodarie.rating.ui.wishes.WishesFragmentDirections
 import java.util.*
 
 class WishesFragment : Fragment() {
@@ -72,24 +70,24 @@ class WishesFragment : Fragment() {
         Log.d(TAG, "onActivityCreated")
         super.onActivityCreated(savedInstanceState)
         initViewModel()
-        initOperationsAdapter()
+        initWishesAdapter()
         setupBinding()
     }
 
     override fun onResume() {
         Log.d(TAG, "onResume")
         super.onResume()
-        refreshOperations()
+        refreshWishes()
         AccountSource.getAccount(
                 requireActivity(),
                 false
         ) {
-            mViewModel.isOwn.set(it != null && it.name == mUserId.toString())
+            mViewModel.account.value = it
         }
     }
 
-    private fun initOperationsAdapter() {
-        Log.d(TAG, "initOperationsAdapter")
+    private fun initWishesAdapter() {
+        Log.d(TAG, "initWishesAdapter")
         mWishesAdapter = WishesAdapter(mViewModel.isOwn, object : WishesAdapter.AdapterCommunicator{
             override fun onDeleteClick(wish: IWish) {
                 showDeleteWishConfirmDialog(wish)
@@ -108,6 +106,8 @@ class WishesFragment : Fragment() {
     private fun initViewModel() {
         Log.d(TAG, "initViewModel")
         mViewModel = ViewModelProvider(requireActivity()).get(WishesViewModel::class.java)
+        mViewModel.discardValues()
+        mViewModel.userId = mUserId
     }
 
     private fun setupBinding() {
@@ -115,7 +115,7 @@ class WishesFragment : Fragment() {
         mBinding.viewModel = mViewModel
         mBinding.list.recyclerView.adapter = mWishesAdapter
         mBinding.refreshListener = SwipeRefreshLayout.OnRefreshListener {
-            refreshOperations()
+            refreshWishes()
         }
         mBinding.userActionListener = object : UserActionListener {
             override fun onAddWishClick() {
@@ -125,12 +125,12 @@ class WishesFragment : Fragment() {
         }
     }
 
-    private fun refreshOperations() {
-        Log.d(TAG, "refreshOperations")
+    private fun refreshWishes() {
+        Log.d(TAG, "refreshWishes")
         mViewModel.downloadInProgress.set(true)
         mViewModel.wishes = mAsyncRepository.getLiveDataPagedListFromDataSource(WishesDataSource.WishesDataSourceFactory(mUserId))
-        mViewModel.wishes?.observe(requireActivity()) { pagedList: PagedList<IWish?>? ->
-            mViewModel.isEmpty.set(pagedList?.isEmpty() ?: true)
+        mViewModel.wishes.observe(requireActivity()) { pagedList: PagedList<IWish?> ->
+            mViewModel.isEmpty.set(pagedList.isEmpty())
             mWishesAdapter.submitList(pagedList)
             mViewModel.downloadInProgress.set(false)
         }
@@ -179,7 +179,7 @@ class WishesFragment : Fragment() {
                 wish.id,
                 {
                     Toast.makeText(requireContext(), R.string.info_msg_wish_deleted, Toast.LENGTH_LONG).show()
-                    refreshOperations()
+                    refreshWishes()
                 }
         ) { throwable: Throwable ->
             if (throwable is BadAuthorizationTokenException) {

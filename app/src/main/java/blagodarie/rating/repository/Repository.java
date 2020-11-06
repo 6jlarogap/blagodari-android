@@ -16,7 +16,6 @@ import blagodarie.rating.model.IProfile;
 import blagodarie.rating.model.IWish;
 import blagodarie.rating.model.entities.OperationToAnyText;
 import blagodarie.rating.model.entities.OperationToUser;
-import blagodarie.rating.model.entities.Wish;
 import blagodarie.rating.server.HttpException;
 
 public interface Repository {

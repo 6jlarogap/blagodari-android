@@ -9,8 +9,6 @@ import org.json.JSONException;
 import java.util.Locale;
 import java.util.UUID;
 
-import blagodarie.rating.model.IKey;
-import blagodarie.rating.model.IWish;
 import okhttp3.Request;
 
 public class DeleteWishRequest

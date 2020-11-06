@@ -13,10 +13,10 @@ import blagodarie.rating.model.entities.Wish
 import blagodarie.rating.ui.createQrCodeBitmap
 
 class WishViewModel(application: Application) : AndroidViewModel(application) {
+    val isOwn = ObservableBoolean(false)
+    val downloadInProgress = ObservableBoolean(false)
     val wish = ObservableField<IWish>(Wish.EMPTY_WISH)
     val qrCode = ObservableField<Bitmap>()
-    val downloadInProgress = ObservableBoolean(false)
-    val isOwn = ObservableBoolean(false)
     val account = MutableLiveData<Account?>()
     val wishLiveData = MutableLiveData<IWish?>()
 
@@ -34,7 +34,7 @@ class WishViewModel(application: Application) : AndroidViewModel(application) {
     private fun isOwnWish(
             account: Account?,
             wish: IWish?
-    ) = account != null && account.name == wish?.ownerUuid.toString()
+    ) = account != null && account.name == wish?.ownerId.toString()
 
     fun discardValues() {
         wish.set(Wish.EMPTY_WISH)

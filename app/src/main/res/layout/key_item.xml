@@ -33,6 +33,7 @@
                     android:layout_gravity="center_vertical"
                     android:onClick="@{() -> UserActionListener.onDeleteClick()}"
                     android:src="@drawable/delete"
+                    android:tint="@android:color/black"
                     android:visibility="@{isOwn ? View.VISIBLE : View.GONE}" />
 
                 <androidx.appcompat.widget.AppCompatImageButton
@@ -41,6 +42,7 @@
                     android:layout_gravity="center_vertical"
                     android:onClick="@{() -> UserActionListener.onEditClick()}"
                     android:src="@drawable/pencil"
+                    android:tint="@android:color/black"
                     android:visibility="@{isOwn ? View.VISIBLE : View.GONE}" />
 
                 <androidx.appcompat.widget.AppCompatImageButton

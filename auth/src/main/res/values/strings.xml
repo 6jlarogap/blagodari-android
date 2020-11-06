@@ -4,7 +4,7 @@
     <string name="token_type">token_type</string>
     <string name="oauth2_client_id" tools:ignore="TypographyDashes">404507462751-5a4j37k4o6nnvlnuof95tl68j30c151p.apps.googleusercontent.com</string>
 
-    <string name="info_msg_one_account_only">Нельзя добавить больше аккаунтов</string>
+    <string name="info_msg_one_account_only">У вас уже есть аккаунт</string>
     <string name="info_msg_update_data_complete">Данные обновлены</string>
     <string name="info_msg_saved">Сохранено</string>
 

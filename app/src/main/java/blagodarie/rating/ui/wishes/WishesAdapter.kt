@@ -28,14 +28,14 @@ class WishesAdapter(
                     oldItem: IWish,
                     newItem: IWish
             ): Boolean {
-                return false
+                return oldItem.id == newItem.id
             }
 
             override fun areContentsTheSame(
                     oldItem: IWish,
                     newItem: IWish
             ): Boolean {
-                return false
+                return oldItem == newItem
             }
         }
     }

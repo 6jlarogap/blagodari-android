@@ -4,30 +4,23 @@ import android.accounts.Account
 import android.accounts.AccountManager
 import android.app.AlertDialog
 import android.content.DialogInterface
-import android.graphics.Bitmap
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.databinding.Observable
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import blagodarie.rating.AppExecutors
 import blagodarie.rating.R
 import blagodarie.rating.databinding.WishFragmentBinding
-import blagodarie.rating.model.entities.Wish
 import blagodarie.rating.repository.AsyncServerRepository
 import blagodarie.rating.server.BadAuthorizationTokenException
 import blagodarie.rating.ui.AccountProvider
 import blagodarie.rating.ui.AccountSource
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.EncodeHintType
-import com.google.zxing.WriterException
-import com.google.zxing.qrcode.QRCodeWriter
+import blagodarie.rating.model.entities.Wish
 import java.util.*
 
 class WishFragment : Fragment() {
@@ -103,7 +96,6 @@ class WishFragment : Fragment() {
         Log.d(TAG, "onDestroyView")
         super.onDestroyView()
         mViewModel.isOwn.removeOnPropertyChangedCallback(mIsOwnObserver)
-        mViewModel.discardValues()
     }
 
     override fun onCreateOptionsMenu(
@@ -146,6 +138,7 @@ class WishFragment : Fragment() {
     private fun initViewModel() {
         Log.d(TAG, "initViewModel")
         mViewModel = ViewModelProvider(requireActivity()).get(WishViewModel::class.java)
+        mViewModel.discardValues()
         mViewModel.isOwn.addOnPropertyChangedCallback(mIsOwnObserver)
     }
 

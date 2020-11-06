@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 
 import blagodarie.rating.model.IWish;
-import blagodarie.rating.model.entities.Wish;
 
 public final class GetUserWishesResponse
         extends _ServerApiResponse {

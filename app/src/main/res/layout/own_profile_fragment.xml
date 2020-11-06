@@ -7,10 +7,11 @@
         android:layout_height="match_parent">
 
         <Button
+            android:id="@+id/btnEnter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/btn_enter"
+            android:text="@string/btn_create_account"
             android:visibility="@{ViewModel.account == null ? View.VISIBLE : View.GONE}" />
 
         <androidx.coordinatorlayout.widget.CoordinatorLayout

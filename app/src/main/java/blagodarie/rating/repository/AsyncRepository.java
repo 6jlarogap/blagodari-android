@@ -6,9 +6,6 @@ import androidx.lifecycle.LiveData;
 import androidx.paging.DataSource;
 import androidx.paging.PagedList;
 
-import org.json.JSONException;
-
-import java.io.IOException;
 import java.util.UUID;
 
 import blagodarie.rating.model.IAbility;
@@ -19,7 +16,6 @@ import blagodarie.rating.model.IProfile;
 import blagodarie.rating.model.IWish;
 import blagodarie.rating.model.entities.OperationToAnyText;
 import blagodarie.rating.model.entities.OperationToUser;
-import blagodarie.rating.server.HttpException;
 
 public interface AsyncRepository {
 

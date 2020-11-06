@@ -131,12 +131,13 @@ public enum UpdateManager {
                         onOkClickListener).
                 setNegativeButton(
                         android.R.string.cancel,
-                        (dialogInterface, i) -> context.getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).
-                                edit().
-                                putInt(String.valueOf(mLastResponse.getVersionCode()), mLastResponse.getVersionCode()).
-                                apply()).
+                        null).
                 create().
                 show();
+        context.getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).
+                edit().
+                putInt(String.valueOf(mLastResponse.getVersionCode()), mLastResponse.getVersionCode()).
+                apply();
     }
 
     private void startUpdate (

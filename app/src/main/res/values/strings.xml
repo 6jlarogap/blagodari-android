@@ -42,7 +42,7 @@
     <string name="btn_yes">Да</string>
     <string name="btn_no">Нет</string>
     <string name="btn_settings">Настройки</string>
-    <string name="btn_enter">Войти</string>
+    <string name="btn_create_account">Создать аккаунт</string>
 
     <string name="rqst_choose_account">Выберите аккаунт</string>
     <string name="rqst_scan_qr_code">Отсканируйте QR-код</string>
@@ -76,6 +76,7 @@
     <string name="qstn_want_load_new_version">Желаете загрузить новую версию %d?</string>
     <string name="qstn_delete_key">Удалить ключ?</string>
     <string name="qstn_delete_wish">Удалить желание?</string>
+    <string name="qstn_realy_logout">Вы действительно хотите выйти?</string>
 
     <string name="err_msg_account_not_created">Аккаунт не был создан</string>
     <string name="err_msg_authentication_error">Ошибка аутентификации</string>
