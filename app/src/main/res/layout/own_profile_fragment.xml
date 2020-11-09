@@ -133,9 +133,19 @@
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_margin="5dp"
+            android:textSize="12sp"
+            android:text="@{String.format(@string/txt_version, BuildConfig.VERSION_NAME)}" />
+
     </FrameLayout>
 
     <data>
+
+        <import type="blagodarie.rating.BuildConfig" />
 
         <import type="android.view.View" />
 

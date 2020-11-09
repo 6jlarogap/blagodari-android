@@ -7,16 +7,6 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/etFilter"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:autofillHints="@string/rqst_enter_name"
-            android:drawableStart="@drawable/magnify"
-            android:hint="@string/rqst_enter_name"
-            android:inputType="textPersonName"
-            android:singleLine="true" />
-
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/srlRefreshProfileInfo"
             onRefresh="@{() -> UserActionListener.onSwipeRefresh()}"

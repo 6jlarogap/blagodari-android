@@ -15,7 +15,7 @@ import blagodarie.rating.R;
 import blagodarie.rating.databinding.UserItemBinding;
 import blagodarie.rating.model.IProfile;
 
-public class PeopleAdapter
+public final class PeopleAdapter
         extends PagedListAdapter<IProfile, PeopleAdapter.UserViewHolder> {
 
     public interface UserActionListener {

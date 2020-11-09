@@ -6,6 +6,7 @@
         android:id="@+id/miSearch"
         android:icon="@drawable/account_search"
         android:title="@string/txt_search"
-        app:showAsAction="ifRoom" />
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="always|collapseActionView" />
 
 </menu>

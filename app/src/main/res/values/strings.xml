@@ -100,7 +100,7 @@
     <string name="txt_card_number">Номер карты</string>
     <string name="txt_thanks_and_thanked_users">Поблагодарившие и отблагодаренные</string>
     <string name="txt_thanks_users">Поблагодарившие</string>
-    <string name="txt_version">Версия: %s</string>
+    <string name="txt_version">v %s</string>
     <string name="txt_share">Поделиться</string>
     <string name="txt_my_account">Мой профиль</string>
     <string name="txt_logout">Выйти из аккаунта</string>
