@@ -58,6 +58,7 @@
     <string name="info_msg_update_available">Доступна новая версия</string>
     <string name="info_msg_cant_add_operation_to_own_profile">Нельзя выполнить эту операцию для собственного профиля.</string>
     <string name="info_msg_need_log_in">Необходимо авторизоваться</string>
+    <string name="info_msg_cant_thanks_yourself">Нельзя благодарить себя</string>
     <string name="info_msg_missing_profile">Такого профиля не существует</string>
     <string name="info_msg_missing_wish">Такого желания не существует</string>
     <string name="info_msg_need_read_contacts_permission">Необходимо разрешение на чтение контактов</string>

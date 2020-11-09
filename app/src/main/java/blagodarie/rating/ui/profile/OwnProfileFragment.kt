@@ -223,13 +223,14 @@ class OwnProfileFragment : Fragment() {
     }
 
     private fun showLogoutConfirmDialog(){
+        Log.d(TAG, "showLogoutConfirmDialog")
         AlertDialog.Builder(requireContext()).setMessage(R.string.qstn_realy_logout).setPositiveButton(R.string.btn_yes) { _: DialogInterface, _: Int ->
             logout()
         }.setNegativeButton(R.string.btn_no, null).show()
     }
 
     private fun logout() {
-        //unSubscribeOnFirebaseNotifications(mAccount.name)
+        Log.d(TAG, "logout")
         mViewModel.discardValues()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
             AccountManager.get(requireContext()).removeAccount(

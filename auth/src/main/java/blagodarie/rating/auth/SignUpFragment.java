@@ -135,6 +135,7 @@ public final class SignUpFragment
         userData.putString(AccountGeneral.USER_DATA_PHOTO, photo);
         accountManager.addAccountExplicitly(account, "", userData);
         accountManager.setAuthToken(account, getString(R.string.token_type), authToken);
+        FirebaseNotificationKt.subscribeOnFirebaseNotifications(userId.toString());
 
         final Bundle bundle = new Bundle();
         bundle.putString(AccountManager.KEY_ACCOUNT_NAME, accountName);

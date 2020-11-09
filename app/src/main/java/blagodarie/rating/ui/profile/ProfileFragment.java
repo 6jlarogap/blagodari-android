@@ -18,7 +18,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
@@ -124,9 +123,15 @@ public final class ProfileFragment
                 requireActivity(),
                 false,
                 account -> {
-                    if (account == null && mLastAccount != null ||
-                            account != null && !account.equals(mLastAccount)) {
-                        refreshProfileData();
+                    if (account != null && account.name.equals(mUserId.toString())) {
+                        NavHostFragment.findNavController(this).popBackStack();
+                        NavHostFragment.findNavController(this).navigate(R.id.global_action_to_user);
+                    } else {
+                        if (account == null && mLastAccount != null ||
+                                account != null && !account.equals(mLastAccount)) {
+                            mLastAccount = account;
+                            refreshProfileData();
+                        }
                     }
                 }
         );
@@ -156,6 +161,7 @@ public final class ProfileFragment
     private void initViewModel () {
         Log.d(TAG, "initViewModel");
         mViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
+        mViewModel.discardValues();
         mViewModel.getQrCode().set(createQrCodeBitmap());
     }
 
@@ -304,33 +310,37 @@ public final class ProfileFragment
                 account -> {
                     mLastAccount = account;
                     if (account != null) {
-                        AccountProvider.getAuthToken(requireActivity(), account, authToken -> {
-                            if (authToken != null) {
-                                mAsyncRepository.setAuthToken(authToken);
-                                new OperationToUserManager().
-                                        createOperationToUser(
-                                                requireActivity(),
-                                                UUID.fromString(account.name),
-                                                mUserId,
-                                                operationType,
-                                                mAsyncRepository,
-                                                () -> {
-                                                    Toast.makeText(requireContext(), R.string.info_msg_saved, Toast.LENGTH_LONG).show();
-                                                    refreshProfileData();
-                                                },
-                                                throwable -> {
-                                                    Log.e(TAG, Log.getStackTraceString(throwable));
-                                                    if (throwable instanceof BadAuthorizationTokenException) {
-                                                        AccountManager.get(requireContext()).invalidateAuthToken(getString(R.string.account_type), authToken);
-                                                        attemptToAddOperation(operationType);
-                                                    } else {
-                                                        Toast.makeText(requireContext(), R.string.err_msg_not_saved, Toast.LENGTH_LONG).show();
-                                                    }
-                                                });
-                            } else {
-                                Toast.makeText(requireContext(), R.string.info_msg_need_log_in, Toast.LENGTH_LONG).show();
-                            }
-                        });
+                        if (account.name.equals(mUserId.toString())) {
+                            Toast.makeText(requireContext(), R.string.info_msg_cant_thanks_yourself, Toast.LENGTH_LONG).show();
+                        } else {
+                            AccountProvider.getAuthToken(requireActivity(), account, authToken -> {
+                                if (authToken != null) {
+                                    mAsyncRepository.setAuthToken(authToken);
+                                    new OperationToUserManager().
+                                            createOperationToUser(
+                                                    requireActivity(),
+                                                    UUID.fromString(account.name),
+                                                    mUserId,
+                                                    operationType,
+                                                    mAsyncRepository,
+                                                    () -> {
+                                                        Toast.makeText(requireContext(), R.string.info_msg_saved, Toast.LENGTH_LONG).show();
+                                                        refreshProfileData();
+                                                    },
+                                                    throwable -> {
+                                                        Log.e(TAG, Log.getStackTraceString(throwable));
+                                                        if (throwable instanceof BadAuthorizationTokenException) {
+                                                            AccountManager.get(requireContext()).invalidateAuthToken(getString(R.string.account_type), authToken);
+                                                            attemptToAddOperation(operationType);
+                                                        } else {
+                                                            Toast.makeText(requireContext(), R.string.err_msg_not_saved, Toast.LENGTH_LONG).show();
+                                                        }
+                                                    });
+                                } else {
+                                    Toast.makeText(requireContext(), R.string.info_msg_need_log_in, Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
                     }
                 }
         );

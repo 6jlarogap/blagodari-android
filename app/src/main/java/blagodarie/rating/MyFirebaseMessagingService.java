@@ -24,10 +24,10 @@ import com.squareup.picasso.Target;
 
 import blagodarie.rating.model.entities.OperationType;
 
-public class MyFirebaseMessagingServise
+public class MyFirebaseMessagingService
         extends FirebaseMessagingService {
 
-    private static final String TAG = MyFirebaseMessagingServise.class.getSimpleName();
+    private static final String TAG = MyFirebaseMessagingService.class.getSimpleName();
 
     private static int id = 0;
 
@@ -98,16 +98,16 @@ public class MyFirebaseMessagingServise
             final Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(getString(R.string.url_profile, remoteMessage.getFrom().replace("/topics/user_", ""))));
             //i.putExtra(UserActivity.EXTRA_TO_OPERATIONS, true);
-            //PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
 
-            /*NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
                     .setSmallIcon(R.drawable.ic_launcher)
                     .setColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary))
                     .setContentTitle(title)
                     .setContentText(comment)
                     .setContentIntent(pendingIntent)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setAutoCancel(true);*/
+                    .setAutoCancel(true);
 
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -129,8 +129,8 @@ public class MyFirebaseMessagingServise
                     .into(new Target() {
                         @Override
                         public void onBitmapLoaded (Bitmap bitmap, Picasso.LoadedFrom from) {
-                            //builder.setLargeIcon(bitmap);
-                            //notificationManager.notify(id++, builder.build());
+                            builder.setLargeIcon(bitmap);
+                            notificationManager.notify(id++, builder.build());
                         }
 
                         @Override

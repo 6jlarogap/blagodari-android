@@ -57,4 +57,11 @@ public final class ProfileViewModel
         mThanksUsers = thanksUsers;
     }
 
+    void discardValues () {
+        mProfileInfo.set(Profile.EMPTY_PROFILE);
+        mQrCode.set(null);
+        mDownloadInProgress.set(false);
+        mThanksUsers = null;
+    }
+
 }
