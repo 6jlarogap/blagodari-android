@@ -74,8 +74,8 @@ public class GetUsersRequest
             final String photo = jsonArrayElement.getString("photo");
             final int fame = jsonArrayElement.getInt("fame");
             final int sumThanksCount = jsonArrayElement.getInt("sum_thanks_count");
-            final int mistrustCount = jsonArrayElement.getInt("trustless_count");
-            final int trustCount = fame - mistrustCount;
+            final int mistrustCount = jsonArrayElement.getInt("mistrust_count");
+            final int trustCount = jsonArrayElement.getInt("trust_count");
             users.add(new Profile(id, lastName, firstName, photo, fame, trustCount, mistrustCount, sumThanksCount, 0, null));
         }
         return new GetUsersResponse(users);

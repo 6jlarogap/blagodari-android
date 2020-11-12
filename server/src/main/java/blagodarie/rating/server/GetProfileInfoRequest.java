@@ -46,8 +46,8 @@ public final class GetProfileInfoRequest
         final String lastName = json.getString("last_name");
         final int fame = json.getInt("fame");
         final int sumThanksCount = json.getInt("sum_thanks_count");
-        final int mistrustCount = json.getInt("trustless_count");
-        final int trustCount = fame - mistrustCount;
+        final int mistrustCount = json.getInt("mistrust_count");
+        final int trustCount = json.getInt("trust_count");
         int thanksCount;
         try {
             thanksCount = json.getInt("thanks_count");

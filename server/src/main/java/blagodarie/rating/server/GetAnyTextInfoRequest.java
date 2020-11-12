@@ -41,13 +41,13 @@ public final class GetAnyTextInfoRequest
         final UUID anyTextId = UUID.fromString(json.getString("uuid"));
         final int fame = json.getInt("fame");
         final int sumThanksCount = json.getInt("sum_thanks_count");
-        final int mistrustCount = json.getInt("trustless_count");
-        final int trustCount = fame - mistrustCount;
-        Integer thanksCount;
+        final int mistrustCount = json.getInt("mistrust_count");
+        final int trustCount = json.getInt("trust_count");
+        int thanksCount;
         try {
             thanksCount = json.getInt("thanks_count");
         } catch (JSONException e) {
-            thanksCount = null;
+            thanksCount = 0;
         }
         Boolean isTrust;
         try {
