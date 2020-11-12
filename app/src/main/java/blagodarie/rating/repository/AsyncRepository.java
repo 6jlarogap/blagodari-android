@@ -98,6 +98,7 @@ public interface AsyncRepository {
             @NonNull final OnErrorListener onErrorListener
     );
 
+    @NonNull
     <T> LiveData<PagedList<T>> getLiveDataPagedListFromDataSource (
             @NonNull final DataSource.Factory<Integer, T> dataSourceFactory
     );

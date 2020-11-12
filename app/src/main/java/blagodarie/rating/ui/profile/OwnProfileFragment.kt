@@ -208,18 +208,19 @@ class OwnProfileFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         Log.d(TAG, "onOptionsItemSelected")
-        when (item.itemId) {
+        return when (item.itemId) {
             R.id.miShare -> {
                 share()
+                true
             }
             R.id.miLogout -> {
                 showLogoutConfirmDialog()
+                true
             }
             else -> {
-                throw IllegalArgumentException("Unknown menu item")
+                super.onOptionsItemSelected(item)
             }
         }
-        return super.onOptionsItemSelected(item)
     }
 
     private fun showLogoutConfirmDialog(){

@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/people"
-        android:icon="@drawable/account_group"
-        android:title="@string/txt_people"
+        android:id="@+id/ownProfileFragment"
+        android:icon="@drawable/account_circle"
+        android:title="@string/txt_profile"
         app:showAsAction="ifRoom" />
 
     <item
@@ -15,15 +15,15 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/qrScan"
-        android:icon="@drawable/qrcode_scan"
-        android:title="@string/txt_qr_scan"
+        android:id="@+id/contacts"
+        android:icon="@drawable/account_group"
+        android:title="@string/txt_contacts"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/ownProfileFragment"
-        android:icon="@drawable/account_circle"
-        android:title="@string/txt_profile"
+        android:id="@+id/qrScan"
+        android:icon="@drawable/qrcode_scan"
+        android:title="@string/txt_qr_scan"
         app:showAsAction="ifRoom" />
 
     <item

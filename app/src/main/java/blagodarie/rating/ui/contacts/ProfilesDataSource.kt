@@ -9,7 +9,8 @@ import blagodarie.rating.server.GetUsersRequest
 import blagodarie.rating.server.ServerApiClient
 
 class ProfilesDataSource(
-        private val filter: List<IKeyPair>
+        private val textFilter: String?,
+        private val keysFilter: List<IKeyPair>?
 ) : PositionalDataSource<IProfile>() {
 
     companion object {
@@ -22,7 +23,7 @@ class ProfilesDataSource(
     ) {
         Log.d(TAG, "loadInitial from=" + params.requestedStartPosition + ", pageSize=" + params.pageSize)
         val client = ServerApiClient()
-        val request = GetUsersRequest("", filter, params.requestedStartPosition, params.pageSize)
+        val request = GetUsersRequest(textFilter, keysFilter, params.requestedStartPosition, params.pageSize)
         try {
             val response = client.execute(request)
             callback.onResult(response.users, 0)
@@ -37,7 +38,7 @@ class ProfilesDataSource(
     ) {
         Log.d(TAG, "loadInitial from=" + params.startPosition + ", pageSize=" + params.loadSize)
         val client = ServerApiClient()
-        val request = GetUsersRequest("", filter, params.startPosition, params.loadSize)
+        val request = GetUsersRequest(textFilter, keysFilter, params.startPosition, params.loadSize)
         try {
             val response = client.execute(request)
             callback.onResult(response.users)
@@ -47,10 +48,11 @@ class ProfilesDataSource(
     }
 
     internal class ProfilesDataSourceFactory(
-            private val filter: List<IKeyPair>
+            private val textFilter: String?,
+            private val keysFilter: List<IKeyPair>?
     ) : Factory<Int, IProfile>() {
         override fun create(): DataSource<Int, IProfile> {
-            return ProfilesDataSource(filter)
+            return ProfilesDataSource(textFilter, keysFilter)
         }
     }
 }

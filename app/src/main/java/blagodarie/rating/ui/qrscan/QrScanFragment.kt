@@ -75,6 +75,7 @@ class QrScanFragment : Fragment() {
 
     private fun attemptToScanQrCode() {
         if (isCameraAllowed()) {
+            mViewModel.isShowExplanation.set(false)
             scanQrCode()
         } else {
             requestPermissions()
@@ -118,6 +119,7 @@ class QrScanFragment : Fragment() {
             CAMERA_PERMISSION_REQUEST_CODE -> {
                 if (grantResults.isNotEmpty() &&
                         grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mViewModel.isShowExplanation.set(false)
                     scanQrCode()
                 } else {
                     if (!mPermissionDeniedExplanationShowed) {

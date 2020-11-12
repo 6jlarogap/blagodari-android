@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_activity"
-    app:startDestination="@id/people">
+    app:startDestination="@id/ownProfileFragment">
 
     <action
         android:id="@+id/global_action_to_user"
@@ -19,17 +19,8 @@
             app:nullable="true" />
     </fragment>
 
-    <navigation android:id="@+id/people"
-        app:startDestination="@id/peopleFragment">
-
-        <fragment
-            android:id="@+id/peopleFragment"
-            android:name="blagodarie.rating.ui.people.PeopleFragment"
-            android:label="PeopleFragment">
-            <action
-                android:id="@+id/action_peopleFragment_to_profileFragment"
-                app:destination="@id/profileFragment" />
-        </fragment>
+    <navigation android:id="@+id/contacts"
+        app:startDestination="@id/contactsFragment">
 
         <fragment
             android:id="@+id/profileFragment"
@@ -46,6 +37,14 @@
                 android:id="@+id/deepLink2"
                 android:autoVerify="true"
                 app:uri="https://dev.blagodarie.org/profile?id={user_uuid}" />
+        </fragment>
+        <fragment
+            android:id="@+id/contactsFragment"
+            android:name="blagodarie.rating.ui.contacts.ContactsFragment"
+            android:label="ContactsFragment" >
+            <action
+                android:id="@+id/action_contactsFragment_to_profileFragment"
+                app:destination="@id/profileFragment" />
         </fragment>
     </navigation>
 

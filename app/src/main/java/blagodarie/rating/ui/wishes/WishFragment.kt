@@ -16,11 +16,11 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import blagodarie.rating.AppExecutors
 import blagodarie.rating.R
 import blagodarie.rating.databinding.WishFragmentBinding
+import blagodarie.rating.model.entities.Wish
 import blagodarie.rating.repository.AsyncServerRepository
 import blagodarie.rating.server.BadAuthorizationTokenException
 import blagodarie.rating.ui.AccountProvider
 import blagodarie.rating.ui.AccountSource
-import blagodarie.rating.model.entities.Wish
 import java.util.*
 
 class WishFragment : Fragment() {
@@ -112,19 +112,20 @@ class WishFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         Log.d(TAG, "onOptionsItemSelected")
-        when (item.itemId) {
+        return when (item.itemId) {
             R.id.miEdit -> {
                 val action = WishFragmentDirections.actionWishFragmentToEditWishFragment(mViewModel.wish.get() as Wish)
                 NavHostFragment.findNavController(this).navigate(action)
+                true
             }
             R.id.miDelete -> {
                 showDeleteWishConfirmDialog()
+                true
             }
             else -> {
-                throw IllegalArgumentException("Unknown menu item")
+                super.onOptionsItemSelected(item)
             }
         }
-        return super.onOptionsItemSelected(item)
     }
 
     private fun initBinding(

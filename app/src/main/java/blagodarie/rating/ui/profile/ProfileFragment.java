@@ -186,16 +186,14 @@ public final class ProfileFragment
 
     @Override
     public boolean onOptionsItemSelected (MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.miShare: {
-                share();
-                break;
-            }
-            default: {
-                throw new IllegalArgumentException("Unknown menu item");
-            }
+        boolean result;
+        if (item.getItemId() == R.id.miShare) {
+            share();
+            result = true;
+        } else {
+            result = super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
+        return result;
     }
 
     @NonNull

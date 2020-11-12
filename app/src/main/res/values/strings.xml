@@ -61,8 +61,8 @@
     <string name="info_msg_cant_thanks_yourself">Нельзя благодарить себя</string>
     <string name="info_msg_missing_profile">Такого профиля не существует</string>
     <string name="info_msg_missing_wish">Такого желания не существует</string>
-    <string name="info_msg_need_read_contacts_permission">Необходимо разрешение на чтение контактов</string>
-    <string name="info_msg_need_camera_permission">Для сканирования QR необходим доступ к камере</string>
+    <string name="info_msg_read_contacts_permission_explanation">Необходимо разрешение на чтение контактов</string>
+    <string name="info_msg_camera_permission_explanation">Для сканирования QR необходим доступ к камере</string>
     <string name="info_msg_list_is_empty">Список пуст</string>
     <string name="info_msg_add_thanks_complete">Благодарность добавлена</string>
     <string name="info_msg_wish_saved">Желание сохранено</string>
@@ -110,7 +110,7 @@
     <string name="txt_qr_scan">Сканировать QR</string>
     <string name="txt_search">Поиск</string>
     <string name="txt_profile">Профиль</string>
-    <string name="txt_social_graph">Граф знакомств</string>
+    <string name="txt_social_graph">Граф</string>
     <string name="txt_comment">Комментарий</string>
     <string name="txt_key">%s: %s</string>
 
