@@ -4,6 +4,7 @@ import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
+import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -107,4 +108,13 @@ public final class Authenticator
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public Bundle getAccountRemovalAllowed(
+            AccountAuthenticatorResponse response,
+            Account account
+    ) throws NetworkErrorException {
+        Log.d(TAG, "getAccountRemovalAllowed");
+        FirebaseNotificationKt.unSubscribeOnFirebaseNotifications(account.name);
+        return super.getAccountRemovalAllowed(response, account);
+    }
 }

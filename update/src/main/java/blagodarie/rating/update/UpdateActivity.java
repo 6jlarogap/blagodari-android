@@ -30,7 +30,6 @@ public final class UpdateActivity
 
     private static final String EXTRA_LATEST_VERSION_NAME = "blagodarie.health.ui.update.LATEST_VERSION_NAME";
     private static final String EXTRA_LATEST_VERSION_URI = "blagodarie.health.ui.update.LATEST_VERSION_URI";
-    private static final String EXTRA_FILE_PROVIDER_AUTHORITIES = "blagodarie.health.ui.update.FILE_PROVIDER_AUTHORITIES";
 
     private UpdateViewModel mViewModel;
 
@@ -51,7 +50,7 @@ public final class UpdateActivity
 
         mLatestVersionName = getIntent().getStringExtra(EXTRA_LATEST_VERSION_NAME);
         mLatestVersionUri = getIntent().getParcelableExtra(EXTRA_LATEST_VERSION_URI);
-        mFileProviderAuthorities = getIntent().getStringExtra(EXTRA_FILE_PROVIDER_AUTHORITIES);
+        mFileProviderAuthorities = getString(R.string.file_provider_authorities);
         mFileName = getString(R.string.file_name, mLatestVersionName);
         mFile = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), mFileName);
 
@@ -134,13 +133,11 @@ public final class UpdateActivity
 
     public static Intent createSelfIntent (
             @NonNull final Context context,
-            @NonNull final String fileProviderAuthorities,
             @NonNull final String versionName,
             @NonNull final Uri latestVersionUri
     ) {
         Log.d(TAG, "createSelfIntent");
         final Intent intent = new Intent(context, UpdateActivity.class);
-        intent.putExtra(EXTRA_FILE_PROVIDER_AUTHORITIES, fileProviderAuthorities);
         intent.putExtra(EXTRA_LATEST_VERSION_NAME, versionName);
         intent.putExtra(EXTRA_LATEST_VERSION_URI, latestVersionUri);
         return intent;

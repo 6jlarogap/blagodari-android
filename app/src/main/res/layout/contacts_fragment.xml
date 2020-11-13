@@ -1,39 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/srlRefreshProfileInfo"
-            onRefresh="@{() -> UserActionListener.onSwipeRefresh()}"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:refreshing="@{ViewModel.downloadInProgress}">
+        <include
+            android:id="@+id/list"
+            layout="@layout/base_recycler"
+            app:downloadInProgress="@{viewModel.downloadInProgress}"
+            app:isEmpty="@{viewModel.isEmpty()}"
+            app:refreshListener="@{refreshListener}" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvPeople"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="@{viewModel.isShowExplanation() ? View.VISIBLE : View.GONE}">
 
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/info_msg_read_contacts_permission_explanation" />
 
-    </LinearLayout>
+            <Button
+                android:id="@+id/btnRequirePermission"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+    </FrameLayout>
 
     <data>
 
         <import type="android.view.View" />
 
         <variable
-            name="ViewModel"
+            name="viewModel"
             type="blagodarie.rating.ui.contacts.ContactsViewModel" />
 
         <variable
             name="UserActionListener"
             type="blagodarie.rating.ui.contacts.ContactsFragment.UserActionListener" />
+
+        <variable
+            name="refreshListener"
+            type="androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener" />
 
     </data>
 </layout>

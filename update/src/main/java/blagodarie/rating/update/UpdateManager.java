@@ -22,12 +22,15 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public final class UpdateManager {
+public enum UpdateManager {
+
+    INSTANCE;
 
     private static final String TAG = UpdateManager.class.getSimpleName();
 
     private static final String NEW_VERSION_NOTIFICATION_PREFERENCE = "blagodarie.rating.update.UpdateManager.newVersionNotification";
 
+    @FunctionalInterface
     public interface OnCheckUpdateListener {
         void onHaveUpdate ();
     }
@@ -37,17 +40,12 @@ public final class UpdateManager {
         void onError (@NonNull final Throwable throwable);
     }
 
-    @NonNull
-    private final String mFileProviderAuthorities;
-
     private GetRatingLatestVersionResponse mLastResponse;
 
     private Integer mLastVersionCodeOnMarket;
 
-    public UpdateManager (
-            @NonNull final String fileProviderAuthorities
+    UpdateManager (
     ) {
-        mFileProviderAuthorities = fileProviderAuthorities;
     }
 
     public Disposable checkUpdate (
@@ -133,18 +131,19 @@ public final class UpdateManager {
                         onOkClickListener).
                 setNegativeButton(
                         android.R.string.cancel,
-                        (dialogInterface, i) -> context.getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).
-                                edit().
-                                putInt(String.valueOf(mLastResponse.getVersionCode()), mLastResponse.getVersionCode()).
-                                apply()).
+                        null).
                 create().
                 show();
+        context.getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).
+                edit().
+                putInt(String.valueOf(mLastResponse.getVersionCode()), mLastResponse.getVersionCode()).
+                apply();
     }
 
     private void startUpdate (
             @NonNull final Context context
     ) {
-        final Intent intent = UpdateActivity.createSelfIntent(context, mFileProviderAuthorities, mLastResponse.getVersionName(), Uri.parse(mLastResponse.getPath()));
+        final Intent intent = UpdateActivity.createSelfIntent(context, mLastResponse.getVersionName(), Uri.parse(mLastResponse.getPath()));
         context.startActivity(intent);
     }
 }

@@ -13,6 +13,7 @@ import blagodarie.rating.model.IAnyTextInfo;
 import blagodarie.rating.model.IKey;
 import blagodarie.rating.model.IKeyPair;
 import blagodarie.rating.model.IProfile;
+import blagodarie.rating.model.IWish;
 import blagodarie.rating.model.entities.OperationToAnyText;
 import blagodarie.rating.model.entities.OperationToUser;
 
@@ -55,8 +56,20 @@ public interface AsyncRepository {
             @NonNull final OnErrorListener onErrorListener
     );
 
+    void getWish (
+            @NonNull final UUID wishId,
+            @NonNull final OnLoadListener<IWish> onLoadListener,
+            @NonNull final OnErrorListener onErrorListener
+    );
+
     void upsertAbility (
             @NonNull final IAbility ability,
+            @NonNull final OnCompleteListener onCompleteListener,
+            @NonNull final OnErrorListener onErrorListener
+    );
+
+    void upsertWish (
+            @NonNull final IWish wish,
             @NonNull final OnCompleteListener onCompleteListener,
             @NonNull final OnErrorListener onErrorListener
     );
@@ -79,6 +92,13 @@ public interface AsyncRepository {
             @NonNull final OnErrorListener onErrorListener
     );
 
+    void deleteWish (
+            @NonNull final UUID wishId,
+            @NonNull final OnCompleteListener onCompleteListener,
+            @NonNull final OnErrorListener onErrorListener
+    );
+
+    @NonNull
     <T> LiveData<PagedList<T>> getLiveDataPagedListFromDataSource (
             @NonNull final DataSource.Factory<Integer, T> dataSourceFactory
     );
