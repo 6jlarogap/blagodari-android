@@ -1,6 +1,5 @@
 package blagodarie.rating.model;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.UUID;

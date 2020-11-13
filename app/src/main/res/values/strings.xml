@@ -13,17 +13,21 @@
     <string name="deep_link_wish">https://blagodarie.org/wish?id={wish_uuid}</string>
 
     <string name="notification_chanel_id_thanks" translatable="false">thanks_notification_chanel</string>
-    <string name="notification_chanel_name_thanks">Благодарности</string>
-    <string name="notification_chanel_description_thanks">Уведомления о благодарностях</string>
     <string name="notification_chanel_id_mistrust" translatable="false">mistrust_notification_chanel</string>
+    <string name="notification_chanel_id_trust" translatable="false">trust_notification_chanel</string>
+    <string name="notification_chanel_id_nullify_trust" translatable="false">nullify_trust_notification_chanel</string>
+    <string name="notification_chanel_name_thanks">Благодарности</string>
     <string name="notification_chanel_name_mistrust">Утраты доверия</string>
+    <string name="notification_chanel_name_trust">Восстановление доверия</string>
+    <string name="notification_chanel_name_nullify_trust">Обнуление доверия</string>
+    <string name="notification_chanel_description_thanks">Уведомления о благодарностях</string>
     <string name="notification_chanel_description_mistrust">Уведомления об утратах доверия</string>
-    <string name="notification_chanel_id_cancel_mistrust" translatable="false">cancel_mistrust_notification_chanel</string>
-    <string name="notification_chanel_name_cancel_mistrust">Восстановление доверия</string>
-    <string name="notification_chanel_description_cancel_mistrust">Уведомления о восстановлении доверия</string>
+    <string name="notification_chanel_description_trust">Уведомления о восстановлении доверия</string>
+    <string name="notification_chanel_description_nullify_trust">Уведомления об обнулении доверия</string>
     <string name="notification_title_thanks_pattern">%s %s поблагодарил вас</string>
-    <string name="notification_title_mistrus_pattern">%s %s утратил доверие к вам</string>
-    <string name="notification_title_cancel_mistrust_pattern">%s %s восстановил доверие к вам</string>
+    <string name="notification_title_mistrust_pattern">%s %s утратил доверие к вам</string>
+    <string name="notification_title_trust_pattern">%s %s установил доверие к вам</string>
+    <string name="notification_title_nullify_trust_pattern">%s %s обнулил доверие к вам</string>
 
     <string name="btn_thanks">Благодарить</string>
     <string name="btn_mistrust">Недоверие</string>

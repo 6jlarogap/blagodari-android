@@ -14,11 +14,11 @@ import androidx.paging.PagedList
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import blagodarie.rating.AppExecutors
 import blagodarie.rating.R
+import blagodarie.rating.commands.CreateOperationToAnyTextCommand
+import blagodarie.rating.commands.CreateOperationToUserCommand
 import blagodarie.rating.databinding.OperationsFragmentBinding
 import blagodarie.rating.model.IDisplayOperation
 import blagodarie.rating.model.entities.OperationType
-import blagodarie.rating.operations.OperationToAnyTextManager
-import blagodarie.rating.operations.OperationToUserManager
 import blagodarie.rating.repository.AsyncServerRepository
 import blagodarie.rating.server.BadAuthorizationTokenException
 import blagodarie.rating.ui.AccountProvider
@@ -82,7 +82,7 @@ class OperationsFragment : Fragment() {
     override fun onResume() {
         Log.d(TAG, "onResume")
         super.onResume()
-        refreshOwnOperations()
+        refreshOperations()
         AccountSource.getAccount(
                 requireActivity(),
                 false
@@ -116,7 +116,7 @@ class OperationsFragment : Fragment() {
         mBinding.viewModel = mViewModel
         mBinding.list.recyclerView.adapter = mOperationsAdapter
         mBinding.refreshListener = SwipeRefreshLayout.OnRefreshListener {
-            refreshOwnOperations()
+            refreshOperations()
         }
         mBinding.userActionListener = object : UserActionListener {
             override fun onThanksClick() {
@@ -125,12 +125,12 @@ class OperationsFragment : Fragment() {
         }
     }
 
-    private fun refreshOwnOperations() {
+    private fun refreshOperations() {
         Log.d(TAG, "refreshOperations")
         mViewModel.downloadInProgress.set(true)
         if (mUserId != null) {
             mViewModel.operations = mAsyncRepository.getLiveDataPagedListFromDataSource(UserOperationsDataSource.UserOperationsDataSourceFactory(mUserId!!))
-        } else if (mAnyTextId != null){
+        } else if (mAnyTextId != null) {
             mViewModel.operations = mAsyncRepository.getLiveDataPagedListFromDataSource(AnyTextOperationsDataSource.AnyTextOperationsDataSourceFactory(mAnyTextId!!))
         }
         mViewModel.operations?.observe(requireActivity()) { pagedList: PagedList<IDisplayOperation>? ->
@@ -157,7 +157,7 @@ class OperationsFragment : Fragment() {
                 ) { authToken: String? ->
                     mAsyncRepository.setAuthToken(authToken)
                     if (userIdTo != null) {
-                        OperationToUserManager().createOperationToUser(
+                        CreateOperationToUserCommand(
                                 requireActivity(),
                                 UUID.fromString(account.name),
                                 userIdTo,
@@ -165,7 +165,7 @@ class OperationsFragment : Fragment() {
                                 mAsyncRepository,
                                 {
                                     Toast.makeText(requireContext(), R.string.info_msg_saved, Toast.LENGTH_LONG).show()
-                                    refreshOwnOperations()
+                                    refreshOperations()
                                 },
                                 { throwable: Throwable? ->
                                     Log.e(TAG, Log.getStackTraceString(throwable))
@@ -175,9 +175,10 @@ class OperationsFragment : Fragment() {
                                     } else {
                                         Toast.makeText(requireContext(), R.string.err_msg_not_saved, Toast.LENGTH_LONG).show()
                                     }
-                                })
+                                }
+                        ).execute()
                     } else if (anyTextIdTo != null) {
-                        OperationToAnyTextManager().createOperationToAnyText(
+                        CreateOperationToAnyTextCommand(
                                 requireActivity(),
                                 UUID.fromString(account.name),
                                 anyTextIdTo,
@@ -186,7 +187,7 @@ class OperationsFragment : Fragment() {
                                 mAsyncRepository,
                                 {
                                     Toast.makeText(requireContext(), R.string.info_msg_saved, Toast.LENGTH_LONG).show()
-                                    refreshOwnOperations()
+                                    refreshOperations()
                                 },
                                 { throwable: Throwable? ->
                                     Log.e(TAG, Log.getStackTraceString(throwable))
@@ -196,7 +197,7 @@ class OperationsFragment : Fragment() {
                                     } else {
                                         Toast.makeText(requireContext(), R.string.err_msg_not_saved, Toast.LENGTH_LONG).show()
                                     }
-                                })
+                                }).execute()
                     }
                 }
             }

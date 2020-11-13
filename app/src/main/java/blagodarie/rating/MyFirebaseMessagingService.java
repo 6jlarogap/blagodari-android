@@ -24,7 +24,7 @@ import com.squareup.picasso.Target;
 
 import blagodarie.rating.model.entities.OperationType;
 
-public class MyFirebaseMessagingService
+public final class MyFirebaseMessagingService
         extends FirebaseMessagingService {
 
     private static final String TAG = MyFirebaseMessagingService.class.getSimpleName();
@@ -77,19 +77,25 @@ public class MyFirebaseMessagingService
                         channelDescription = getApplicationContext().getString(R.string.notification_chanel_description_thanks);
                         break;
                     case MISTRUST:
-                        title = getApplicationContext().getString(R.string.notification_title_mistrus_pattern, firstName, lastName);
+                        title = getApplicationContext().getString(R.string.notification_title_mistrust_pattern, firstName, lastName);
                         channelId = getApplicationContext().getString(R.string.notification_chanel_id_mistrust);
                         channelName = getApplicationContext().getString(R.string.notification_chanel_name_mistrust);
                         channelDescription = getApplicationContext().getString(R.string.notification_chanel_description_mistrust);
                         break;
                     case TRUST:
-                        title = getApplicationContext().getString(R.string.notification_title_cancel_mistrust_pattern, firstName, lastName);
-                        channelId = getApplicationContext().getString(R.string.notification_chanel_id_cancel_mistrust);
-                        channelName = getApplicationContext().getString(R.string.notification_chanel_name_cancel_mistrust);
-                        channelDescription = getApplicationContext().getString(R.string.notification_chanel_description_cancel_mistrust);
+                        title = getApplicationContext().getString(R.string.notification_title_trust_pattern, firstName, lastName);
+                        channelId = getApplicationContext().getString(R.string.notification_chanel_id_trust);
+                        channelName = getApplicationContext().getString(R.string.notification_chanel_name_trust);
+                        channelDescription = getApplicationContext().getString(R.string.notification_chanel_description_trust);
+                        break;
+                    case NULLIFY_TRUST:
+                        title = getApplicationContext().getString(R.string.notification_title_nullify_trust_pattern, firstName, lastName);
+                        channelId = getApplicationContext().getString(R.string.notification_chanel_id_nullify_trust);
+                        channelName = getApplicationContext().getString(R.string.notification_chanel_name_nullify_trust);
+                        channelDescription = getApplicationContext().getString(R.string.notification_chanel_description_nullify_trust);
                         break;
                     default:
-                        title = "";
+                        throw new IllegalArgumentException("Unknown OperationType");
                 }
             }
 
@@ -122,7 +128,6 @@ public class MyFirebaseMessagingService
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
 
 // notificationId is a unique int for each notification that you must define
-            //notificationManager.notify(1, builder.build());
             Handler uiHandler = new Handler(Looper.getMainLooper());
             uiHandler.post(() -> Picasso.get().load(photo)
                     .resize(250, 250)

@@ -34,10 +34,12 @@ import java.util.UUID;
 import blagodarie.rating.AppExecutors;
 import blagodarie.rating.MainActivityDirections;
 import blagodarie.rating.R;
+import blagodarie.rating.commands.CreateOperationToAnyTextCommand;
 import blagodarie.rating.databinding.AnyTextFragmentBinding;
+import blagodarie.rating.model.IAnyTextInfo;
+import blagodarie.rating.model.IProfile;
 import blagodarie.rating.model.entities.AnyTextInfo;
 import blagodarie.rating.model.entities.OperationType;
-import blagodarie.rating.operations.OperationToAnyTextManager;
 import blagodarie.rating.repository.AsyncServerRepository;
 import blagodarie.rating.server.BadAuthorizationTokenException;
 import blagodarie.rating.ui.AccountProvider;
@@ -228,12 +230,22 @@ public final class AnyTextFragment
 
     @Override
     public void onTrustClick () {
-        attemptToAddOperation(OperationType.TRUST);
+        Log.d(TAG, "onTrustClick");
+        final IAnyTextInfo anyTextInfo = mViewModel.getAnyTextInfo().get();
+        if (anyTextInfo != null) {
+            final Boolean isTrust = anyTextInfo.isTrust();
+            attemptToAddOperation(isTrust != null && isTrust ? OperationType.NULLIFY_TRUST : OperationType.TRUST);
+        }
     }
 
     @Override
     public void onMistrustClick () {
-        attemptToAddOperation(OperationType.MISTRUST);
+        Log.d(TAG, "onMistrustClick");
+        final IAnyTextInfo anyTextInfo = mViewModel.getAnyTextInfo().get();
+        if (anyTextInfo != null) {
+            final Boolean isTrust = anyTextInfo.isTrust();
+            attemptToAddOperation(isTrust != null && !isTrust ? OperationType.NULLIFY_TRUST : OperationType.MISTRUST);
+        }
     }
 
     @Override
@@ -251,27 +263,27 @@ public final class AnyTextFragment
                         AccountProvider.getAuthToken(requireActivity(), account, authToken -> {
                             if (authToken != null) {
                                 mAsyncRepository.setAuthToken(authToken);
-                                new OperationToAnyTextManager().
-                                        createOperationToAnyText(
-                                                requireActivity(),
-                                                UUID.fromString(account.name),
-                                                mAnyTextId,
-                                                operationType,
-                                                mAnyText,
-                                                mAsyncRepository,
-                                                () -> {
-                                                    Toast.makeText(requireContext(), R.string.info_msg_saved, Toast.LENGTH_LONG).show();
-                                                    refreshAnyTextData();
-                                                },
-                                                throwable -> {
-                                                    Log.e(TAG, Log.getStackTraceString(throwable));
-                                                    if (throwable instanceof BadAuthorizationTokenException) {
-                                                        AccountManager.get(requireContext()).invalidateAuthToken(getString(R.string.account_type), authToken);
-                                                        attemptToAddOperation(operationType);
-                                                    } else {
-                                                        Toast.makeText(requireContext(), R.string.err_msg_not_saved, Toast.LENGTH_LONG).show();
-                                                    }
-                                                });
+                                new CreateOperationToAnyTextCommand(
+                                        requireActivity(),
+                                        UUID.fromString(account.name),
+                                        mAnyTextId,
+                                        operationType,
+                                        mAnyText,
+                                        mAsyncRepository,
+                                        () -> {
+                                            Toast.makeText(requireContext(), R.string.info_msg_saved, Toast.LENGTH_LONG).show();
+                                            refreshAnyTextData();
+                                        },
+                                        throwable -> {
+                                            Log.e(TAG, Log.getStackTraceString(throwable));
+                                            if (throwable instanceof BadAuthorizationTokenException) {
+                                                AccountManager.get(requireContext()).invalidateAuthToken(getString(R.string.account_type), authToken);
+                                                attemptToAddOperation(operationType);
+                                            } else {
+                                                Toast.makeText(requireContext(), R.string.err_msg_not_saved, Toast.LENGTH_LONG).show();
+                                            }
+                                        }
+                                ).execute();
                             } else {
                                 Toast.makeText(requireContext(), R.string.info_msg_need_log_in, Toast.LENGTH_LONG).show();
                             }

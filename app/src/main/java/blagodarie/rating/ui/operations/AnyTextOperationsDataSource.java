@@ -10,7 +10,6 @@ import java.util.UUID;
 
 import blagodarie.rating.model.IDisplayOperation;
 import blagodarie.rating.server.GetAnyTextOperationsRequest;
-import blagodarie.rating.server.GetUserOperationsRequest;
 import blagodarie.rating.server.GetOperationsResponse;
 import blagodarie.rating.server.ServerApiClient;
 
@@ -46,7 +45,7 @@ public final class AnyTextOperationsDataSource
     public void loadRange (@NonNull LoadRangeParams params, @NonNull LoadRangeCallback<IDisplayOperation> callback) {
         Log.d(TAG, "loadRange startPosition=" + params.startPosition + ", loadSize=" + params.loadSize);
         final ServerApiClient client = new ServerApiClient();
-        final GetUserOperationsRequest request = new GetUserOperationsRequest(mAnyTextId, params.startPosition, params.loadSize);
+        final GetAnyTextOperationsRequest request = new GetAnyTextOperationsRequest(mAnyTextId, params.startPosition, params.loadSize);
         try {
             final GetOperationsResponse response = client.execute(request);
             callback.onResult(response.getOperations());
@@ -59,18 +58,18 @@ public final class AnyTextOperationsDataSource
             extends Factory<Integer, IDisplayOperation> {
 
         @NonNull
-        private final UUID mUserId;
+        private final UUID mAnyTextId;
 
 
         public AnyTextOperationsDataSourceFactory (
-                @NonNull final UUID userId
+                @NonNull final UUID anyTextId
         ) {
-            mUserId = userId;
+            mAnyTextId = anyTextId;
         }
 
         @Override
         public DataSource<Integer, IDisplayOperation> create () {
-            return new AnyTextOperationsDataSource(mUserId);
+            return new AnyTextOperationsDataSource(mAnyTextId);
         }
 
     }

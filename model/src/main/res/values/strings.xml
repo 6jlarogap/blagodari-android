@@ -3,6 +3,7 @@
     <string name="operation_type_name_thanks">Благодарность</string>
     <string name="operation_type_name_mistrust">Недоверие</string>
     <string name="operation_type_name_trust">Доверие</string>
+    <string name="operation_type_name_nullify_trust">Обнулление доверия</string>
 
     <string name="key_type_phone">Телефон</string>
     <string name="key_type_email">Емэйл</string>

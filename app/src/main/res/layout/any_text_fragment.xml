@@ -86,7 +86,6 @@
                             android:layout_weight="1"
                             android:background="@{ViewModel.anyTextInfo.isTrust != null &amp;&amp; ViewModel.anyTextInfo.isTrust ? @android:color/holo_green_light : @color/light_gray}"
                             android:textColor="@{ViewModel.anyTextInfo.isTrust != null &amp;&amp; ViewModel.anyTextInfo.isTrust ? @android:color/white : @android:color/black}"
-                            android:enabled="@{ViewModel.anyTextInfo.isTrust == null || !ViewModel.anyTextInfo.isTrust}"
                             android:onClick="@{() -> UserActionListener.onTrustClick()}"
                             android:text="@string/btn_trust" />
 
@@ -98,7 +97,6 @@
                             android:layout_weight="1"
                             android:background="@{ViewModel.anyTextInfo.isTrust != null &amp;&amp; !ViewModel.anyTextInfo.isTrust ? @android:color/holo_red_dark : @color/light_gray}"
                             android:textColor="@{ViewModel.anyTextInfo.isTrust != null &amp;&amp; !ViewModel.anyTextInfo.isTrust ? @android:color/white : @android:color/black}"
-                            android:enabled="@{ViewModel.anyTextInfo.isTrust == null || ViewModel.anyTextInfo.isTrust}"
                             android:onClick="@{() -> UserActionListener.onMistrustClick()}"
                             android:text="@string/btn_mistrust" />
 

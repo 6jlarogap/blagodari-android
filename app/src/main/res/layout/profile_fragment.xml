@@ -95,7 +95,6 @@
                                 android:layout_gravity="center_horizontal"
                                 android:layout_weight="1"
                                 android:background="@{ViewModel.profileInfo.isTrust != null &amp;&amp; ViewModel.profileInfo.isTrust ? @android:color/holo_green_light : @color/light_gray}"
-                                android:enabled="@{ViewModel.profileInfo.isTrust == null || !ViewModel.profileInfo.isTrust}"
                                 android:onClick="@{() -> UserActionListener.onTrustClick()}"
                                 android:text="@string/btn_trust"
                                 android:textColor="@{ViewModel.profileInfo.isTrust != null &amp;&amp; ViewModel.profileInfo.isTrust ? @android:color/white : @android:color/black}" />
@@ -107,7 +106,6 @@
                                 android:layout_gravity="center_horizontal"
                                 android:layout_weight="1"
                                 android:background="@{ViewModel.profileInfo.isTrust != null &amp;&amp; !ViewModel.profileInfo.isTrust ? @android:color/holo_red_dark : @color/light_gray}"
-                                android:enabled="@{ViewModel.profileInfo.isTrust == null || ViewModel.profileInfo.isTrust}"
                                 android:onClick="@{() -> UserActionListener.onMistrustClick()}"
                                 android:text="@string/btn_mistrust"
                                 android:textColor="@{ViewModel.profileInfo.isTrust != null &amp;&amp; !ViewModel.profileInfo.isTrust ? @android:color/white : @android:color/black}" />
