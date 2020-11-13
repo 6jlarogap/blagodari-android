@@ -17,22 +17,12 @@ import blagodarie.rating.server.GetThanksUsersResponse.ThanksUser
 import blagodarie.rating.ui.createQrCodeBitmap
 
 class OwnProfileViewModel(application: Application) : AndroidViewModel(application) {
-    val account: ObservableField<Account> = ObservableField()
     val profileInfo = ObservableField<IProfile>(Profile.EMPTY_PROFILE)
     val qrCode = ObservableField<Bitmap>()
     val downloadInProgress = ObservableBoolean(false)
     var thanksUsers: LiveData<PagedList<ThanksUser>>? = null
 
-    init {
-        account.addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
-            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-                qrCode.set(if (account.get() != null) createQrCodeBitmap(application.applicationContext.getString(R.string.url_profile, account.get()!!.name)) else null)
-            }
-        })
-    }
-
     fun discardValues() {
-        account.set(null)
         profileInfo.set(Profile.EMPTY_PROFILE)
         qrCode.set(null)
         downloadInProgress.set(false)

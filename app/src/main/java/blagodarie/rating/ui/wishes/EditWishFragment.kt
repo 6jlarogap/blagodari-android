@@ -101,9 +101,8 @@ class EditWishFragment : Fragment() {
     private fun saveWish(
             wishText: String
     ) {
-        AccountSource.getAccount(
+        AccountSource.requireAccount(
                 requireActivity(),
-                true
         ) { account: Account? ->
             if (account != null) {
                 val wish = Wish(mWish.id, mWish.ownerId, wishText, mWish.lastEdit)

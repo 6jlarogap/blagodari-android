@@ -100,9 +100,8 @@ class EditAbilityFragment : Fragment() {
     private fun saveAbility(
             abilityText: String
     ) {
-        AccountSource.getAccount(
+        AccountSource.requireAccount(
                 requireActivity(),
-                true
         ) { account: Account? ->
             if (account != null) {
                 mAbility.text = abilityText

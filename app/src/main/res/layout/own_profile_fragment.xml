@@ -12,18 +12,18 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/btn_create_account"
-            android:visibility="@{ViewModel.account == null ? View.VISIBLE : View.GONE}" />
+            android:visibility="@{mainViewModel.account == null ? View.VISIBLE : View.GONE}" />
 
         <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="@{ViewModel.account != null &amp;&amp; ViewModel.profileInfo != null ? View.VISIBLE : View.GONE}">
+            android:visibility="@{mainViewModel.account != null &amp;&amp; ownProfileViewModel.profileInfo != null ? View.VISIBLE : View.GONE}">
 
             <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                 android:id="@+id/srlRefreshProfileInfo"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:refreshing="@{ViewModel.downloadInProgress}">
+                app:refreshing="@{ownProfileViewModel.downloadInProgress}">
 
                 <androidx.core.widget.NestedScrollView
                     android:layout_width="match_parent"
@@ -44,11 +44,11 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
                             android:gravity="center_horizontal"
-                            android:text='@{ViewModel.profileInfo.fullName}' />
+                            android:text='@{ownProfileViewModel.profileInfo.fullName}' />
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/ivPhoto"
-                            imageUrl="@{ViewModel.profileInfo.photo}"
+                            imageUrl="@{ownProfileViewModel.profileInfo.photo}"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
@@ -60,7 +60,7 @@
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/ivQRCode"
-                            imageBitmap="@{ViewModel.qrCode}"
+                            imageBitmap="@{ownProfileViewModel.qrCode}"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
@@ -73,20 +73,20 @@
                             style="@style/TextAppearance.AppCompat.Body1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@{String.format(@string/txt_fame, ViewModel.profileInfo.fame)}" />
+                            android:text="@{String.format(@string/txt_fame, ownProfileViewModel.profileInfo.fame)}" />
 
                         <TextView
                             style="@style/TextAppearance.AppCompat.Body1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@{String.format(@string/txt_own_profile_trust, ViewModel.profileInfo.mistrustCount)}" />
+                            android:text="@{String.format(@string/txt_own_profile_trust, ownProfileViewModel.profileInfo.mistrustCount)}" />
 
                         <Button
                             android:id="@+id/btnThanksCount"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:onClick="@{() -> UserActionListener.onOperationsClick()}"
-                            android:text="@{String.format(@string/txt_thanks_count, ViewModel.profileInfo.sumThanksCount)}" />
+                            android:text="@{String.format(@string/txt_thanks_count, ownProfileViewModel.profileInfo.sumThanksCount)}" />
 
                         <Button
                             android:layout_width="match_parent"
@@ -152,8 +152,12 @@
         <import type="blagodarie.rating.model.entities.OperationType" />
 
         <variable
-            name="ViewModel"
+            name="ownProfileViewModel"
             type="blagodarie.rating.ui.profile.OwnProfileViewModel" />
+
+        <variable
+            name="mainViewModel"
+            type="blagodarie.rating.ui.MainViewModel" />
 
         <variable
             name="UserActionListener"

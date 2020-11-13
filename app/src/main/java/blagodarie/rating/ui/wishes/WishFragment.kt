@@ -85,8 +85,7 @@ class WishFragment : Fragment() {
         super.onResume()
         downloadWish()
         AccountSource.getAccount(
-                requireActivity(),
-                false
+                requireContext(),
         ) {
             mViewModel.account.value = it
         }
@@ -185,9 +184,8 @@ class WishFragment : Fragment() {
 
     private fun deleteWish() {
         Log.d(TAG, "deleteWish")
-        AccountSource.getAccount(
+        AccountSource.requireAccount(
                 requireActivity(),
-                true
         ) { account: Account? ->
             if (account != null) {
                 deleteWish(account)

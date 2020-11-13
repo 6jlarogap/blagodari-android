@@ -75,8 +75,7 @@ class KeysFragment : Fragment() {
         super.onResume()
         refreshKeys()
         AccountSource.getAccount(
-                requireActivity(),
-                false
+                requireContext(),
         ) {
             mViewModel.isOwn.set(it != null && it.name == mUserId.toString())
         }
@@ -138,8 +137,7 @@ class KeysFragment : Fragment() {
             key: IKey
     ) {
         AccountSource.getAccount(
-                requireActivity(),
-                false
+                requireContext(),
         ) {
             if (it != null) {
                 AccountProvider.getAuthToken(requireActivity(), it) { authToken: String? -> editKey(authToken, key) }
@@ -151,8 +149,7 @@ class KeysFragment : Fragment() {
             key: IKey
     ) {
         AccountSource.getAccount(
-                requireActivity(),
-                false
+                requireContext(),
         ) {
             if (it != null) {
                 AccountProvider.getAuthToken(requireActivity(), it) { authToken: String? -> deleteKey(authToken, key) }

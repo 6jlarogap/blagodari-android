@@ -37,7 +37,6 @@ import blagodarie.rating.R;
 import blagodarie.rating.commands.CreateOperationToAnyTextCommand;
 import blagodarie.rating.databinding.AnyTextFragmentBinding;
 import blagodarie.rating.model.IAnyTextInfo;
-import blagodarie.rating.model.IProfile;
 import blagodarie.rating.model.entities.AnyTextInfo;
 import blagodarie.rating.model.entities.OperationType;
 import blagodarie.rating.repository.AsyncServerRepository;
@@ -177,8 +176,7 @@ public final class AnyTextFragment
     public final void refreshAnyTextData () {
         Log.d(TAG, "refreshAnyTextData");
         AccountSource.INSTANCE.getAccount(
-                requireActivity(),
-                false,
+                requireContext(),
                 account -> {
                     if (account != null) {
                         AccountProvider.getAuthToken(requireActivity(), account, this::downloadAnyTextData);
@@ -255,9 +253,8 @@ public final class AnyTextFragment
 
     public void attemptToAddOperation (@NonNull final OperationType operationType) {
         Log.d(TAG, "onAddOperation");
-        AccountSource.INSTANCE.getAccount(
+        AccountSource.INSTANCE.requireAccount(
                 requireActivity(),
-                true,
                 account -> {
                     if (account != null) {
                         AccountProvider.getAuthToken(requireActivity(), account, authToken -> {

@@ -84,8 +84,7 @@ class OperationsFragment : Fragment() {
         super.onResume()
         refreshOperations()
         AccountSource.getAccount(
-                requireActivity(),
-                false
+                requireContext(),
         ) {
             mViewModel.isOwn.set(it != null && it.name == mUserId.toString())
         }
@@ -146,9 +145,8 @@ class OperationsFragment : Fragment() {
     ) {
         Log.d(TAG, "onAddOperation")
 
-        AccountSource.getAccount(
+        AccountSource.requireAccount(
                 requireActivity(),
-                true
         ) { account: Account? ->
             if (account != null) {
                 AccountProvider.getAuthToken(

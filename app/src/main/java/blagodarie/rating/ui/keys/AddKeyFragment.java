@@ -119,9 +119,8 @@ public final class AddKeyFragment
     }
 
     private void attemptToInsertKey (@NonNull final KeyPair keyPair) {
-        AccountSource.INSTANCE.getAccount(
+        AccountSource.INSTANCE.requireAccount(
                 requireActivity(),
-                true,
                 account -> {
                     if (account != null) {
                         AccountProvider.getAuthToken(requireActivity(), account, authToken -> insertKey(authToken, keyPair));

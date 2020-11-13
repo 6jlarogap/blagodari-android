@@ -89,9 +89,8 @@ class AddAbilityFragment : Fragment() {
     private fun saveAbility(
             abilityText: String
     ) {
-        AccountSource.getAccount(
+        AccountSource.requireAccount(
                 requireActivity(),
-                true
         ) { account: Account? ->
             if (account != null) {
                 val ability = Ability(UUID.randomUUID(), UUID.fromString(account.name), abilityText, Date())

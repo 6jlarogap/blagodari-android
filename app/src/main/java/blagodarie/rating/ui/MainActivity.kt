@@ -7,12 +7,14 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI
 import blagodarie.rating.BuildConfig
 import blagodarie.rating.R
 import blagodarie.rating.databinding.MainActivityBinding
+import blagodarie.rating.ui.profile.OwnProfileViewModel
 import blagodarie.rating.update.UpdateManager
 
 class MainActivity : AppCompatActivity() {
@@ -22,6 +24,7 @@ class MainActivity : AppCompatActivity() {
         fun startActivity(context: Context) = context.startActivity(Intent(context, MainActivity::class.java))
     }
 
+    private lateinit var mMainViewModel: MainViewModel
     private lateinit var mBinding: MainActivityBinding
     private lateinit var mNavController: NavController
 
@@ -30,6 +33,8 @@ class MainActivity : AppCompatActivity() {
     ) {
         Log.d(TAG, "onCreate")
         super.onCreate(savedInstanceState)
+        mMainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        lifecycle.addObserver(mMainViewModel.accountObserver)
         mBinding = DataBindingUtil.setContentView(this, R.layout.main_activity)
         setupToolbar()
         mNavController = Navigation.findNavController(this, R.id.nav_host_fragment)

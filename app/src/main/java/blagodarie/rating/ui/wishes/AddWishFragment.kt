@@ -90,9 +90,8 @@ class AddWishFragment : Fragment() {
     private fun saveWish(
             wishText: String
     ) {
-        AccountSource.getAccount(
+        AccountSource.requireAccount(
                 requireActivity(),
-                true
         ) { account: Account? ->
             if (account != null) {
                 val wish = Wish(UUID.randomUUID(), UUID.fromString(account.name), wishText, Date())

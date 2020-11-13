@@ -22,19 +22,41 @@ object AccountSource {
     private const val LAST_ACCOUNT_PREFERENCE = "blagodarie.rating.ui.AccountSource.pref"
     private const val LAST_ACCOUNT_NAME = "currentAccountName"
 
+    /**
+     * Получает аккаунт.
+     */
     fun getAccount(
-            activity: Activity,
-            requireCreateAccount: Boolean = true,
+            context: Context,
             getAccountListener: GetAccountListener
     ) {
         Log.d(TAG, "getAccount")
-        val sharedPreferences = activity.getSharedPreferences(LAST_ACCOUNT_PREFERENCE, Context.MODE_PRIVATE)
-        val accountManager = AccountManager.get(activity)
-        val accounts = accountManager.getAccountsByType(activity.getString(R.string.account_type))
+        requireAccount(context, getAccountListener)
+    }
+
+    /**
+     * Получает аккаунт, а если его нету, то запрашивает авторизацию.
+     */
+    fun requireAccount(
+            activity: Activity,
+            getAccountListener: GetAccountListener
+    ) {
+        Log.d(TAG, "requireAccount")
+        requireAccount(activity, getAccountListener, activity)
+    }
+
+    private fun requireAccount(
+            context: Context,
+            getAccountListener: GetAccountListener,
+            activity: Activity? = null
+    ) {
+        Log.d(TAG, "requireAccount")
+        val sharedPreferences = context.getSharedPreferences(LAST_ACCOUNT_PREFERENCE, Context.MODE_PRIVATE)
+        val accountManager = AccountManager.get(context)
+        val accounts = accountManager.getAccountsByType(context.getString(R.string.account_type))
         when {
             accounts.isEmpty() -> {
                 sharedPreferences.edit().remove(LAST_ACCOUNT_NAME).apply()
-                if (requireCreateAccount) {
+                if (activity != null) {
                     attemptToCreateAccount(activity, getAccountListener)
                 } else {
                     getAccountListener.onGetAccount(null)
@@ -45,7 +67,7 @@ object AccountSource {
                 getAccountListener.onGetAccount(accounts[0])
             }
             else -> {
-                val lastAccount = getLastAccount(activity)
+                val lastAccount = getLastAccount(context)
                 var currentAccount: Account? = null
                 if (lastAccount != null) {
                     for (account in accounts) {
@@ -55,7 +77,7 @@ object AccountSource {
                     }
                 }
                 if (currentAccount == null) {
-                    showAccountPicker(activity, accounts, getAccountListener)
+                    showAccountPicker(context, accounts, getAccountListener)
                 } else {
                     getAccountListener.onGetAccount(currentAccount)
                 }

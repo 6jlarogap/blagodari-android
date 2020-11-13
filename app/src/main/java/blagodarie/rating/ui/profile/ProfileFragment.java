@@ -94,8 +94,7 @@ public final class ProfileFragment
         super.onActivityCreated(savedInstanceState);
 
         AccountSource.INSTANCE.getAccount(
-                requireActivity(),
-                false,
+                requireContext(),
                 account -> {
                     mLastAccount = account;
                     if (account != null && account.name.equals(mUserId.toString())) {
@@ -121,8 +120,7 @@ public final class ProfileFragment
     public void onResume () {
         super.onResume();
         AccountSource.INSTANCE.getAccount(
-                requireActivity(),
-                false,
+                requireContext(),
                 account -> {
                     if (account != null && account.name.equals(mUserId.toString())) {
                         NavHostFragment.findNavController(this).popBackStack();
@@ -229,8 +227,7 @@ public final class ProfileFragment
     public final void refreshProfileData () {
         Log.d(TAG, "refreshProfileData");
         AccountSource.INSTANCE.getAccount(
-                requireActivity(),
-                false,
+                requireContext(),
                 account -> {
                     mLastAccount = account;
                     if (account != null) {
@@ -311,9 +308,8 @@ public final class ProfileFragment
 
     public void attemptToAddOperation (@NonNull final OperationType operationType) {
         Log.d(TAG, "attemptToAddOperation");
-        AccountSource.INSTANCE.getAccount(
+        AccountSource.INSTANCE.requireAccount(
                 requireActivity(),
-                true,
                 account -> {
                     mLastAccount = account;
                     if (account != null) {

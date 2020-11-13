@@ -79,8 +79,7 @@ class WishesFragment : Fragment() {
         super.onResume()
         refreshWishes()
         AccountSource.getAccount(
-                requireActivity(),
-                false
+                requireContext(),
         ) {
             mViewModel.account.value = it
         }
@@ -151,9 +150,8 @@ class WishesFragment : Fragment() {
     private fun attemptToDeleteWish(
             wish: IWish
     ) {
-        AccountSource.getAccount(
+        AccountSource.requireAccount(
                 requireActivity(),
-                true
         ) { account: Account? ->
             if (account != null) {
                 AccountProvider.getAuthToken(

@@ -71,8 +71,7 @@ class AbilitiesFragment : Fragment() {
         super.onResume()
         refreshAbilities()
         AccountSource.getAccount(
-                requireActivity(),
-                false
+                requireContext(),
         ) {
             mViewModel.isOwn.set(it != null && it.name == mUserId.toString())
         }

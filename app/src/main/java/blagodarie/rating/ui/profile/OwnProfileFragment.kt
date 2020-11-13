@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.databinding.Observable
+import androidx.databinding.ObservableField
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavDirections
@@ -21,11 +22,10 @@ import blagodarie.rating.AppExecutors
 import blagodarie.rating.R
 import blagodarie.rating.databinding.OwnProfileFragmentBinding
 import blagodarie.rating.model.IProfile
+import blagodarie.rating.model.entities.Profile
 import blagodarie.rating.repository.AsyncServerRepository
 import blagodarie.rating.server.GetThanksUsersResponse.ThanksUser
-import blagodarie.rating.ui.AccountProvider
-import blagodarie.rating.ui.AccountSource
-import blagodarie.rating.ui.GridAutofitLayoutManager
+import blagodarie.rating.ui.*
 import blagodarie.rating.ui.profile.ThanksUsersDataSource.ThanksUserDataSourceFactory
 import java.util.*
 
@@ -43,7 +43,9 @@ class OwnProfileFragment : Fragment() {
         private val TAG: String = OwnProfileFragment::class.java.name
     }
 
-    private lateinit var mViewModel: OwnProfileViewModel
+    private lateinit var mMainViewModel: MainViewModel
+
+    private lateinit var mOwnProfileViewModel: OwnProfileViewModel
 
     private lateinit var mBinding: OwnProfileFragmentBinding
 
@@ -53,14 +55,18 @@ class OwnProfileFragment : Fragment() {
 
     private var mMiLogout: MenuItem? = null
 
-    private var mIsFirstAccountRequest = true
+    private var mIsFirstShowing = true
 
     private val mAsyncRepository = AsyncServerRepository(AppExecutors.getInstance().networkIO(), AppExecutors.getInstance().mainThread())
 
-    private val mAccountObserver = object : Observable.OnPropertyChangedCallback() {
+    private val mChangeAccountObserver = object : Observable.OnPropertyChangedCallback() {
         override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-            updateMenuItemsVisibility()
-            refreshProfileData()
+            if (sender is ObservableField<*> && sender.get() is Account?) {
+                Log.d(TAG, "mChangeAccountObserver.onPropertyChanged account=${sender.get()}")
+                updateMenuItemsVisibility()
+                refreshProfileData()
+                mOwnProfileViewModel.qrCode.set(if (sender.get() != null) createQrCodeBitmap(getString(R.string.url_profile, (sender.get() as Account).name)) else null)
+            }
         }
     }
 
@@ -68,31 +74,31 @@ class OwnProfileFragment : Fragment() {
 
         override fun onOperationsClick() {
             Log.d(TAG, "onOperationsClick")
-            val action: NavDirections = OwnProfileFragmentDirections.actionGlobalOperationsFragment().setUserId(UUID.fromString(mViewModel.account.get()?.name))
+            val action: NavDirections = OwnProfileFragmentDirections.actionGlobalOperationsFragment().setUserId(UUID.fromString(mMainViewModel.account.get()?.name))
             NavHostFragment.findNavController(this@OwnProfileFragment).navigate(action)
         }
 
         override fun onWishesClick() {
             Log.d(TAG, "onAbilitiesClick")
-            val action: NavDirections = OwnProfileFragmentDirections.actionGlobalWishesFragment(UUID.fromString(mViewModel.account.get()?.name))
+            val action: NavDirections = OwnProfileFragmentDirections.actionGlobalWishesFragment(UUID.fromString(mMainViewModel.account.get()?.name))
             NavHostFragment.findNavController(this@OwnProfileFragment).navigate(action)
         }
 
         override fun onAbilitiesClick() {
             Log.d(TAG, "onAbilitiesClick")
-            val action: NavDirections = OwnProfileFragmentDirections.actionGlobalAbilitiesFragment(UUID.fromString(mViewModel.account.get()?.name))
+            val action: NavDirections = OwnProfileFragmentDirections.actionGlobalAbilitiesFragment(UUID.fromString(mMainViewModel.account.get()?.name))
             NavHostFragment.findNavController(this@OwnProfileFragment).navigate(action)
         }
 
         override fun onKeysClick() {
             Log.d(TAG, "onKeysClick")
-            val action: NavDirections = OwnProfileFragmentDirections.actionGlobalKeysFragment(UUID.fromString(mViewModel.account.get()?.name))
+            val action: NavDirections = OwnProfileFragmentDirections.actionGlobalKeysFragment(UUID.fromString(mMainViewModel.account.get()?.name))
             NavHostFragment.findNavController(this@OwnProfileFragment).navigate(action)
         }
 
         override fun onSocialGraphClick() {
             Log.d(TAG, "onSocialGraphClick")
-            val action: NavDirections = OwnProfileFragmentDirections.actionGlobalGraphFragment().setUserId(UUID.fromString(mViewModel.account.get()?.name))
+            val action: NavDirections = OwnProfileFragmentDirections.actionGlobalGraphFragment().setUserId(UUID.fromString(mMainViewModel.account.get()?.name))
             NavHostFragment.findNavController(this@OwnProfileFragment).navigate(action)
         }
     }
@@ -112,7 +118,7 @@ class OwnProfileFragment : Fragment() {
         Log.d(TAG, "onActivityCreated")
         super.onActivityCreated(savedInstanceState)
 
-        initViewModel()
+        initViewModels()
         initThanksUserAdapter()
         setupBinding()
     }
@@ -120,25 +126,27 @@ class OwnProfileFragment : Fragment() {
     override fun onResume() {
         Log.d(TAG, "onResume")
         super.onResume()
-        AccountSource.getAccount(
-                requireActivity(),
-                mIsFirstAccountRequest
-        ) {
-            if (mViewModel.account.get() == null && it != null ||
-                    mViewModel.account.get() != null && it == null ||
-                    mViewModel.account.get() != null && it != null && mViewModel.account.get()!! != it) {
-                mViewModel.account.set(it)
+        if (mMainViewModel.account.get() != null) {
+            if (mOwnProfileViewModel.profileInfo.get() == Profile.EMPTY_PROFILE) {
+                refreshProfileData()
             }
-        }
-        if (mIsFirstAccountRequest) {
-            mIsFirstAccountRequest = false
+            mOwnProfileViewModel.qrCode.set(if (mMainViewModel.account.get() != null) createQrCodeBitmap(getString(R.string.url_profile, mMainViewModel.account.get()!!.name)) else null)
+            mMainViewModel.account.addOnPropertyChangedCallback(mChangeAccountObserver)
+        } else if (mIsFirstShowing) {
+            mMainViewModel.account.addOnPropertyChangedCallback(mChangeAccountObserver)
+            AccountSource.requireAccount(
+                    requireActivity(),
+            ) {
+                mMainViewModel.accountObserver.value = it
+            }
+            mIsFirstShowing = false
         }
     }
 
     override fun onDestroyView() {
         Log.d(TAG, "onDestroyView")
         super.onDestroyView()
-        mViewModel.account.removeOnPropertyChangedCallback(mAccountObserver)
+        mMainViewModel.account.removeOnPropertyChangedCallback(mChangeAccountObserver)
     }
 
     private fun initBinding(
@@ -152,7 +160,7 @@ class OwnProfileFragment : Fragment() {
     private fun initThanksUserAdapter() {
         Log.d(TAG, "initThanksUserAdapter")
         mThanksUsersAdapter = ThanksUsersAdapter { userId: UUID -> onThanksUserClick(userId) }
-        mThanksUsersAdapter.submitList(mViewModel.thanksUsers?.value)
+        mThanksUsersAdapter.submitList(mOwnProfileViewModel.thanksUsers?.value)
     }
 
     private fun onThanksUserClick(userId: UUID) {
@@ -160,11 +168,12 @@ class OwnProfileFragment : Fragment() {
         NavHostFragment.findNavController(this).navigate(Uri.parse(getString(R.string.url_profile, userId)))
     }
 
-    private fun initViewModel() {
+    private fun initViewModels() {
         Log.d(TAG, "initViewModel")
-        mViewModel = ViewModelProvider(requireActivity()).get(OwnProfileViewModel::class.java)
-        mViewModel.discardValues()
-        mViewModel.account.addOnPropertyChangedCallback(mAccountObserver)
+        mMainViewModel = ViewModelProvider(requireActivity()).get(MainViewModel::class.java)
+        mOwnProfileViewModel = ViewModelProvider(requireActivity()).get(OwnProfileViewModel::class.java)
+        mOwnProfileViewModel.discardValues()
+        mOwnProfileViewModel.qrCode.set(if (mMainViewModel.account.get() != null) createQrCodeBitmap(getString(R.string.url_profile, mMainViewModel.account.get()!!.name)) else null)
     }
 
     private fun setupBinding() {
@@ -173,17 +182,13 @@ class OwnProfileFragment : Fragment() {
         mBinding.srlRefreshProfileInfo.setOnRefreshListener { this.refreshProfileData() }
         mBinding.rvThanksUsers.layoutManager = GridAutofitLayoutManager(requireContext(), (resources.getDimension(R.dimen.thanks_user_photo_width) + resources.getDimension(R.dimen.thanks_user_photo_margin) * 2).toInt())
         mBinding.rvThanksUsers.adapter = mThanksUsersAdapter
-        mBinding.viewModel = mViewModel
+        mBinding.ownProfileViewModel = mOwnProfileViewModel
+        mBinding.mainViewModel = mMainViewModel
         mBinding.btnEnter.setOnClickListener {
-            AccountSource.getAccount(
+            AccountSource.requireAccount(
                     requireActivity(),
-                    true
             ) {
-                if (mViewModel.account.get() == null && it != null ||
-                        mViewModel.account.get() != null && it == null ||
-                        mViewModel.account.get() != null && it != null && mViewModel.account.get()!! != it) {
-                    mViewModel.account.set(it)
-                }
+                mMainViewModel.accountObserver.value = it
             }
         }
     }
@@ -202,8 +207,8 @@ class OwnProfileFragment : Fragment() {
 
     private fun updateMenuItemsVisibility() {
         Log.d(TAG, "updateMenuItemsVisibility")
-        mMiShare?.isVisible = mViewModel.account.get() != null
-        mMiLogout?.isVisible = mViewModel.account.get() != null
+        mMiShare?.isVisible = mMainViewModel.account.get() != null
+        mMiLogout?.isVisible = mMainViewModel.account.get() != null
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -223,7 +228,7 @@ class OwnProfileFragment : Fragment() {
         }
     }
 
-    private fun showLogoutConfirmDialog(){
+    private fun showLogoutConfirmDialog() {
         Log.d(TAG, "showLogoutConfirmDialog")
         AlertDialog.Builder(requireContext()).setMessage(R.string.qstn_realy_logout).setPositiveButton(R.string.btn_yes) { _: DialogInterface, _: Int ->
             logout()
@@ -232,20 +237,20 @@ class OwnProfileFragment : Fragment() {
 
     private fun logout() {
         Log.d(TAG, "logout")
-        mViewModel.discardValues()
+        mOwnProfileViewModel.discardValues()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
             AccountManager.get(requireContext()).removeAccount(
-                    mViewModel.account.get(),
+                    mMainViewModel.accountObserver.value,
                     requireActivity(),
                     {
-                        mViewModel.account.set(null)
+                        mMainViewModel.accountObserver.value = null
                     },
                     null)
         } else {
             AccountManager.get(requireContext()).removeAccount(
-                    mViewModel.account.get(),
+                    mMainViewModel.accountObserver.value,
                     {
-                        mViewModel.account.set(null)
+                        mMainViewModel.accountObserver.value = null
                     },
                     null)
         }
@@ -253,21 +258,12 @@ class OwnProfileFragment : Fragment() {
 
     private fun refreshProfileData() {
         Log.d(TAG, "refreshProfileData")
-        AccountSource.getAccount(
-                requireActivity(),
-                false
-        ) { account: Account? ->
-            if (mViewModel.account.get() == null && account != null ||
-                    mViewModel.account.get() != null && account == null ||
-                    mViewModel.account.get() != null && account != null && mViewModel.account.get()!! != account) {
-                mViewModel.account.set(account)
-            }
-            if (account != null) {
-                AccountProvider.getAuthToken(
-                        requireActivity(),
-                        account
-                ) { authToken: String? -> this.downloadProfileData(UUID.fromString(account.name), authToken) }
-            }
+        val account = mMainViewModel.accountObserver.value
+        if (account != null) {
+            AccountProvider.getAuthToken(
+                    requireActivity(),
+                    account
+            ) { authToken: String? -> this.downloadProfileData(UUID.fromString(account.name), authToken) }
         }
     }
 
@@ -276,16 +272,16 @@ class OwnProfileFragment : Fragment() {
             authToken: String?
     ) {
         Log.d(TAG, "downloadProfileData")
-        mViewModel.downloadInProgress.set(true)
+        mOwnProfileViewModel.downloadInProgress.set(true)
         mAsyncRepository.setAuthToken(authToken)
         mAsyncRepository.getProfileInfo(
                 userId,
                 { profileInfo: IProfile? ->
-                    mViewModel.downloadInProgress.set(false)
-                    mViewModel.profileInfo.set(profileInfo)
+                    mOwnProfileViewModel.downloadInProgress.set(false)
+                    mOwnProfileViewModel.profileInfo.set(profileInfo)
                 },
                 { throwable: Throwable ->
-                    mViewModel.downloadInProgress.set(false)
+                    mOwnProfileViewModel.downloadInProgress.set(false)
                     Toast.makeText(requireActivity(), throwable.message, Toast.LENGTH_LONG).show()
                 })
         refreshThanksUsers(userId)
@@ -295,15 +291,15 @@ class OwnProfileFragment : Fragment() {
             userId: UUID
     ) {
         Log.d(TAG, "refreshThanksUsers")
-        mViewModel.thanksUsers = mAsyncRepository.getLiveDataPagedListFromDataSource(ThanksUserDataSourceFactory(userId))
-        mViewModel.thanksUsers?.observe(requireActivity(), androidx.lifecycle.Observer { pagedList: PagedList<ThanksUser?>? -> mThanksUsersAdapter.submitList(pagedList) })
+        mOwnProfileViewModel.thanksUsers = mAsyncRepository.getLiveDataPagedListFromDataSource(ThanksUserDataSourceFactory(userId))
+        mOwnProfileViewModel.thanksUsers?.observe(requireActivity(), androidx.lifecycle.Observer { pagedList: PagedList<ThanksUser?>? -> mThanksUsersAdapter.submitList(pagedList) })
     }
 
     private fun share() {
         Log.d(TAG, "onShareClick")
         val sendIntent = Intent()
         sendIntent.action = Intent.ACTION_SEND
-        sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.url_profile, mViewModel.account.get()?.name.toString()))
+        sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.url_profile, mMainViewModel.account.get()?.name.toString()))
         sendIntent.type = "text/plain"
         startActivity(Intent.createChooser(sendIntent, "Поделиться"))
     }
