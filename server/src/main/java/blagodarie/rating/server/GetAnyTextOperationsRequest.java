@@ -22,7 +22,8 @@ import okhttp3.RequestBody;
 
 public final class GetAnyTextOperationsRequest
         extends ServerApiRequest<GetOperationsResponse> {
-    private static final String TAG = GetUserOperationsRequest.class.getSimpleName();
+
+    private static final String TAG = GetAnyTextOperationsRequest.class.getSimpleName();
 
     @NonNull
     private final UUID mAnyTextId;

@@ -1,33 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/srlRefreshProfileInfo"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:refreshing="@{ViewModel.downloadInProgress}">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvOperations"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        <include
+            android:id="@+id/list"
+            layout="@layout/base_recycler"
+            app:downloadInProgress="@{viewModel.downloadInProgress}"
+            app:isEmpty="@{viewModel.isEmpty()}"
+            app:refreshListener="@{refreshListener}" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/fab_margin"
-            android:onClick="@{() -> UserActionsListener.onThanksClick()}"
+            android:onClick="@{() -> userActionListener.onThanksClick()}"
             android:src="@drawable/heart_outline"
-            android:visibility="@{!ViewModel.isOwnProfile() ? View.VISIBLE : View.GONE}"
+            android:visibility="@{!viewModel.isOwn() ? View.VISIBLE : View.GONE}"
             app:backgroundTint="@color/colorPrimary"
             app:borderWidth="0dp"
             app:elevation="2dp"
@@ -41,15 +33,18 @@
 
         <import type="android.view.View" />
 
-        <import type="blagodarie.rating.model.entities.OperationType" />
+        <variable
+            name="viewModel"
+            type="blagodarie.rating.ui.operations.OperationsViewModel" />
 
         <variable
-            name="UserActionsListener"
-            type="blagodarie.rating.ui.user.operations.OperationsFragment.UserActionListener" />
+            name="refreshListener"
+            type="androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener" />
 
         <variable
-            name="ViewModel"
-            type="blagodarie.rating.ui.user.operations.OperationsViewModel" />
+            name="userActionListener"
+            type="blagodarie.rating.ui.operations.OperationsFragment.UserActionListener" />
 
     </data>
+
 </layout>

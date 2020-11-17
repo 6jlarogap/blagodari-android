@@ -8,7 +8,8 @@ public enum OperationType {
 
     THANKS(1, R.string.operation_type_name_thanks),
     MISTRUST(2, R.string.operation_type_name_mistrust),
-    TRUST(3, R.string.operation_type_name_trust);
+    TRUST(3, R.string.operation_type_name_trust),
+    NULLIFY_TRUST(4, R.string.operation_type_name_nullify_trust);
 
     private final int mId;
 
@@ -42,6 +43,9 @@ public enum OperationType {
                 break;
             case 3:
                 operationType = TRUST;
+                break;
+            case 4:
+                operationType = NULLIFY_TRUST;
                 break;
             default:
                 operationType = null;

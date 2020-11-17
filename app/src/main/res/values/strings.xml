@@ -2,25 +2,32 @@
     <string name="app_name">БлагоДари!</string>
 
     <string name="host">blagodarie.org</string>
+    <string name="url_social_graph">https://blagodarie.org</string>
     <string name="url_profile">https://blagodarie.org/profile?id=%s</string>
     <string name="url_wish">https://blagodarie.org/wish?id=%s</string>
     <string name="url_any_text">https://blagodarie.org/anytext?text=%s</string>
-    <string name="url_social_graph">https://blagodarie.org/socialgraph?from=%s&amp;to=%s</string>
     <string name="url_prof">https://blagodarie.org/prof?id=%s</string>
     <string name="url_play_market">https://play.google.com/store/apps/details?id=blagodarie.rating</string>
 
+    <string name="deep_link_profile">https://blagodarie.org/profile?id={user_uuid}</string>
+    <string name="deep_link_wish">https://blagodarie.org/wish?id={wish_uuid}</string>
+
     <string name="notification_chanel_id_thanks" translatable="false">thanks_notification_chanel</string>
-    <string name="notification_chanel_name_thanks">Благодарности</string>
-    <string name="notification_chanel_description_thanks">Уведомления о благодарностях</string>
     <string name="notification_chanel_id_mistrust" translatable="false">mistrust_notification_chanel</string>
+    <string name="notification_chanel_id_trust" translatable="false">trust_notification_chanel</string>
+    <string name="notification_chanel_id_nullify_trust" translatable="false">nullify_trust_notification_chanel</string>
+    <string name="notification_chanel_name_thanks">Благодарности</string>
     <string name="notification_chanel_name_mistrust">Утраты доверия</string>
+    <string name="notification_chanel_name_trust">Восстановление доверия</string>
+    <string name="notification_chanel_name_nullify_trust">Обнуление доверия</string>
+    <string name="notification_chanel_description_thanks">Уведомления о благодарностях</string>
     <string name="notification_chanel_description_mistrust">Уведомления об утратах доверия</string>
-    <string name="notification_chanel_id_cancel_mistrust" translatable="false">cancel_mistrust_notification_chanel</string>
-    <string name="notification_chanel_name_cancel_mistrust">Восстановление доверия</string>
-    <string name="notification_chanel_description_cancel_mistrust">Уведомления о восстановлении доверия</string>
+    <string name="notification_chanel_description_trust">Уведомления о восстановлении доверия</string>
+    <string name="notification_chanel_description_nullify_trust">Уведомления об обнулении доверия</string>
     <string name="notification_title_thanks_pattern">%s %s поблагодарил вас</string>
-    <string name="notification_title_mistrus_pattern">%s %s утратил доверие к вам</string>
-    <string name="notification_title_cancel_mistrust_pattern">%s %s восстановил доверие к вам</string>
+    <string name="notification_title_mistrust_pattern">%s %s утратил доверие к вам</string>
+    <string name="notification_title_trust_pattern">%s %s установил доверие к вам</string>
+    <string name="notification_title_nullify_trust_pattern">%s %s обнулил доверие к вам</string>
 
     <string name="btn_thanks">Благодарить</string>
     <string name="btn_mistrust">Недоверие</string>
@@ -39,6 +46,7 @@
     <string name="btn_yes">Да</string>
     <string name="btn_no">Нет</string>
     <string name="btn_settings">Настройки</string>
+    <string name="btn_create_account">Создать аккаунт</string>
 
     <string name="rqst_choose_account">Выберите аккаунт</string>
     <string name="rqst_scan_qr_code">Отсканируйте QR-код</string>
@@ -54,11 +62,26 @@
     <string name="info_msg_update_available">Доступна новая версия</string>
     <string name="info_msg_cant_add_operation_to_own_profile">Нельзя выполнить эту операцию для собственного профиля.</string>
     <string name="info_msg_need_log_in">Необходимо авторизоваться</string>
+    <string name="info_msg_cant_thanks_yourself">Нельзя благодарить себя</string>
     <string name="info_msg_missing_profile">Такого профиля не существует</string>
-    <string name="info_msg_need_read_contacts_permission">Необходимо разрешение на чтение контактов</string>
+    <string name="info_msg_missing_wish">Такого желания не существует</string>
+    <string name="info_msg_read_contacts_permission_explanation">Необходимо разрешение на чтение контактов</string>
+    <string name="info_msg_camera_permission_explanation">Для сканирования QR необходим доступ к камере</string>
+    <string name="info_msg_list_is_empty">Список пуст</string>
+    <string name="info_msg_add_thanks_complete">Благодарность добавлена</string>
+    <string name="info_msg_wish_saved">Желание сохранено</string>
+    <string name="info_msg_ability_saved">Возможность сохранена</string>
+    <string name="info_msg_key_saved">Ключ сохранен</string>
+    <string name="info_msg_key_deleted">Ключ удален</string>
+    <string name="info_msg_wish_deleted">Желание удалено</string>
+    <string name="info_msg_trust_is_lost">Доверие утрачено</string>
+    <string name="info_msg_trust_restored">Доверие восстановлено</string>
+    <string name="info_msg_in_developing">Функция в разработке</string>
 
     <string name="qstn_want_load_new_version">Желаете загрузить новую версию %d?</string>
     <string name="qstn_delete_key">Удалить ключ?</string>
+    <string name="qstn_delete_wish">Удалить желание?</string>
+    <string name="qstn_realy_logout">Вы действительно хотите выйти?</string>
 
     <string name="err_msg_account_not_created">Аккаунт не был создан</string>
     <string name="err_msg_authentication_error">Ошибка аутентификации</string>
@@ -69,6 +92,7 @@
     <string name="err_msg_incorrect_link">Неверная ссылка</string>
     <string name="err_msg_required_to_fill">Обязательно для заполнения</string>
     <string name="err_msg_not_saved">Не удалось сохранить</string>
+    <string name="err_msg_connection_error">Ошибка соединения</string>
 
     <string name="txt_fame">Известность: %d</string>
     <string name="txt_thanks_count">Благодарности: %d</string>
@@ -78,16 +102,19 @@
     <string name="txt_yes">Да</string>
     <string name="txt_no">Нет</string>
     <string name="txt_card_number">Номер карты</string>
-    <string name="txt_thanks_and_thanked_users">Поблагодарившие и отблагодаренные</string>
+    <string name="txt_thanks_and_thanked_users">Пространство доверия</string>
     <string name="txt_thanks_users">Поблагодарившие</string>
-    <string name="txt_version">Версия: %s</string>
-    <string name="txt_share">Потелиться</string>
+    <string name="txt_version">v %s</string>
+    <string name="txt_share">Поделиться</string>
     <string name="txt_my_account">Мой профиль</string>
     <string name="txt_logout">Выйти из аккаунта</string>
     <string name="txt_update">Обновить</string>
     <string name="txt_people">Люди</string>
     <string name="txt_contacts">Контакты</string>
-    <string name="txt_qr_code_scan">Сканировать QR-код</string>
+    <string name="txt_qr_scan">Сканировать QR</string>
+    <string name="txt_search">Поиск</string>
+    <string name="txt_profile">Профиль</string>
+    <string name="txt_social_graph">Граф</string>
     <string name="txt_comment">Комментарий</string>
     <string name="txt_key">%s: %s</string>
 

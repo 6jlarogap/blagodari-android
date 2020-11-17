@@ -4,23 +4,22 @@
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingHorizontal="@dimen/activity_horizontal_margin"
-        android:paddingVertical="@dimen/activity_vertical_margin">
+        android:layout_height="match_parent">
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <EditText
-                android:id="@+id/etWishText"
+                android:id="@+id/etAbilityText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="start"
                 android:hint="@string/rqst_enter_your_ability"
+                android:imeOptions="actionDone"
                 android:importantForAutofill="no"
-                android:inputType="textMultiLine"
-                android:text="@={Ability.text}" />
+                android:inputType="text"
+                android:singleLine="true" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -29,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/fab_margin"
-            android:onClick="@{() -> UserActionListener.onSaveClick(Ability)}"
+            android:onClick="@{() -> UserActionListener.onSaveClick()}"
             android:src="@drawable/content_save"
             app:backgroundTint="@color/colorPrimary"
             app:borderWidth="0dp"
@@ -42,12 +41,8 @@
     <data>
 
         <variable
-            name="Ability"
-            type="blagodarie.rating.model.IAbility" />
-
-        <variable
             name="UserActionListener"
-            type="blagodarie.rating.ui.user.abilities.EditAbilityFragment.UserActionListener" />
+            type="blagodarie.rating.ui.abilities.EditAbilityFragment.UserActionListener" />
 
     </data>
 </layout>

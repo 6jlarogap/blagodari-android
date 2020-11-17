@@ -19,19 +19,6 @@
             android:layout_height="match_parent"
             android:visibility="@{ViewModel.profileInfo != null ? View.VISIBLE : View.GONE}">
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top|end"
-                android:layout_margin="@dimen/fab_margin"
-                android:onClick="@{() -> UserActionListener.onShareClick()}"
-                android:src="@drawable/share_variant"
-                app:backgroundTint="@color/colorPrimary"
-                app:borderWidth="0dp"
-                app:elevation="6dp"
-                app:fabSize="mini" />
-
             <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                 android:id="@+id/srlRefreshProfileInfo"
                 android:layout_width="match_parent"
@@ -92,7 +79,7 @@
                             style="@style/TextAppearance.AppCompat.Body1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@{ViewModel.isOwnProfile || !ViewModel.isHaveAccount ? String.format(@string/txt_own_profile_trust, ViewModel.profileInfo.mistrustCount) : String.format(@string/txt_trust, ViewModel.profileInfo.trustCount, ViewModel.profileInfo.mistrustCount)}" />
+                            android:text="@{String.format(@string/txt_trust, ViewModel.profileInfo.trustCount, ViewModel.profileInfo.mistrustCount)}" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -108,11 +95,9 @@
                                 android:layout_gravity="center_horizontal"
                                 android:layout_weight="1"
                                 android:background="@{ViewModel.profileInfo.isTrust != null &amp;&amp; ViewModel.profileInfo.isTrust ? @android:color/holo_green_light : @color/light_gray}"
-                                android:enabled="@{ViewModel.profileInfo.isTrust == null || !ViewModel.profileInfo.isTrust}"
                                 android:onClick="@{() -> UserActionListener.onTrustClick()}"
                                 android:text="@string/btn_trust"
-                                android:textColor="@{ViewModel.profileInfo.isTrust != null &amp;&amp; ViewModel.profileInfo.isTrust ? @android:color/white : @android:color/black}"
-                                android:visibility="@{!ViewModel.isOwnProfile ? View.VISIBLE : View.GONE}" />
+                                android:textColor="@{ViewModel.profileInfo.isTrust != null &amp;&amp; ViewModel.profileInfo.isTrust ? @android:color/white : @android:color/black}" />
 
                             <Button
                                 style="?android:attr/buttonStyle"
@@ -121,11 +106,9 @@
                                 android:layout_gravity="center_horizontal"
                                 android:layout_weight="1"
                                 android:background="@{ViewModel.profileInfo.isTrust != null &amp;&amp; !ViewModel.profileInfo.isTrust ? @android:color/holo_red_dark : @color/light_gray}"
-                                android:enabled="@{ViewModel.profileInfo.isTrust == null || ViewModel.profileInfo.isTrust}"
                                 android:onClick="@{() -> UserActionListener.onMistrustClick()}"
                                 android:text="@string/btn_mistrust"
-                                android:textColor="@{ViewModel.profileInfo.isTrust != null &amp;&amp; !ViewModel.profileInfo.isTrust ? @android:color/white : @android:color/black}"
-                                android:visibility="@{!ViewModel.isOwnProfile ? View.VISIBLE : View.GONE}" />
+                                android:textColor="@{ViewModel.profileInfo.isTrust != null &amp;&amp; !ViewModel.profileInfo.isTrust ? @android:color/white : @android:color/black}" />
 
                         </LinearLayout>
 
@@ -140,7 +123,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:onClick="@{() -> UserActionListener.onOperationsClick()}"
-                                android:text="@{ViewModel.isOwnProfile || !ViewModel.isHaveAccount ? String.format(@string/txt_thanks_count, ViewModel.profileInfo.sumThanksCount) : String.format(@string/txt_sum_thanks_count_and_thanks_count, ViewModel.profileInfo.sumThanksCount, ViewModel.profileInfo.thanksCount)}"
+                                android:text="@{String.format(@string/txt_sum_thanks_count_and_thanks_count, ViewModel.profileInfo.sumThanksCount, ViewModel.profileInfo.thanksCount)}"
                                 app:layout_constrainedWidth="true"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toStartOf="@id/fabThanks"
@@ -154,7 +137,6 @@
                                 android:layout_gravity="center_vertical|end"
                                 android:onClick="@{() -> UserActionListener.onThanksClick()}"
                                 android:src="@drawable/heart_outline"
-                                android:visibility="@{!ViewModel.isOwnProfile() ? View.VISIBLE : View.GONE}"
                                 app:backgroundTint="@color/colorPrimary"
                                 app:borderWidth="0dp"
                                 app:elevation="2dp"
@@ -221,11 +203,11 @@
 
         <variable
             name="ViewModel"
-            type="blagodarie.rating.ui.user.profile.ProfileViewModel" />
+            type="blagodarie.rating.ui.profile.ProfileViewModel" />
 
         <variable
             name="UserActionListener"
-            type="blagodarie.rating.ui.user.profile.ProfileUserActionListener" />
+            type="blagodarie.rating.ui.profile.ProfileUserActionListener" />
 
     </data>
 

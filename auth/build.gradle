@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: "androidx.navigation.safeargs"
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 30
@@ -43,6 +44,7 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-auth:18.1.0'
     implementation 'com.google.android.material:material:1.2.1'
+    implementation 'com.google.firebase:firebase-messaging:21.0.0'
 
     implementation "io.reactivex.rxjava2:rxjava:2.2.9"
     implementation "io.reactivex.rxjava2:rxandroid:2.1.0"

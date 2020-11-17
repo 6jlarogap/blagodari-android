@@ -13,7 +13,7 @@ import blagodarie.rating.server.GetUsersRequest;
 import blagodarie.rating.server.GetUsersResponse;
 import blagodarie.rating.server.ServerApiClient;
 
-public class PeopleDataSource
+public final class PeopleDataSource
         extends PositionalDataSource<IProfile> {
 
     private static final String TAG = PeopleDataSource.class.getSimpleName();
