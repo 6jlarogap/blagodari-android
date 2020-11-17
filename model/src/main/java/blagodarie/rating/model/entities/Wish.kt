@@ -1,9 +1,11 @@
 package blagodarie.rating.model.entities
 
+import androidx.annotation.Keep
 import blagodarie.rating.model.IWish
 import java.io.Serializable
 import java.util.*
 
+@Keep
 data class Wish(
         override val id: UUID,
         override val ownerId: UUID,

@@ -102,7 +102,7 @@
     <string name="txt_yes">Да</string>
     <string name="txt_no">Нет</string>
     <string name="txt_card_number">Номер карты</string>
-    <string name="txt_thanks_and_thanked_users">Поблагодарившие и отблагодаренные</string>
+    <string name="txt_thanks_and_thanked_users">Пространство доверия</string>
     <string name="txt_thanks_users">Поблагодарившие</string>
     <string name="txt_version">v %s</string>
     <string name="txt_share">Поделиться</string>

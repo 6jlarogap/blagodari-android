@@ -93,7 +93,7 @@ public enum UpdateManager {
                 appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
                     Log.d(TAG, "appUpdateInfo=" + appUpdateInfo.toString());
                     mLastVersionCodeOnMarket = appUpdateInfo.availableVersionCode();
-                    if (appUpdateInfo.availableVersionCode() > BuildConfig.VERSION_CODE) {
+                    if (appUpdateInfo.availableVersionCode() > currentCodeVersion) {
                         if (!context.getSharedPreferences(NEW_VERSION_NOTIFICATION_PREFERENCE, Context.MODE_PRIVATE).contains(String.valueOf(appUpdateInfo.availableVersionCode()))) {
                             showUpdateDialog(
                                     context,
