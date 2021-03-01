@@ -11,10 +11,10 @@
       "type": "SINGLE",
       "filters": [],
       "properties": [],
-      "versionCode": 35,
-      "versionName": "0.0.35",
+      "versionCode": 36,
+      "versionName": "0.0.36",
       "enabled": true,
-      "outputFile": "rating-0.0.35-debug.apk"
+      "outputFile": "rating-0.0.36-debug.apk"
     }
   ]
 }
