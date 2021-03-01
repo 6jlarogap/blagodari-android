@@ -18,7 +18,7 @@ public abstract class ServerApiRequest<ApiResponseType extends _ServerApiRespons
     private static final String TAG = ServerApiRequest.class.getSimpleName();
 
     protected static final MediaType JSON_TYPE = MediaType.parse("application/json; charset=utf-8");
-    private final static String API_BASE_URL = BuildConfig.DEBUG ? "https://api.dev.благодарие.рф/api/" : "https://api.благодарие.рф/api/";
+    private final static String API_BASE_URL = BuildConfig.DEBUG ? "https://api.dev.blagodarie.org/api/" : "https://api.blagodarie.org/api/";
 
     @NonNull
     private final String mRelateUrl;
